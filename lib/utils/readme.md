@@ -4,3 +4,10 @@ Designed for your different app _utilites_.
 # Example:
 
 `DateInDays(DateTime tripDate){ return DateTime.now().difference(tripDate).inDays; }`
+
+// Dart & Other Packages
+// Flutter's Material Components
+// Utils
+// Models
+// Components
+// Widgets
