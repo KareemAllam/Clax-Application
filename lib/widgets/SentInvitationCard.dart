@@ -2,7 +2,7 @@ import '../models/familyrequests.dart';
 import 'package:flutter/material.dart';
 
 class SentInvitationCard extends StatelessWidget {
-  final FamilyRequest member;
+  final FamilyRequestModel member;
   final Function cancel;
   SentInvitationCard({this.member, this.cancel});
   @override

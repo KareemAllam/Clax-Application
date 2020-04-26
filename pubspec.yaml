@@ -21,7 +21,13 @@ dependencies:
   pin_code_fields: ^2.4.0
   dbcrypt: ^1.0.0
   image_picker: ^0.6.3+4
-
+  url_launcher: ^5.4.2
+  webview_flutter: ^0.3.19+9
+  font_awesome_flutter: ^8.7.0
+  month_picker_dialog: ^0.3.1
+  google_maps_flutter: ^0.5.26+4
+  geolocator: ^5.3.1
+  flutter_socket_io: ^0.6.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

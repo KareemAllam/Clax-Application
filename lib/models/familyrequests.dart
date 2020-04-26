@@ -1,11 +1,11 @@
-class FamilyRequest {
+class FamilyRequestModel {
   String sId;
   String name;
   String phone;
 
-  FamilyRequest({this.sId, this.name, this.phone});
+  FamilyRequestModel({this.sId, this.name, this.phone});
 
-  FamilyRequest.fromJson(Map<String, dynamic> json) {
+  FamilyRequestModel.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
     name = json['name'];
     phone = json['phone'];

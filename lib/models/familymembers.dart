@@ -1,11 +1,11 @@
-class Familymember {
+class FamilymemberModel {
   String sId;
   String name;
   String phone;
 
-  Familymember({this.sId, this.name, this.phone});
+  FamilymemberModel({this.sId, this.name, this.phone});
 
-  Familymember.fromJson(Map<String, dynamic> json) {
+  FamilymemberModel.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
     name = json['name'];
     phone = json['phone'];

@@ -2,7 +2,7 @@ import 'package:clax/models/familyrequests.dart';
 import 'package:flutter/material.dart';
 
 class MemberInvitationCard extends StatelessWidget {
-  final FamilyRequest invitation;
+  final FamilyRequestModel invitation;
   final Function accept;
   final Function deny;
   const MemberInvitationCard({Key key, this.invitation, this.accept, this.deny})

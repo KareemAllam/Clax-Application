@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Auth extends ChangeNotifier {
+class AuthProvider extends ChangeNotifier {
   String _auth = "User Not Authenticated";
   SharedPreferences _prefs;
   // Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
-  Auth() {
+  AuthProvider() {
     getSharedPrefrence();
   }
 

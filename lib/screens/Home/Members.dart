@@ -28,9 +28,9 @@ class Members extends StatefulWidget {
 class _MembersState extends State<Members> {
   bool loading = true;
   bool error = false;
-  List<Familymember> members;
-  List<FamilyRequest> sentInvitations;
-  List<FamilyRequest> receivedInvitations;
+  List<FamilymemberModel> members;
+  List<FamilyRequestModel> sentInvitations;
+  List<FamilyRequestModel> receivedInvitations;
 
   Future<bool> addAMember(Contact contact) async {
     String number = getNumberViewString(contact.phoneNumber.number);
@@ -40,9 +40,10 @@ class _MembersState extends State<Members> {
     if (result.statusCode == 200) {
       Response receivedRequestsRes = await Api.get('family/received-requests');
 
-      List<FamilyRequest> receivedRequests = List<FamilyRequest>.from((json
-          .decode(receivedRequestsRes.body)
-          .map((trip) => FamilyRequest.fromJson(trip))).toList());
+      List<FamilyRequestModel> receivedRequests = List<FamilyRequestModel>.from(
+          (json
+              .decode(receivedRequestsRes.body)
+              .map((trip) => FamilyRequestModel.fromJson(trip))).toList());
 
       setState(() {
         receivedInvitations = receivedRequests;
@@ -69,7 +70,7 @@ class _MembersState extends State<Members> {
       setState(() {
         receivedInvitations =
             receivedInvitations.where((element) => element.sId != id).toList();
-        members.add(Familymember(
+        members.add(FamilymemberModel(
             name: acceptedmember[0].name,
             phone: acceptedmember[0].phone,
             sId: acceptedmember[0].sId));
@@ -105,15 +106,16 @@ class _MembersState extends State<Members> {
     Response sentRequestsRes = await Api.get('family/sent-requests');
     Response receivedRequestsRes = await Api.get('family/received-requests');
 
-    List<Familymember> membersList = List<Familymember>.from((json
+    List<FamilymemberModel> membersList = List<FamilymemberModel>.from((json
         .decode(membersRes.body)
-        .map((trip) => Familymember.fromJson(trip))).toList());
-    List<FamilyRequest> sentRequests = List<FamilyRequest>.from((json
+        .map((trip) => FamilymemberModel.fromJson(trip))).toList());
+    List<FamilyRequestModel> sentRequests = List<FamilyRequestModel>.from((json
         .decode(sentRequestsRes.body)
-        .map((trip) => FamilyRequest.fromJson(trip))).toList());
-    List<FamilyRequest> receivedRequests = List<FamilyRequest>.from((json
-        .decode(receivedRequestsRes.body)
-        .map((trip) => FamilyRequest.fromJson(trip))).toList());
+        .map((trip) => FamilyRequestModel.fromJson(trip))).toList());
+    List<FamilyRequestModel> receivedRequests = List<FamilyRequestModel>.from(
+        (json
+            .decode(receivedRequestsRes.body)
+            .map((trip) => FamilyRequestModel.fromJson(trip))).toList());
 
     setState(() {
       loading = false;

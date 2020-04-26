@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class NullContent extends StatelessWidget {
   final String things;
   NullContent({this.things = "محتوى"});
+  @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

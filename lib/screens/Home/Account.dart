@@ -20,11 +20,11 @@ class Account extends StatefulWidget {
 
 class _AccountState extends State<Account> {
   final _form = GlobalKey<FormState>();
-  Profile _originalProfile;
+  ProfileModel _originalProfile;
   String pass = '';
   String email = '';
   String phone = '';
-  Name name = Name(first: '', last: '');
+  NameModel name = NameModel(first: '', last: '');
   bool error = false;
 
   Future<String> _saveForm() async {
@@ -59,8 +59,9 @@ class _AccountState extends State<Account> {
     }
 
     if (finalData.isNotEmpty) {
-      String result = await Provider.of<Profiles>(context, listen: false)
-          .updateProfile(finalData, _originalProfile);
+      String result =
+          await Provider.of<ProfilesProvider>(context, listen: false)
+              .updateProfile(finalData, _originalProfile);
       return result;
     } else
       Navigator.pop(context);
@@ -69,7 +70,8 @@ class _AccountState extends State<Account> {
 
   void initState() {
     super.initState();
-    _originalProfile = Provider.of<Profiles>(context, listen: false).profile;
+    _originalProfile =
+        Provider.of<ProfilesProvider>(context, listen: false).profile;
   }
 
   Widget build(BuildContext context) {

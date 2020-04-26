@@ -17,8 +17,8 @@ class YourAccount extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Profile profileData =
-        Provider.of<Profiles>(context, listen: false).profile;
+    final ProfileModel profileData =
+        Provider.of<ProfilesProvider>(context, listen: false).profile;
     return Scaffold(
         appBar: AppBar(
           title: Text(
@@ -38,7 +38,7 @@ class YourAccount extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: () {
-                Provider.of<Profiles>(context, listen: false).init();
+                Provider.of<ProfilesProvider>(context, listen: false).init();
               },
             ),
           ],

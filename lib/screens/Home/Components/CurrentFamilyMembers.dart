@@ -9,7 +9,7 @@ import 'package:clax/widgets/MemberCard.dart';
 import 'package:clax/widgets/null.dart';
 
 class CurrentFamilyMembers extends StatelessWidget {
-  final List<Familymember> members;
+  final List<FamilymemberModel> members;
   final Function remove;
   final Function addAMember;
 

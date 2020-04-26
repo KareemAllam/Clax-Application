@@ -5,11 +5,11 @@ class ExtendedAppbar extends StatelessWidget {
   ExtendedAppbar({this.child});
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
+    final height = MediaQuery.of(context).size.width;
     return Container(
-      height: height * 0.2,
-      width: double.infinity,
       alignment: Alignment.center,
+      width: double.infinity,
+      height: height * 0.35,
       child: child,
     );
   }

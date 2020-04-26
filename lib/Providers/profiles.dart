@@ -5,10 +5,10 @@ import 'package:http/http.dart';
 import 'package:clax/services/Backend.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Profiles with ChangeNotifier {
+class ProfilesProvider with ChangeNotifier {
   // Initial Data
-  Profile _profile = Profile(
-      name: Name(first: "Hager", last: "Alaa El-Din"),
+  ProfileModel _profile = ProfileModel(
+      name: NameModel(first: "Hager", last: "Alaa El-Din"),
       phone: '+201090556127',
       mailVerified: true,
       phoneVerified: true,
@@ -18,7 +18,7 @@ class Profiles with ChangeNotifier {
       pass: '');
 
   // Provider Constructor
-  Profiles() {
+  ProfilesProvider() {
     init();
   }
 
@@ -26,24 +26,24 @@ class Profiles with ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getString('profile') != null) {
       print("fetching Data");
-      _profile = Profile.fromJson(json.decode(prefs.getString('profile')));
+      _profile = ProfileModel.fromJson(json.decode(prefs.getString('profile')));
       notifyListeners();
     }
     try {
       Response account = await Api.get('passengers/settings/me');
       if (account.statusCode == 200) {
         var profile = json.decode(account.body);
-        _profile = Profile.fromJson(profile);
+        _profile = ProfileModel.fromJson(profile);
         notifyListeners();
       }
     } catch (_) {}
   }
 
   Future<String> updateProfile(
-      Map<String, dynamic> changes, Profile editiedProfile) async {
+      Map<String, dynamic> changes, ProfileModel editiedProfile) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    Profile originalAccount = _profile;
+    ProfileModel originalAccount = _profile;
     _profile = editiedProfile;
     notifyListeners();
     try {
@@ -73,5 +73,5 @@ class Profiles with ChangeNotifier {
       return false;
   }
 
-  Profile get profile => _profile;
+  ProfileModel get profile => _profile;
 }

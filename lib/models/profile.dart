@@ -1,5 +1,5 @@
-class Profile {
-  Name name;
+class ProfileModel {
+  NameModel name;
   String mail;
   String phone;
   String pass;
@@ -8,7 +8,7 @@ class Profile {
   bool mailVerified;
   bool phoneVerified;
 
-  Profile(
+  ProfileModel(
       {this.name,
       this.mail,
       this.phone,
@@ -17,8 +17,8 @@ class Profile {
       this.passLength,
       this.mailVerified,
       this.phoneVerified});
-  Profile.fromJson(Map<String, dynamic> json) {
-    name = json['name'] != null ? new Name.fromJson(json['name']) : null;
+  ProfileModel.fromJson(Map<String, dynamic> json) {
+    name = json['name'] != null ? new NameModel.fromJson(json['name']) : null;
     mail = json['mail'];
     phone = json['phone'];
     pass = json['pass'];
@@ -44,13 +44,13 @@ class Profile {
   }
 }
 
-class Name {
+class NameModel {
   String first;
   String last;
 
-  Name({this.first, this.last});
+  NameModel({this.first, this.last});
 
-  Name.fromJson(Map<String, dynamic> json) {
+  NameModel.fromJson(Map<String, dynamic> json) {
     first = json['first'];
     last = json['last'];
   }

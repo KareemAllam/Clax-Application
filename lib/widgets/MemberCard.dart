@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 //import '../widgets/alertDialog.dart';
 
 class MemberCard extends StatelessWidget {
-  final Familymember member;
+  final FamilymemberModel member;
   final Function remove;
   MemberCard({this.member, this.remove});
   @override

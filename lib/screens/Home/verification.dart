@@ -42,7 +42,8 @@ class _EVerifyState extends State<EVerify> {
   Widget build(BuildContext context) {
     Map<String, String> settings = ModalRoute.of(context).settings.arguments;
     String route = settings['route'];
-    String phone = Provider.of<Profiles>(context, listen: false).profile.phone;
+    String phone =
+        Provider.of<ProfilesProvider>(context, listen: false).profile.phone;
     GestureRecognizer onTapRecognizer = TapGestureRecognizer()
       ..onTap = () {
         getCode(phone);
@@ -50,7 +51,7 @@ class _EVerifyState extends State<EVerify> {
       };
     // getCode();
 
-    var result = Provider.of<Profiles>(context);
+    var result = Provider.of<ProfilesProvider>(context);
     return Scaffold(
         resizeToAvoidBottomPadding: false,
         appBar: buildAppBar(context, 'كود التحقق'),
