@@ -1,7 +1,7 @@
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 // Screen
-import 'package:clax/screens/Home/yourAcc.dart';
+import 'package:clax/screens/Home/AccountOverview.dart';
 import 'package:clax/screens/Home/Notifications.dart';
 import 'package:clax/screens/Home/Safety.dart';
 import 'package:clax/screens/Home/Signout.dart';

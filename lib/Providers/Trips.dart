@@ -1,24 +1,45 @@
-import 'package:flutter/material.dart';
-import 'package:clax/models/Trip.dart';
+// Dart & Other Packages
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../services/Backend.dart';
 import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+// Flutter's Material Components
+import 'package:flutter/material.dart';
+// Models
+import 'package:clax/models/Station.dart';
+import 'package:clax/models/Trip.dart';
+// Service
+import 'package:clax/services/Backend.dart';
 
 class TripsProvider extends ChangeNotifier {
-  List<Trip> _trips = [];
+  // Last Trips
+  List<Trip> _trips;
+
+  // Current Available Stations
+  List<Station> _stations;
+
+  // Provider Constructor
   TripsProvider() {
     initialize();
   }
 
+  // Async Constructor
   void initialize() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
-    // Get Cached Data
+
+    // Get Cached Past Trips
     _trips = _prefs.getString("trips") != null
         ? json
             .decode(_prefs.getString("trips"))
             .forEach((trip) => _trips.add(Trip.fromJson(trip)))
         : [];
+
+    // Get Cached Stations
+    _stations = _prefs.getString("appMap") != null
+        ? json
+            .decode(_prefs.getString("appMap"))
+            .forEach((station) => _stations.add(Station.fromJson(station)))
+        : [];
+
     notifyListeners();
 
     // Fetch Data from Server
@@ -27,6 +48,7 @@ class TripsProvider extends ChangeNotifier {
 
   Future<bool> fetchData() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
+
     try {
       Response trips = await Api.get('user');
       if (trips.statusCode == 200) {

@@ -51,7 +51,7 @@ class _HistoryState extends State<History> {
     Map<String, dynamic> body = {
       'tripsIds': tripsIds,
     };
-    await Api.put('passengers/past-trips/favourite/', body);
+    await Api.put('passengers/past-trips/favourite/', reqBody: body);
     // if (tripsIds.length != 0) {
     //   await Api.put('passengers/past-trips/favourite/', body);
     // }

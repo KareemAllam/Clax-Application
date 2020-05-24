@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 // Providers
-import 'package:clax/providers/Account.dart';
-import 'package:clax/providers/Payments.dart';
+import 'package:clax/providers/Payment.dart';
 // Models
 import 'package:clax/models/Bill.dart';
 import 'package:clax/models/CreditCard.dart';
@@ -32,8 +31,8 @@ class _PaymentHistoryState extends State<PaymentHistory> {
   }
 
   Widget build(BuildContext context) {
-    List<CreditCardModel> cards = Provider.of<AccountProvider>(context).cards;
-    var billsProvider = Provider.of<PaymentsProvider>(context, listen: false);
+    List<CreditCardModel> cards = Provider.of<PaymentProvider>(context).cards;
+    var billsProvider = Provider.of<PaymentProvider>(context, listen: false);
     List<BillModel> bills = billsProvider.bills;
     bills.sort((a, b) => b.date.compareTo(a.date));
 

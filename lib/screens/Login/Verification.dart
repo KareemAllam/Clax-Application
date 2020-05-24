@@ -1,9 +1,15 @@
 // Dart & Other Packages
 import 'dart:async';
+import 'package:http/http.dart';
 import 'package:pin_view/pin_view.dart';
+import 'package:provider/provider.dart';
 // Flutter's Material Components
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+// Backend
+import 'package:clax/services/Backend.dart';
+// Providers
+import 'package:clax/providers/Profiles.dart';
 
 class Verification extends StatefulWidget {
   static const routeName = '/verification';
@@ -16,7 +22,7 @@ class _VerificationState extends State<Verification> {
   bool _enabled = true;
   String _code;
   String _userCode;
-
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   void startTimer() {
     setState(() {
       counting = true;
@@ -30,23 +36,77 @@ class _VerificationState extends State<Verification> {
   }
 
   void getCode() async {
-    Future.delayed(Duration(seconds: 2), () {
-      _code = '123456';
+    String phone =
+        Provider.of<ProfilesProvider>(context, listen: false).profile.phone;
+    Map<String, String> body = {"phone": phone};
+    Response response =
+        await Api.post('passengers/settings/phone-verification', body);
+    _code = response.body;
+    print(_code);
+  }
+
+  void validateCode() async {
+    // Disabling "re-send code" button
+    setState(() {
+      _enabled = false;
+    });
+
+    // If User's Code is correct
+    if (_userCode == _code) {
+      // Send back to the server
+      await Api.put("passengers/settings/phone-verification");
+
+      // Change Current State
+      bool result = await Provider.of<ProfilesProvider>(context, listen: false)
+          .verifyPhone();
+
+      // If internet connection went off
+      if (!result)
+        _scaffoldKey.currentState.showSnackBar(SnackBar(
+            content: Text(
+              ".تأكد من اتصالك بالانترنت و حاول مره اخرى",
+              style: Theme.of(context)
+                  .textTheme
+                  .caption
+                  .copyWith(color: Colors.white),
+            ),
+            backgroundColor: Colors.red));
+      else {
+        Navigator.of(context).pop();
+      }
+    }
+
+    // If User's Code is incorrect
+    else
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+          content: Text(
+            ".تأكد من الكود الخاص بك و حاول مره اخرى",
+            style: Theme.of(context)
+                .textTheme
+                .caption
+                .copyWith(color: Colors.white),
+          ),
+          backgroundColor: Colors.red));
+    // print("Code Not Valid");
+
+    setState(() {
+      _enabled = true;
     });
   }
 
   @override
   void initState() {
     super.initState();
+    getCode();
   }
 
   Widget build(BuildContext context) {
-    getCode();
     ThemeData theme = Theme.of(context);
     Color purple = theme.primaryColor;
     TextTheme textTheme = theme.textTheme;
 
     return Scaffold(
+      key: _scaffoldKey,
       body: GestureDetector(
         onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
         child: SingleChildScrollView(
@@ -106,7 +166,7 @@ class _VerificationState extends State<Verification> {
                           return code.join(); // 341430
                         }),
                     count: 6, // describes the field number
-                    autoFocusFirstField: false, // defaults to true
+                    autoFocusFirstField: true, // defaults to true
                     margin: EdgeInsets.symmetric(
                         horizontal: 10), // margin between the fields
                     style: textTheme.bodyText1.copyWith(
@@ -117,9 +177,6 @@ class _VerificationState extends State<Verification> {
                         fontSize: 20.0,
                         color: Colors.grey),
                     submit: (String pin) {
-                      // setState(() {
-                      //   _userCode = pin;
-                      // });
                       _userCode = pin;
                     }),
               ),
@@ -131,25 +188,7 @@ class _VerificationState extends State<Verification> {
                   width: double.infinity,
                   child: RaisedButton(
                     textColor: Theme.of(context).hintColor,
-                    onPressed: () {
-                      setState(() {
-                        _enabled = false;
-                      });
-                      if (_userCode == _code)
-                        // print("Code Verified");
-                        Scaffold.of(context).showSnackBar(SnackBar(
-                          content: Text("Code Verified"),
-                        ));
-                      else
-                        Scaffold.of(context).showSnackBar(SnackBar(
-                          content: Text("Code Not Valid"),
-                        ));
-                      // print("Code Not Valid");
-
-                      setState(() {
-                        _enabled = true;
-                      });
-                    },
+                    onPressed: validateCode,
                     highlightElevation: 0.1,
                     elevation: 1,
                     shape: StadiumBorder(),
@@ -168,7 +207,7 @@ class _VerificationState extends State<Verification> {
               ),
               counting
                   ? Text(
-                      "تم ارسال رساله لك.",
+                      "تم ارسال رساله لهاتفك.",
                       style:
                           textTheme.subtitle2.copyWith(color: Colors.black54),
                     )
@@ -180,7 +219,10 @@ class _VerificationState extends State<Verification> {
                                 .copyWith(color: Colors.black54)),
                         TextSpan(
                             recognizer: TapGestureRecognizer()
-                              ..onTap = startTimer,
+                              ..onTap = () {
+                                startTimer();
+                                getCode();
+                              },
                             text: " اضغط هنا",
                             style: textTheme.subtitle2.copyWith(
                                 color: purple, fontWeight: FontWeight.w600))

@@ -1,5 +1,3 @@
-// Dart & Other Packages
-import 'package:toast/toast.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 // Screens
@@ -77,9 +75,9 @@ class _ResetPassState extends State<ResetPass> {
                             if (_formKey.currentState.validate()) {
                               // If the form is valid
                               Navigator.pushNamed(context, "/login");
-                              Toast.show(mailController.text, context,
-                                  duration: Toast.LENGTH_SHORT,
-                                  gravity: Toast.CENTER);
+                              // Toast.show(mailController.text, context,
+                              //     duration: Toast.LENGTH_SHORT,
+                              //     gravity: Toast.CENTER);
                             }
                             print(mailController.text);
                           },

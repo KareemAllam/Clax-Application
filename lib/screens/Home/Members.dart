@@ -36,7 +36,7 @@ class _MembersState extends State<Members> {
     String number = getNumberViewString(contact.phoneNumber.number);
     setState(() {});
     print(number);
-    Response result = await Api.put('family/add', {"phone": number});
+    Response result = await Api.put('family/add', reqBody: {"phone": number});
     if (result.statusCode == 200) {
       Response receivedRequestsRes = await Api.get('family/received-requests');
 
@@ -54,7 +54,8 @@ class _MembersState extends State<Members> {
   }
 
   void removeAMember(id) async {
-    Response result = await Api.put('family/delete', {'_id': id.toString()});
+    Response result =
+        await Api.put('family/delete', reqBody: {'_id': id.toString()});
     if (result.statusCode == 200)
       setState(() {
         members = members.where((element) => element.sId != id).toList();
@@ -63,7 +64,7 @@ class _MembersState extends State<Members> {
 
   void acceptARequest(id) async {
     Response result =
-        await Api.put('family/accept', {'acceptedId': id.toString()});
+        await Api.put('family/accept', reqBody: {'acceptedId': id.toString()});
     if (result.statusCode == 200) {
       var acceptedmember =
           receivedInvitations.where((element) => element.sId == id).toList();
@@ -80,7 +81,7 @@ class _MembersState extends State<Members> {
 
   void denyARequest(id) async {
     Response result =
-        await Api.put('family/accept', {'acceptedId': id.toString()});
+        await Api.put('family/accept', reqBody: {'acceptedId': id.toString()});
     if (result.statusCode == 200)
       setState(() {
         receivedInvitations =
@@ -90,7 +91,7 @@ class _MembersState extends State<Members> {
 
   void cancelARequest(id) async {
     Response result =
-        await Api.put('family/cancel', {'recipientId': id.toString()});
+        await Api.put('family/cancel', reqBody: {'recipientId': id.toString()});
     if (result.statusCode == 200)
       setState(() {
         sentInvitations =

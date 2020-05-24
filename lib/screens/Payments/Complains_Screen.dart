@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 // Models
 import 'package:clax/models/card.dart';
 // Widgets
+import 'package:clax/widgets/Drawer.dart';
 import 'package:clax/widgets/ExtendedAppBar.dart';
 import 'package:clax/widgets/Card_NavigationElement.dart';
 
-class Complaints extends StatelessWidget {
-  static const routeName = '/complaints';
+class Complains extends StatelessWidget {
+  static const routeName = '/complains';
   final menuCards = const [
     CardModel(
         title: 'اكتب شكوى جديدة',
@@ -23,13 +24,14 @@ class Complaints extends StatelessWidget {
         title: 'اتصل بينا',
         icon: Icons.phone,
         description: 'تواصل معنا مباشراً',
-        screen: "tel://07775000")
+        screen: "tel://01024839987")
   ];
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     return new Scaffold(
+      drawer: MainDrawer(),
       appBar: AppBar(
         elevation: 0,
         title: Text(

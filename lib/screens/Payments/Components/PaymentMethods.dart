@@ -5,8 +5,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 // Providers
-import 'package:clax/providers/Account.dart';
-import 'package:clax/providers/Payments.dart';
+import 'package:clax/providers/Payment.dart';
 // Models
 import 'package:clax/models/CreditCard.dart';
 
@@ -48,10 +47,10 @@ class _PaymentPopupState extends State<PaymentPopup> {
         error = false;
         loading = true;
       });
-      String result = await Provider.of<AccountProvider>(context, listen: false)
+      String result = await Provider.of<PaymentProvider>(context, listen: false)
           .chargeCredit(id, amount.text);
       if (result != '400' || result != "408") {
-        Provider.of<PaymentsProvider>(context, listen: false).add(result);
+        Provider.of<PaymentProvider>(context, listen: false).add(result);
         setState(() {
           loading = false;
           error = false;
@@ -84,7 +83,7 @@ class _PaymentPopupState extends State<PaymentPopup> {
         error = false;
         loading = true;
       });
-      String result = await Provider.of<AccountProvider>(context, listen: false)
+      String result = await Provider.of<PaymentProvider>(context, listen: false)
           .chargePaypal(amount.text);
       if (result != 'error') {
         setState(() {

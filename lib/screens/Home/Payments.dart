@@ -5,7 +5,6 @@ import 'package:clax/screens/Home/creditCard.dart';
 import 'package:clax/screens/Home/cancellations.dart';
 import 'package:clax/screens/Home/payOptions.dart';
 import 'package:clax/screens/Home/upfrontPricing.dart';
-import 'package:clax/screens/Home/wallet.dart';
 import 'package:clax/screens/Home/promoCodes.dart';
 // Widgets
 import 'package:clax/widgets/appBar.dart';
@@ -20,7 +19,6 @@ class Payments extends StatelessWidget {
     },
     {"title": "الإلغاء", "route": Cancellations.routeName},
     {"title": "التعرفة الأولية", "route": UpFrontPricing.routeName},
-    {"title": "محفظة كلاكس", "route": Wallet.routeName},
     {"title": "خيارات الدفع", "route": PayOptions.routeName},
     {"title": "البروموكود", "route": PromoCodes.routeName},
   ];

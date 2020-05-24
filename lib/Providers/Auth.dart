@@ -1,20 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class AuthProvider extends ChangeNotifier {
-  String _auth = "User Not Authenticated";
+  String _auth = "";
   SharedPreferences _prefs;
-  // Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  String _firebaseToken;
+  FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
   AuthProvider() {
     getSharedPrefrence();
+    firebaseConfig();
+  }
+
+  Future firebaseConfig() async {
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print(
+            "onMessage: Title: ${message['notification']['title']}, Data: ${message['notification']['body']}");
+        // Message Handling Class
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print("onLaunch: $message");
+        // Message Handling Class
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print("onResume: $message");
+        // Message Handling Class
+      },
+    );
+
+    _firebaseToken = await _firebaseMessaging.getToken();
   }
 
   Future<String> getSharedPrefrence() async {
     try {
       _prefs = await SharedPreferences.getInstance();
       _auth = _prefs.getString("loginToken");
-      notifyListeners();
+      // notifyListeners();
       return _auth;
     } catch (_) {
       return null;
@@ -22,7 +45,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   bool isUserAuthenticated() {
-    return _auth == "User Not Authenticated" ? false : true;
+    return _auth == "" ? false : true;
   }
 
   String getUser() {
@@ -33,12 +56,10 @@ class AuthProvider extends ChangeNotifier {
     try {
       _prefs.setString("loginToken", token);
       _auth = token;
-      notifyListeners();
       return true;
     } catch (_) {
       _prefs.remove("loginToken");
-      _auth = "User Not Authenticated";
-      notifyListeners();
+      _auth = "";
       return false;
     }
   }
@@ -47,7 +68,7 @@ class AuthProvider extends ChangeNotifier {
     String originalToken = _auth;
     try {
       _prefs.remove("loginToken");
-      _auth = "User Not Authenticated";
+      _auth = "";
       notifyListeners();
       return true;
     } catch (_) {
@@ -57,4 +78,6 @@ class AuthProvider extends ChangeNotifier {
       return true;
     }
   }
+
+  String get fbToken => _firebaseToken;
 }

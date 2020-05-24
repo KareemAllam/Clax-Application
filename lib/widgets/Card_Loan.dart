@@ -1,5 +1,4 @@
-import 'package:clax/providers/Account.dart';
-import 'package:clax/providers/Payments.dart';
+import 'package:clax/providers/Payment.dart';
 import 'package:clax/widgets/Confirmation.dart';
 
 import 'package:provider/provider.dart';
@@ -14,8 +13,8 @@ class MemberInvitationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var transactions = Provider.of<TransactionsProvider>(context);
-    var account = Provider.of<AccountProvider>(context, listen: false);
-    var payments = Provider.of<PaymentsProvider>(context, listen: false);
+    var account = Provider.of<PaymentProvider>(context, listen: false);
+    var payments = Provider.of<PaymentProvider>(context, listen: false);
     return Container(
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 0),
         decoration: BoxDecoration(

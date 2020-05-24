@@ -2,18 +2,15 @@ class ProfileModel {
   NameModel name;
   String mail;
   String phone;
-  String pass;
-  int avatarIndex;
+  String passHashed;
   int passLength;
   bool mailVerified;
   bool phoneVerified;
-
   ProfileModel(
       {this.name,
       this.mail,
       this.phone,
-      this.pass,
-      this.avatarIndex,
+      this.passHashed,
       this.passLength,
       this.mailVerified,
       this.phoneVerified});
@@ -21,8 +18,7 @@ class ProfileModel {
     name = json['name'] != null ? new NameModel.fromJson(json['name']) : null;
     mail = json['mail'];
     phone = json['phone'];
-    pass = json['pass'];
-    avatarIndex = json['avatarIndex'];
+    passHashed = json['pass'];
     passLength = json['passLength'];
     mailVerified = json['mail_verified'];
     phoneVerified = json['phone_verified'];
@@ -35,8 +31,7 @@ class ProfileModel {
     }
     data['mail'] = this.mail;
     data['phone'] = this.phone;
-    data['pass'] = this.pass;
-    data['avatarIndex'] = this.avatarIndex;
+    data['pass'] = this.passHashed;
     data['passLength'] = this.passLength;
     data['mail_verified'] = this.mailVerified;
     data['phone_verified'] = this.phoneVerified;
@@ -47,14 +42,11 @@ class ProfileModel {
 class NameModel {
   String first;
   String last;
-
   NameModel({this.first, this.last});
-
   NameModel.fromJson(Map<String, dynamic> json) {
     first = json['first'];
     last = json['last'];
   }
-
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['first'] = this.first;

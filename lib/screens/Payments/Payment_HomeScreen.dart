@@ -5,7 +5,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 // Providers
-import 'package:clax/providers/Account.dart';
+import 'package:clax/providers/Payment.dart';
 // Models
 import 'package:clax/models/card.dart';
 import 'package:clax/models/CreditCard.dart';
@@ -37,11 +37,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
         icon: Icons.featured_play_list,
         description: 'اعرف تفاصيل اكتر عن مدفوعاتك',
         screen: "/payment/payment_history"),
-    CardModel(
-        title: 'شكاوي الرحلات',
-        icon: Icons.announcement,
-        description: 'عندك مشكله في رحلة معينه؟',
-        screen: '/complaints')
   ];
   void add(card) {
     setState(() {
@@ -64,25 +59,26 @@ class _PaymentScreenState extends State<PaymentScreen> {
       });
   }
 
+  Future updateData() async {
+    setState(() {
+      refreshing = true;
+    });
+    bool result =
+        await Provider.of<PaymentProvider>(context, listen: false).fetchData();
+    if (result)
+      setState(() {
+        refreshing = false;
+        nic = false;
+      });
+    else
+      setState(() {
+        refreshing = false;
+        nic = true;
+      });
+  }
+
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
-    updateData() async {
-      setState(() {
-        refreshing = true;
-      });
-      bool result = await Provider.of<AccountProvider>(context, listen: false)
-          .fetchData();
-      if (result)
-        setState(() {
-          refreshing = false;
-          nic = false;
-        });
-      else
-        setState(() {
-          refreshing = false;
-          nic = true;
-        });
-    }
 
     return Scaffold(
         drawer: MainDrawer(),
@@ -95,17 +91,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 : Builder(
                     builder: (context) => IconButton(
                         icon: Icon(Icons.refresh, color: Colors.white),
-                        onPressed: () async {
-                          await updateData();
-                          // if (nic)
-                          //   Scaffold.of(context).showSnackBar(SnackBar(
-                          //       content: Text(
-                          //           "تعذر الوصول للإنترنت. تأكد من اتصالك بالإنترنت و حاول مره اخرى.",
-                          //           style: Theme.of(context)
-                          //               .textTheme
-                          //               .caption
-                          //               .copyWith(color: Colors.white))));
-                        }),
+                        onPressed: updateData),
                   )
           ],
           elevation: 0.0,

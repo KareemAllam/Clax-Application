@@ -47,7 +47,7 @@ via `Provider.of`.
 
 If you have a general question about Provider, the best places to go are:
 
-- [Provider documentation](https://pub.dev/documentation/provider/latest/)
+- [Provider documentation](https://pub.dev/documentation/providers/latest/)
 - [StackOverflow](https://stackoverflow.com/questions/tagged/flutter)
 
 If you run into an issue with the sample itself, please file an issue

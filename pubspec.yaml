@@ -11,23 +11,30 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+
+  # Essential Pacakges
   provider: ^4.0.2
-  toast: ^0.1.5
   http: ^0.12.0+4
-  pin_view: ^1.0.1
   shared_preferences: ^0.5.6+3
-  contact_picker: ^0.0.2
-  flutter_spinkit: ^4.1.2
-  pin_code_fields: ^2.4.0
-  dbcrypt: ^1.0.0
-  image_picker: ^0.6.3+4
   url_launcher: ^5.4.2
   webview_flutter: ^0.3.19+9
+  dbcrypt: ^1.0.0
+
+  # UI Packages
+  pin_view: ^1.0.1
+  contact_picker: ^0.0.2
+  flutter_spinkit: ^4.1.2
   font_awesome_flutter: ^8.7.0
   month_picker_dialog: ^0.3.1
-  google_maps_flutter: ^0.5.26+4
-  geolocator: ^5.3.1
-  flutter_socket_io: ^0.6.0
+  select_dialog: 1.0.7
+
+  # Google  Services
+  geocoder: ^0.2.1
+  geolocator: ^5.3.0
+  firebase_database: ^3.1.5
+  google_maps_flutter: ^0.5.24+3
+  firebase_messaging: ^6.0.13
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,16 +1,17 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:http/http.dart' as http;
-
-Map<String, String> configHeaders = {
-  'x-login-token':
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZTYyYmVkOGUzNzgwNzA4Njg1MTNlODAiLCJpc19wYXNzZW5nZXIiOnRydWUsInN0cmlwZUlkIjoiY3VzX0d3OGFLdzFzemlHTDl4IiwiaWF0IjoxNTg1ODEwNDczLCJleHAiOjE1ODYzMjg4NzN9.4_RXBLshe4OrFyv0KlzQAuBWvl_ybHIITwySyGzIWfA'
-};
+// import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Api {
-  static const String BaseUrl = 'http://10.0.2.2:3000/api/';
+  static Map<String, String> configHeaders;
+  static const String BaseUrl = 'https://www.clax-egyp.me/api/';
 
   static Future<http.Response> get(url) async {
+    // Retreive Token from Cache
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    configHeaders = {'x-login-token': _prefs.getString("loginToken")};
     try {
       return await http
           .get(BaseUrl + url, headers: configHeaders)
@@ -28,6 +29,9 @@ class Api {
   }
 
   static Future<http.Response> post(String url, reqBody) async {
+    // Retreive Token from Cache
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    configHeaders = {'x-login-token': _prefs.getString("loginToken")};
     try {
       return await http
           .post(BaseUrl + url, headers: configHeaders, body: reqBody)
@@ -44,7 +48,10 @@ class Api {
     }
   }
 
-  static Future<http.Response> put(url, reqBody) async {
+  static Future<http.Response> put(url, {dynamic reqBody}) async {
+    // Retreive Token from Cache
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    configHeaders = {'x-login-token': _prefs.getString("loginToken")};
     try {
       return await http
           .put(BaseUrl + url, headers: configHeaders, body: reqBody)
@@ -61,7 +68,10 @@ class Api {
     }
   }
 
-  static Future<http.Response> delete(url, reqBody) async {
+  static Future<http.Response> delete(url) async {
+    // Retreive Token from Cache
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    configHeaders = {'x-login-token': _prefs.getString("loginToken")};
     try {
       return await http
           .delete(BaseUrl + url, headers: configHeaders)

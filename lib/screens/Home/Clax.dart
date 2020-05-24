@@ -1,13 +1,14 @@
 // Flutter's Material Components
+// import 'package:clax/screens/Tracking/Map.dart';
+import 'package:clax/screens/Home/StartARide.dart';
 import 'package:flutter/material.dart';
 // Components
 import 'package:clax/screens/Home/Components/favourites.dart';
-import 'package:clax/screens/Home/Components/new_trip.dart';
 // Widgets
 import 'package:clax/widgets/drawer.dart';
 
 class Tabs extends StatefulWidget {
-  static const routeName = '/screen';
+  static const routeName = '/homescreen';
   @override
   _TabsState createState() => _TabsState();
 }
@@ -15,7 +16,8 @@ class Tabs extends StatefulWidget {
 class _TabsState extends State<Tabs> {
   final List<Map<String, Object>> _pages = [
     {
-      'page': NewTrip(),
+      // 'page': MapPage(),
+      'page': StartARide(),
       'title': 'رحلة جديدة',
     },
     {

@@ -1,7 +1,4 @@
-// Dart & Other Packages
-// import 'package:image_picker/image_picker.dart';
 // Flutter's Material Components
-import 'package:clax/screens/Payments/Payment_HomeScreen.dart';
 import 'package:flutter/material.dart';
 // Screens
 import 'package:clax/screens/Home/Clax.dart';
@@ -9,6 +6,8 @@ import 'package:clax/screens/Home/Rahalatk.dart';
 import 'package:clax/screens/Home/free_rides.dart';
 import 'package:clax/screens/Home/help.dart';
 import 'package:clax/screens/Home/settings.dart';
+import 'package:clax/screens/Payments/Complains_Screen.dart';
+import 'package:clax/screens/Payments/Payment_HomeScreen.dart';
 
 class MainDrawer extends StatefulWidget {
   @override
@@ -29,6 +28,7 @@ class _MainDrawerState extends State<MainDrawer> {
       "icon": Icons.attach_money,
       "route": PaymentScreen.routeName
     },
+    {"title": 'الشكاوي', "icon": Icons.feedback, "route": Complains.routeName},
     {"title": 'الإعدادات', "icon": Icons.settings, "route": Settings.routeName},
     {"title": 'مساعدة', "icon": Icons.help, "route": Help.routeName},
   ];
@@ -58,7 +58,7 @@ class _MainDrawerState extends State<MainDrawer> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Image.asset(
-              'assets/images/taxi.jpg',
+              'assets/images/taxi.png',
               width: double.infinity,
               fit: BoxFit.fitWidth,
             ),

@@ -10,9 +10,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacementNamed('/Main');
-    });
   }
 
   Widget build(BuildContext context) {

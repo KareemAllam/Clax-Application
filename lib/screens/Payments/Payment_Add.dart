@@ -6,7 +6,7 @@ import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 // Providers
-import 'package:clax/providers/Account.dart';
+import 'package:clax/providers/Payment.dart';
 // Components
 import 'package:clax/screens/Payments/Components/CreditCardType.dart';
 // Widgets
@@ -132,7 +132,7 @@ class _PaymentAddState extends State<PaymentAdd> {
         "exp_month": "$month",
         "cvc": _ccvNumber.text
       };
-      bool result = await Provider.of<AccountProvider>(context, listen: false)
+      bool result = await Provider.of<PaymentProvider>(context, listen: false)
           .addCard(body);
       print(result);
       if (result) {

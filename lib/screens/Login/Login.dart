@@ -1,16 +1,17 @@
 // Dart & Other Packages
-// import 'package:http/http.dart';
-// import 'package:provider/provider.dart';
-// import 'package:toast/toast.dart';
+import 'package:http/http.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 // Utils
-// import 'package:clax/services/Backend.dart';
+import 'package:clax/services/Backend.dart';
 // Providers
-// import 'package:clax/Providers/Auth.dart';
+import 'package:clax/providers/Auth.dart';
 // Screens
-// import 'package:clax/screens/Login_Screens/ForgotPassword.dart';
+import 'package:clax/screens/Home/Clax.dart';
+import 'package:clax/screens/Login/ForgotPassword.dart';
 // Widgets
 // import 'package:clax/widgets/ExtendedAppBar.dart';
 
@@ -21,6 +22,7 @@ class Login extends StatefulWidget {
 }
 
 class LoginState extends State<Login> {
+  bool _loading = false;
   TextEditingController _usernameController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   FocusNode _usernameNode = FocusNode();
@@ -34,36 +36,59 @@ class LoginState extends State<Login> {
 
   @override
   void dispose() {
-    super.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
     _usernameNode.dispose();
     _passwordNode.dispose();
+    super.dispose();
   }
 
-  Future<bool> submitform() async {
+  Future<bool> submitform(firebaseToken) async {
+    setState(() {
+      _loading = true;
+    });
     if (_formKey.currentState.validate()) {
-      Navigator.of(context).pushReplacementNamed('/screen');
-      return true;
       // Authenticate From Server
-      // Map<String, String> body = {
-      //   "user": _usernameController.text.trim(),
-      //   "pass": _passwordController.text
-      // };
-      // Response response = await Api.post('signing/passengers/login', body);
-      // if (response.statusCode == 200) {
-      //     # Update Cache with id
-      //     Provider.of<Auth>(context, listen: false).logIn(response.body);
-      //     Navigator.of(context).pushReplacementNamed('/screen');
-      //     return true;
-      // } else
-      //   return false;
-    } else
+      Map<String, String> body = {
+        "user": _usernameController.text.trim(),
+        "pass": _passwordController.text,
+        "fireBaseId": firebaseToken
+      };
+
+      Response response = await Api.post('signing/passengers/login', body);
+
+      if (response.statusCode == 200) {
+        //  Update Cache with id
+        Provider.of<AuthProvider>(context, listen: false)
+            .logIn(response.headers['x-login-token']);
+        Navigator.of(context).pushReplacementNamed(Tabs.routeName);
+        setState(() {
+          _loading = false;
+        });
+        return true;
+      }
+
+      // If Server Erros Occured
+      else {
+        setState(() {
+          _loading = false;
+        });
+        return false;
+      }
+    }
+    // If there is no Internet Connection
+    else {
+      setState(() {
+        _loading = false;
+      });
       return false;
+    }
   }
 
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
+    final ThemeData theme = Theme.of(context);
+    final String firebaseToken = Provider.of<AuthProvider>(context).fbToken;
 
     return Scaffold(
       body: GestureDetector(
@@ -82,33 +107,24 @@ class LoginState extends State<Login> {
                           text: TextSpan(children: [
                             TextSpan(
                               text: "مرحبا بك",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline3
-                                  .copyWith(
-                                      height: 1.4,
-                                      color: Colors.black87,
-                                      fontWeight: FontWeight.w800),
+                              style: theme.textTheme.headline3.copyWith(
+                                  height: 1.4,
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.w800),
                             ),
                             TextSpan(
                               text: "\nفي كلاكس",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline3
-                                  .copyWith(
-                                      height: 1.4,
-                                      color: Colors.black87,
-                                      fontWeight: FontWeight.w800),
+                              style: theme.textTheme.headline3.copyWith(
+                                  height: 1.4,
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.w800),
                             ),
                             TextSpan(
                               text: ".",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline3
-                                  .copyWith(
-                                      height: 1.4,
-                                      color: Theme.of(context).primaryColor,
-                                      fontWeight: FontWeight.w800),
+                              style: theme.textTheme.headline3.copyWith(
+                                  height: 1.4,
+                                  color: theme.primaryColor,
+                                  fontWeight: FontWeight.w800),
                             ),
                           ])),
                     ),
@@ -143,15 +159,12 @@ class LoginState extends State<Login> {
                                   return null;
                                 }
                               },
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyText1
-                                  .copyWith(
-                                      fontFamily: "Product Sans",
-                                      fontWeight: FontWeight.w600),
+                              style: theme.textTheme.bodyText1.copyWith(
+                                  fontFamily: "Product Sans",
+                                  fontWeight: FontWeight.w600),
                               textInputAction: TextInputAction.next,
                               focusNode: _usernameNode,
-                              cursorColor: Theme.of(context).primaryColor,
+                              cursorColor: theme.primaryColor,
                               controller: _usernameController,
                               onFieldSubmitted: (_) {
                                 _usernameNode.unfocus();
@@ -170,9 +183,7 @@ class LoginState extends State<Login> {
                                 prefixIcon: Icon(
                                   Icons.person_outline,
                                 ),
-                                labelStyle: Theme.of(context)
-                                    .textTheme
-                                    .bodyText1
+                                labelStyle: theme.textTheme.bodyText1
                                     .copyWith(color: Colors.grey),
                                 labelText: 'رقم الهاتف / البريد الالكتروني',
                               ),
@@ -213,33 +224,44 @@ class LoginState extends State<Login> {
                             ),
                             SizedBox(height: 10),
                             Builder(
-                              builder: (context) => Container(
-                                width: double.infinity,
-                                child: RaisedButton(
-                                  padding: EdgeInsets.symmetric(vertical: 7),
-                                  child: Text(
-                                    'تسجيل دخول',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  textColor: Theme.of(context).hintColor,
-                                  elevation: 1,
-                                  shape: StadiumBorder(),
-                                  color: Theme.of(context).primaryColor,
-                                  highlightElevation: 0.1,
-                                  onPressed: () async {
-                                    bool result = await submitform();
-                                    if (result == false)
-                                      Scaffold.of(context).showSnackBar(SnackBar(
-                                          content: Text(
-                                              "تأكد من اتصالك بالإنترنت و حاول مره اخرى.",
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyText2
-                                                  .copyWith(
-                                                      color: Colors.white))));
-                                  },
-                                ),
-                              ),
+                              builder: (context) => _loading
+                                  ? Padding(
+                                      child: SpinKitCircle(
+                                          color: theme.primaryColor, size: 30),
+                                      padding: EdgeInsets.only(top: 15),
+                                    )
+                                  : Container(
+                                      width: double.infinity,
+                                      child: RaisedButton(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 7),
+                                        child: Text(
+                                          'تسجيل دخول',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        textColor: theme.hintColor,
+                                        elevation: 1,
+                                        shape: StadiumBorder(),
+                                        color: theme.primaryColor,
+                                        highlightElevation: 0.1,
+                                        onPressed: () async {
+                                          bool result =
+                                              await submitform(firebaseToken);
+                                          if (result == false)
+                                            Scaffold.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  "تأكد من اتصالك بالإنترنت و حاول مره اخرى.",
+                                                  style: theme
+                                                      .textTheme.bodyText2
+                                                      .copyWith(
+                                                          color: Colors.white),
+                                                ),
+                                              ),
+                                            );
+                                        },
+                                      ),
+                                    ),
                             ),
                             SizedBox(height: 10),
                             Divider(
@@ -260,17 +282,15 @@ class LoginState extends State<Login> {
                                       child: Text(
                                         'ليس لديك حساب؟',
                                         style: TextStyle(
-                                            color:
-                                                Theme.of(context).primaryColor),
+                                            color: theme.primaryColor),
                                       ),
                                     ),
                                     GestureDetector(
                                       onTap: () => Navigator.of(context)
-                                          .pushNamed('/resetPassword'),
+                                          .pushNamed(ForgetPass.routeName),
                                       child: Text('يوجد لديك مشكله؟',
                                           style: TextStyle(
-                                            color:
-                                                Theme.of(context).primaryColor,
+                                            color: theme.primaryColor,
                                           )),
                                     )
                                   ]),

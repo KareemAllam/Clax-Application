@@ -1,5 +1,6 @@
 // Dart & Other Packages
 import 'dart:convert';
+import 'package:clax/widgets/null.dart';
 import 'package:http/http.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 // Flutter's Material Components
@@ -16,16 +17,20 @@ class Favourites extends StatefulWidget {
 }
 
 class _FavouritesState extends State<Favourites> {
-  var fetched = 0;
-  List<dynamic> trips;
+  int fetched = 0;
+  List trips;
 
   void fetch() async {
     try {
       Response response = await Api.get('passengers/past-trips/favourite');
       if (response.statusCode == 200)
         setState(() {
-          trips = json.decode(response.body);
+          trips = json.decode(response.body)['_favourites'];
           fetched = 1;
+        });
+      else
+        setState(() {
+          fetched = 2;
         });
     } catch (_) {
       setState(() {
@@ -37,12 +42,10 @@ class _FavouritesState extends State<Favourites> {
   @override
   void initState() {
     super.initState();
+    fetch();
   }
 
-  @override
   Widget build(BuildContext context) {
-    fetch();
-
     return fetched == 0
         ? Center(
             child: SpinKitCircle(
@@ -52,12 +55,16 @@ class _FavouritesState extends State<Favourites> {
             ),
           )
         : fetched == 1
-            ? ListView.builder(
-                itemCount: trips.length,
-                itemBuilder: (context, index) {
-                  return FavTripCard(trips[index]);
-                },
-              )
+            ? trips.length > 0
+                ? ListView.builder(
+                    itemCount: trips.length,
+                    itemBuilder: (context, index) {
+                      return FavTripCard(trips[index]);
+                    },
+                  )
+                : Center(
+                    child: NullContent(things: "رحلات"),
+                  )
             : Center(child: FourOFour(press: fetch));
   }
 }

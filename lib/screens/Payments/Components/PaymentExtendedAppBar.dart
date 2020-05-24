@@ -5,7 +5,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 // Providers
-import 'package:clax/providers/Account.dart';
+import 'package:clax/providers/Payment.dart';
+import 'package:clax/providers/Profiles.dart';
+// Screens
+import 'package:clax/screens/Login/Verification.dart';
 // Components
 import 'package:clax/screens/Payments/Components/PaymentMethods.dart';
 // Widgets
@@ -18,8 +21,10 @@ class PaymentAppBarBottom extends StatefulWidget {
 
 class _PaymentAppBarBottomState extends State<PaymentAppBarBottom> {
   _PaymentAppBarBottomState();
+
   String urll = "error";
-  Future<bool> checkData() async {
+
+  Future<bool> checkInternet() async {
     try {
       final result = await InternetAddress.lookup('google.com');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
@@ -31,11 +36,16 @@ class _PaymentAppBarBottomState extends State<PaymentAppBarBottom> {
     return false;
   }
 
+  bool checkVerification() {
+    return Provider.of<ProfilesProvider>(context, listen: false).phoneVerified;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     final width = MediaQuery.of(context).size.width;
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-      Consumer<AccountProvider>(
+      Consumer<PaymentProvider>(
         builder: (context, account, child) => Text(
           account.balance.toString(),
           style: TextStyle(
@@ -48,32 +58,41 @@ class _PaymentAppBarBottomState extends State<PaymentAppBarBottom> {
       Builder(
         builder: (context) => Material(
           borderRadius: BorderRadius.all(Radius.circular(width)),
-          color: Theme.of(context).accentColor,
+          color: theme.accentColor,
           elevation: 2.0,
           child: InkWell(
             borderRadius: BorderRadius.all(Radius.circular(width)),
             splashColor: Colors.orange,
             onTap: () async {
-              bool result = await checkData();
-              if (result)
-                showModalBottomSheet<bool>(
-                    context: context,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    backgroundColor: Colors.transparent,
-                    // isScrollControlled: true,
-                    isDismissible: true,
-                    builder: (BuildContext context) {
-                      return CardsList();
-                    });
-              else
+              bool result = await checkInternet();
+              if (result) {
+                if (checkVerification()) {
+                  showModalBottomSheet<bool>(
+                      context: context,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      backgroundColor: Colors.transparent,
+                      // isScrollControlled: true,
+                      isDismissible: true,
+                      builder: (BuildContext context) {
+                        return CardsList();
+                      });
+                } else
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                      backgroundColor: theme.primaryColor,
+                      action: SnackBarAction(
+                          label: "تفعيل",
+                          onPressed: () => Navigator.of(context)
+                              .pushNamed(Verification.routeName)),
+                      content: Text("برجاء تفعيل هاتفك اولاًَ.",
+                          style: theme.textTheme.subtitle2
+                              .copyWith(color: Colors.white))));
+              } else
                 Scaffold.of(context).showSnackBar(SnackBar(
                     content: Text(
                         "تعذر الوصول للإنترنت. تأكد من اتصالك بالإنترنت و حاول مره اخرى.",
-                        style: Theme.of(context)
-                            .textTheme
-                            .caption
+                        style: theme.textTheme.caption
                             .copyWith(color: Colors.white))));
             },
             child: ConstrainedBox(
@@ -82,7 +101,7 @@ class _PaymentAppBarBottomState extends State<PaymentAppBarBottom> {
                 padding: EdgeInsets.symmetric(vertical: 5, horizontal: 50),
                 child: Text(
                   "اضافة المزيد",
-                  style: Theme.of(context).textTheme.button.copyWith(
+                  style: theme.textTheme.button.copyWith(
                       color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -97,7 +116,7 @@ class _PaymentAppBarBottomState extends State<PaymentAppBarBottom> {
 class CardsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var cards = Provider.of<AccountProvider>(context);
+    var cards = Provider.of<PaymentProvider>(context);
     return Column(mainAxisSize: MainAxisSize.min, children: [
       BottomSheetTitle(
           icon: Icons.account_balance_wallet,
