@@ -1,7 +1,7 @@
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 // Screens
-import 'package:clax/screens/Home/Clax.dart';
+import 'package:clax/screens/MakeARide/Clax.dart';
 import 'package:clax/screens/Home/Rahalatk.dart';
 import 'package:clax/screens/Home/free_rides.dart';
 import 'package:clax/screens/Home/help.dart';
@@ -66,6 +66,31 @@ class _MainDrawerState extends State<MainDrawer> {
                   index['title'],
                   index['icon'],
                   () {
+                    // Get Current Route Name
+                    String currentRoute = ModalRoute.of(context).settings.name;
+                    // If App is on the Homescreen
+                    if (currentRoute == '/homescreen') {
+                      // Dismiss Drawer
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pushNamed(index['route']);
+                      return;
+                    }
+                    // If App is on a Screen and User is navigating to Homescreen
+                    if (currentRoute == '/homepage') {
+                      // Dismiss Drawer
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                      return;
+                    }
+                    // If App is on a Screen and User is navigating to the same screen
+                    if (currentRoute == index['route']) {
+                      // Dismiss Drawer
+                      Navigator.of(context).pop();
+                      return;
+                    }
+                    // Dismiss Drawer
+                    Navigator.of(context).pop();
+                    // Navigate to Screen
                     Navigator.of(context).pushReplacementNamed(index['route']);
                   },
                 )),

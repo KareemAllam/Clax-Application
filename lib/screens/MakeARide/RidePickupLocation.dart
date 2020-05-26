@@ -2,20 +2,24 @@ import 'package:clax/appMap.dart';
 import 'package:clax/models/Station.dart';
 import 'package:clax/providers/Map.dart';
 import 'package:clax/providers/Payment.dart';
-import 'package:clax/screens/Home/RideInfo.dart';
+// import 'package:clax/screens/Home/GoogleMap.dart';
+import 'package:clax/screens/MakeARide/StartARide.dart';
+import 'package:clax/screens/Payments/Payment_HomeScreen.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
+
 // import 'package:clax/screens/Home/GoogleMap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 
-class StartARide extends StatefulWidget {
-  static const routeName = "startARide";
+class RidePickLocation extends StatefulWidget {
+  static const routeName = "ridePickLocation";
   @override
-  _StartARideState createState() => _StartARideState();
+  _RidePickLocationState createState() => _RidePickLocationState();
 }
 
-class _StartARideState extends State<StartARide> {
+class _RidePickLocationState extends State<RidePickLocation> {
   List<Station> stations;
   TextEditingController _controllerPlace = new TextEditingController();
   List<Station> _searchResult = [];
@@ -36,63 +40,32 @@ class _StartARideState extends State<StartARide> {
   void noEnoughMoneyDB() {
     TextTheme textTheme = Theme.of(context).textTheme;
     Color primaryColor = Theme.of(context).primaryColor;
-    Color accentColor = Theme.of(context).accentColor;
+    // Color accentColor = Theme.of(context).accentColor;
     // set up the button
     Widget okButton = FlatButton(
-      child: Text("حسنا", style: TextStyle(color: Colors.white)),
-      onPressed: () {},
+      child: Text("حسنا", style: TextStyle(color: Colors.black54)),
+      onPressed: Navigator.of(context).pop,
     );
     // set charge the button
     Widget chargeNow = FlatButton(
-      child: Text("اشحن الان", style: TextStyle(color: Colors.white)),
-      onPressed: () {},
+      child: Text("اشحن الان", style: TextStyle(color: primaryColor)),
+      onPressed: () {
+        Navigator.of(context).pop();
+        Navigator.of(context).pushNamed(PaymentScreen.routeName);
+      },
     );
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      // title: Text(""),
-      backgroundColor: Colors.transparent,
-      contentPadding: EdgeInsets.all(0),
-      titlePadding: EdgeInsets.all(0),
-      title: Container(
-        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        decoration: BoxDecoration(
-            color: primaryColor,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            )),
-        child: Container(
-          color: primaryColor,
-          child: Row(
-            children: <Widget>[
-              Icon(Icons.sentiment_dissatisfied, size: 20, color: accentColor),
-              SizedBox(width: 5),
-              Text("عذراً",
-                  style: textTheme.bodyText1.copyWith(color: Colors.white))
-            ],
-          ),
-        ),
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Container(
-            color: Colors.white,
-            child: Text("لا يوجد رصيد كافي في محفظتك",
-                textAlign: TextAlign.right, style: textTheme.bodyText2),
-          ),
-          Container(
-            color: primaryColor,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[okButton, chargeNow],
-            ),
-          ),
-        ],
-      ),
+      // title: Text("عذرب"),
+      contentPadding: EdgeInsets.only(top: 20, right: 15, bottom: 20),
+      content:
+          Text("عذراً، لو يوجد لديك رصيد كافي", style: textTheme.bodyText2),
+      actions: [
+        chargeNow,
+        okButton,
+      ],
     );
-    // actions: [chargeNow, okButton],
 
     // show the dialog
     showDialog(
@@ -116,8 +89,10 @@ class _StartARideState extends State<StartARide> {
               if (balance < _station.cost.toDouble())
                 noEnoughMoneyDB();
               else {
+                FocusScope.of(context).unfocus();
                 // Navigate to Info Screen
-                Navigator.of(context).pushNamed(RideInfo.routeName, arguments: {
+                Navigator.of(context)
+                    .pushNamed(StartARide.routeName, arguments: {
                   "line": {
                     "from": _station.from,
                     "to": _station.to,
@@ -161,7 +136,7 @@ class _StartARideState extends State<StartARide> {
   }
 
   Widget build(BuildContext context) {
-    Provider.of<CustomMap>(context).setDriverId = "driver123";
+    Provider.of<MapProvider>(context).setDriverId = "driver123";
     double balance = Provider.of<PaymentProvider>(context).balance;
     ThemeData theme = Theme.of(context);
     List<Widget> lines = renderLines(balance);
@@ -208,27 +183,3 @@ class _StartARideState extends State<StartARide> {
               ]);
   }
 }
-
-//  TextField(
-//                   controller: _controllerPlace,
-//                   keyboardType: TextInputType.number,
-//                   inputFormatters: <TextInputFormatter>[
-//                     WhitelistingTextInputFormatter.digitsOnly
-//                   ],
-//                   maxLength: 1,
-//                   decoration: InputDecoration(
-//                       counterText: '',
-//                       enabledBorder: InputBorder.none,
-//                       // contentPadding: EdgeInsets.all(0),
-//                       filled: true,
-//                       fillColor: Colors.white,
-//                       hintText: 'هتحجز كام مكان',
-//                       prefixIcon: Icon(
-//                         Icons.people_outline,
-//                       ),
-//                       suffixIcon: new IconButton(
-//                         icon: new Icon(Icons.cancel),
-//                         onPressed: () {
-//                           _controllerPlace.clear();
-//                         },
-//                       )))

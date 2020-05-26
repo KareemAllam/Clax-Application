@@ -6,15 +6,11 @@ import 'package:provider/provider.dart';
 // Screens
 //// Authentication
 import 'package:clax/screens/Login/LoadMainScreen.dart';
-import 'package:clax/screens/Home/Clax.dart';
 import 'package:clax/screens/Login/Login.dart';
 import 'package:clax/screens/Login/Register.dart';
 import 'package:clax/screens/Login/Verification.dart';
 import 'package:clax/screens/Login/ForgotPassword.dart';
 //// Home Screens
-import 'package:clax/screens/Home/StartARide.dart';
-import 'package:clax/screens/Home/RideInfo.dart';
-import 'package:clax/screens/Home/GoogleMap.dart';
 import 'package:clax/screens/Home/AccountOverview.dart';
 import 'package:clax/screens/Home/Bookings.dart';
 import 'package:clax/screens/Home/Components/Family.dart';
@@ -47,111 +43,139 @@ import 'package:clax/screens/Payments/Complaint_Details.dart';
 import 'package:clax/screens/Payments/complains_Historty.dart';
 import 'package:clax/screens/Payments/Complains_Screen.dart';
 import 'package:clax/screens/Payments/Complain_Write.dart';
+import 'package:clax/screens/MakeARide/Clax.dart';
 //// Tracking Screens
-// import 'package:clax/screens/Tracking/Map.dart';
-// import 'package:clax/screens/Tracking/LinesPage.dart';
-// import 'package:clax/screens/Tracking/TripDetails.dart';
+import 'package:clax/screens/MakeARide/StartARide.dart';
+import 'package:clax/screens/MakeARide/GoogleMap.dart';
+import 'package:clax/screens/MakeARide/RidePickupLocation.dart';
 
 class Router {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case '/':
-        return MaterialPageRoute(builder: (_) => LoadMainScreen());
+        return MaterialPageRoute(
+            builder: (_) => LoadMainScreen(), settings: settings);
       case Login.routeName:
-        return MaterialPageRoute(builder: (_) => Login());
+        return MaterialPageRoute(builder: (_) => Login(), settings: settings);
       // Home
       case Tabs.routeName:
-        return MaterialPageRoute(builder: (_) => Tabs());
+        return MaterialPageRoute(builder: (_) => Tabs(), settings: settings);
       case StartARide.routeName:
-        return MaterialPageRoute(builder: (_) => StartARide());
-      case RideInfo.routeName:
         return MaterialPageRoute(
-            builder: (_) => RideInfo(), settings: settings);
+            builder: (_) => StartARide(), settings: settings);
+      case RidePickLocation.routeName:
+        return MaterialPageRoute(
+            builder: (_) => RidePickLocation(), settings: settings);
       case MapPage.routeName:
-        return MaterialPageRoute(builder: (_) => MapPage());
+        return MaterialPageRoute(builder: (_) => MapPage(), settings: settings);
       case RegisterForm.routeName:
-        return MaterialPageRoute(builder: (_) => RegisterForm());
+        return MaterialPageRoute(
+            builder: (_) => RegisterForm(), settings: settings);
       case Verification.routeName:
-        return MaterialPageRoute(builder: (_) => Verification());
+        return MaterialPageRoute(
+            builder: (_) => Verification(), settings: settings);
       case ForgetPass.routeName:
-        return MaterialPageRoute(builder: (_) => ForgetPass());
+        return MaterialPageRoute(
+            builder: (_) => ForgetPass(), settings: settings);
       case Account.routeName:
-        return MaterialPageRoute(builder: (_) => Account());
+        return MaterialPageRoute(builder: (_) => Account(), settings: settings);
       case Bookings.routeName:
-        return MaterialPageRoute(builder: (_) => Bookings());
+        return MaterialPageRoute(
+            builder: (_) => Bookings(), settings: settings);
       case Family.routeName:
-        return MaterialPageRoute(builder: (_) => Family());
+        return MaterialPageRoute(builder: (_) => Family(), settings: settings);
       case FamilyMembers.routeName:
-        return MaterialPageRoute(builder: (_) => FamilyMembers());
+        return MaterialPageRoute(
+            builder: (_) => FamilyMembers(), settings: settings);
       case History.routeName:
-        return MaterialPageRoute(builder: (_) => History());
+        return MaterialPageRoute(builder: (_) => History(), settings: settings);
       case FreeRides.routeName:
-        return MaterialPageRoute(builder: (_) => FreeRides());
+        return MaterialPageRoute(
+            builder: (_) => FreeRides(), settings: settings);
       case Guide.routeName:
-        return MaterialPageRoute(builder: (_) => Guide());
+        return MaterialPageRoute(builder: (_) => Guide(), settings: settings);
       case Members.routeName:
-        return MaterialPageRoute(builder: (_) => Members());
+        return MaterialPageRoute(builder: (_) => Members(), settings: settings);
       case More.routeName:
-        return MaterialPageRoute(builder: (_) => More());
+        return MaterialPageRoute(builder: (_) => More(), settings: settings);
       case Notifications.routeName:
-        return MaterialPageRoute(builder: (_) => Notifications());
+        return MaterialPageRoute(
+            builder: (_) => Notifications(), settings: settings);
       case Rides.routeName:
-        return MaterialPageRoute(builder: (_) => Rides());
+        return MaterialPageRoute(builder: (_) => Rides(), settings: settings);
       case Safety.routeName:
-        return MaterialPageRoute(builder: (_) => Safety());
+        return MaterialPageRoute(builder: (_) => Safety(), settings: settings);
       case Signout.routeName:
-        return MaterialPageRoute(builder: (_) => Signout());
+        return MaterialPageRoute(builder: (_) => Signout(), settings: settings);
       case Cancellations.routeName:
-        return MaterialPageRoute(builder: (_) => Cancellations());
+        return MaterialPageRoute(
+            builder: (_) => Cancellations(), settings: settings);
       case CreditCard.routeName:
-        return MaterialPageRoute(builder: (_) => CreditCard());
+        return MaterialPageRoute(
+            builder: (_) => CreditCard(), settings: settings);
       case Help.routeName:
-        return MaterialPageRoute(builder: (_) => Help());
+        return MaterialPageRoute(builder: (_) => Help(), settings: settings);
       case PayOptions.routeName:
-        return MaterialPageRoute(builder: (_) => PayOptions());
+        return MaterialPageRoute(
+            builder: (_) => PayOptions(), settings: settings);
       case Settings.routeName:
         return MaterialPageRoute(
             builder: (_) => Provider<ProfilesProvider>(
                   create: (settings) => ProfilesProvider(),
                   child: Settings(),
-                ));
+                ),
+            settings: settings);
       case TrustedContacts.routeName:
-        return MaterialPageRoute(builder: (_) => TrustedContacts());
+        return MaterialPageRoute(
+            builder: (_) => TrustedContacts(), settings: settings);
       case UpFrontPricing.routeName:
-        return MaterialPageRoute(builder: (_) => UpFrontPricing());
+        return MaterialPageRoute(
+            builder: (_) => UpFrontPricing(), settings: settings);
 
       case YourAccount.routeName:
-        return MaterialPageRoute(builder: (_) => YourAccount());
+        return MaterialPageRoute(
+            builder: (_) => YourAccount(), settings: settings);
       case PromoCodes.routeName:
-        return MaterialPageRoute(builder: (_) => PromoCodes());
+        return MaterialPageRoute(
+            builder: (_) => PromoCodes(), settings: settings);
       // Payment
       case PaymentScreen.routeName:
-        return MaterialPageRoute(builder: (_) => PaymentScreen());
+        return MaterialPageRoute(
+            builder: (_) => PaymentScreen(), settings: settings);
       case ComplainDetails.routeName:
-        return MaterialPageRoute(builder: (_) => ComplainDetails());
+        return MaterialPageRoute(
+            builder: (_) => ComplainDetails(), settings: settings);
       case ComplaintsHistory.routeName:
-        return MaterialPageRoute(builder: (_) => ComplaintsHistory());
+        return MaterialPageRoute(
+            builder: (_) => ComplaintsHistory(), settings: settings);
       case PaymentAdd.routeName:
-        return MaterialPageRoute(builder: (_) => PaymentAdd());
+        return MaterialPageRoute(
+            builder: (_) => PaymentAdd(), settings: settings);
       case PaypalWeb.routeName:
-        return MaterialPageRoute(builder: (_) => PaypalWeb());
+        return MaterialPageRoute(
+            builder: (_) => PaypalWeb(), settings: settings);
       case Complains.routeName:
-        return MaterialPageRoute(builder: (_) => Complains());
+        return MaterialPageRoute(
+            builder: (_) => Complains(), settings: settings);
       case WriteAComplain.routeName:
-        return MaterialPageRoute(builder: (_) => WriteAComplain());
+        return MaterialPageRoute(
+            builder: (_) => WriteAComplain(), settings: settings);
       case PaymentHistory.routeName:
-        return MaterialPageRoute(builder: (_) => PaymentHistory());
+        return MaterialPageRoute(
+            builder: (_) => PaymentHistory(), settings: settings);
       case TransferMoney.routeName:
-        return MaterialPageRoute(builder: (_) => TransferMoney());
+        return MaterialPageRoute(
+            builder: (_) => TransferMoney(), settings: settings);
       case PaypalWeb.routeName:
-        return MaterialPageRoute(builder: (_) => PaypalWeb());
+        return MaterialPageRoute(
+            builder: (_) => PaypalWeb(), settings: settings);
       // Tracking
       // case TripDetails.routeName:
-      //   return MaterialPageRoute(builder: (_) => TripDetails());
+      //   return MaterialPageRoute(builder: (_) => TripDetails(),settings: settings);
       // case MapPage.routeName:
-      //   return MaterialPageRoute(builder: (_) => MapPage());
+      //   return MaterialPageRoute(builder: (_) => MapPage(),settings: settings);
       // case LinesPage.routeName:
-      //   return MaterialPageRoute(builder: (_) => LinesPage());
+      //   return MaterialPageRoute(builder: (_) => LinesPage(),settings: settings);
       default:
         return MaterialPageRoute(builder: (_) {
           return Scaffold(

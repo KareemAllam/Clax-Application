@@ -9,6 +9,7 @@ import 'package:http/http.dart';
 
 class PaymentProvider extends ChangeNotifier {
   double _balance = 0.0;
+  double discount = 0.0;
   List<CreditCardModel> _cards = [];
   List<BillModel> _bills = [];
 
@@ -207,4 +208,8 @@ class PaymentProvider extends ChangeNotifier {
 
   List<BillModel> get bills => _bills;
   double get balance => _balance;
+  set setDiscount(double value) {
+    discount = value;
+    notifyListeners();
+  }
 }

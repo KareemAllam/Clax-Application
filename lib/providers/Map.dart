@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class CustomMap extends ChangeNotifier {
-  CustomMap() {
+class MapProvider extends ChangeNotifier {
+  MapProvider() {
     init();
   }
   // Scaffold Key
@@ -33,6 +33,8 @@ class CustomMap extends ChangeNotifier {
   Set<Polyline> _polylines;
   // Initializing Realtime Database Connection
   RealtimeDB _realtimeDB;
+  // Setting App to Trip State so User can't make another tirp
+  bool _busy = false;
 
   void init() async {
     _markers = {};
@@ -189,17 +191,21 @@ class CustomMap extends ChangeNotifier {
     }
   }
 
-  set setScaffoldKey(GlobalKey<ScaffoldState> scaffoldkey) {
-    _scaffoldKey = scaffoldkey;
-  }
-
   Map<String, dynamic> get markedLocation => _markedLocation;
   StreamSubscription<Position> get locationStreaming => streamingLocation;
   Set<Polyline> get polylines => _polylines;
   Set<Circle> get circles => _circles;
+  bool get busy => _busy;
   Map<String, Marker> get markers => _markers;
   Completer<GoogleMapController> get controller => _controller;
   set controller(controller) => _controller = controller;
-  set setDriverId(id) => _driverId = id;
   set focusDriver(boolean) => _focusDriver = boolean;
+  set setScaffoldKey(GlobalKey<ScaffoldState> sk) => _scaffoldKey = sk;
+  set setBusy(bool val) {
+    _busy = val;
+  }
+
+  set setDriverId(id) {
+    _driverId = id;
+  }
 }

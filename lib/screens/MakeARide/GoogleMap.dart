@@ -15,7 +15,7 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  CustomMap map;
+  MapProvider map;
 
   @override
   void dispose() {
@@ -24,7 +24,7 @@ class _MapPageState extends State<MapPage> {
   }
 
   Widget build(BuildContext context) {
-    map = Provider.of<CustomMap>(context);
+    map = Provider.of<MapProvider>(context);
     map.setScaffoldKey = _scaffoldKey;
     if (map.streamingLocation != null) map.enableStreamingDriverLocation();
 

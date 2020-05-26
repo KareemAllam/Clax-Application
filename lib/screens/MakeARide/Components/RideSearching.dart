@@ -1,0 +1,64 @@
+import 'package:flutter/material.dart';
+
+class RideSearching extends StatefulWidget {
+  static const titleName = 'ابحث عن سائق';
+  final Function changeWidget;
+  RideSearching(this.changeWidget);
+  @override
+  _RideSearchingState createState() => _RideSearchingState();
+}
+
+class _RideSearchingState extends State<RideSearching>
+    with TickerProviderStateMixin {
+  AnimationController forwardAnimation;
+  @override
+  void initState() {
+    forwardAnimation =
+        AnimationController(duration: Duration(seconds: 2), vsync: this)
+          ..addListener(() {
+            setState(() {});
+          })
+          ..repeat().orCancel;
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    forwardAnimation.dispose();
+    super.dispose();
+  }
+
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            RotationTransition(
+              turns: CurvedAnimation(
+                  parent: Tween(begin: 0.0, end: 1.0).animate(forwardAnimation),
+                  curve: Curves.easeInOutBack),
+              child: GestureDetector(
+                onTap: widget.changeWidget,
+                child: Image(
+                  image: AssetImage('assets/images/logo.png'),
+                  height: 200,
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
+            Text("جاري البحث عن سائق",
+                style: Theme.of(context).textTheme.headline6),
+            Text(
+              "قد يستغرق بعض دقائق",
+              style: Theme.of(context)
+                  .textTheme
+                  .caption
+                  .copyWith(color: Colors.grey),
+            )
+          ]),
+    );
+  }
+}

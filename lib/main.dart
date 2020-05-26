@@ -1,7 +1,6 @@
 // Dart & Other Packages;
 import 'package:clax/Route.dart';
 import 'package:clax/commonUI.dart';
-import 'package:clax/providers/Map.dart';
 import 'package:provider/provider.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
@@ -14,6 +13,7 @@ import 'package:clax/providers/Complains.dart';
 import 'package:clax/providers/Payment.dart';
 import 'package:clax/providers/Trips.dart';
 import 'package:clax/providers/Transactions.dart';
+import 'package:clax/providers/Map.dart';
 
 void main() {
   Provider.debugCheckInvalidValueType = null;
@@ -33,14 +33,14 @@ class MyApp extends StatelessWidget {
         Provider(create: (context) => ComplainsProvider()),
         Provider(create: (context) => TripsProvider()),
         Provider(create: (context) => TransactionsProvider()),
-        Provider(create: (context) => CustomMap()),
+        Provider(create: (context) => MapProvider()),
         ChangeNotifierProvider(create: (context) => ProfilesProvider()),
         ChangeNotifierProvider(create: (context) => AuthProvider()),
         ChangeNotifierProvider(create: (context) => PaymentProvider()),
         ChangeNotifierProvider(create: (context) => ComplainsProvider()),
         ChangeNotifierProvider(create: (context) => TripsProvider()),
         ChangeNotifierProvider(create: (context) => TransactionsProvider()),
-        ChangeNotifierProvider(create: (context) => CustomMap()),
+        ChangeNotifierProvider(create: (context) => MapProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
