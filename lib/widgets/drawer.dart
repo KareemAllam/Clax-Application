@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:clax/screens/MakeARide/Clax.dart';
 import 'package:clax/screens/Home/Rahalatk.dart';
 import 'package:clax/screens/Home/free_rides.dart';
-import 'package:clax/screens/Home/help.dart';
-import 'package:clax/screens/Home/settings.dart';
+import 'package:clax/screens/Help/Help.dart';
+import 'package:clax/screens/Settings/Settings.dart';
 import 'package:clax/screens/Payments/Complains_Screen.dart';
 import 'package:clax/screens/Payments/Payment_HomeScreen.dart';
 

@@ -9,22 +9,28 @@ class RideSearching extends StatefulWidget {
 }
 
 class _RideSearchingState extends State<RideSearching>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   AnimationController forwardAnimation;
+
   @override
   void initState() {
     forwardAnimation =
         AnimationController(duration: Duration(seconds: 2), vsync: this)
           ..addListener(() {
-            setState(() {});
+            if (mounted) {
+              setState(() {});
+            }
           })
-          ..repeat().orCancel;
-
+          ..repeat();
     super.initState();
   }
 
   @override
+  bool get mounted => super.mounted;
+
+  @override
   void dispose() {
+    forwardAnimation.stop();
     forwardAnimation.dispose();
     super.dispose();
   }

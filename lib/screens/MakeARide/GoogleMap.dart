@@ -19,22 +19,57 @@ class _MapPageState extends State<MapPage> {
 
   @override
   void dispose() {
-    super.dispose();
     map.disableStreamingDriverLocation();
+    map.init();
+    super.dispose();
   }
 
-  Widget build(BuildContext context) {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     map = Provider.of<MapProvider>(context);
     map.setScaffoldKey = _scaffoldKey;
-    if (map.streamingLocation != null) map.enableStreamingDriverLocation();
+    map.setDriverId = 'driver123';
+    if (!map.isListeningToDriver()) map.enableStreamingDriverLocation();
+  }
 
+  void showInfo() {
+    TextTheme textTheme = Theme.of(context).textTheme;
+    // Color accentColor = Theme.of(context).accentColor;
+    // set up the button
+    Widget okButton = FlatButton(
+      child: Text("حسنا", style: TextStyle(color: Colors.black54)),
+      onPressed: Navigator.of(context).pop,
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      // title: Text("عذرب"),
+      contentPadding: EdgeInsets.only(top: 20, right: 15, bottom: 20),
+      content:
+          Text("من فضلك، فعل نظام الملاحه خاصتك", style: textTheme.bodyText2),
+      actions: [
+        okButton,
+      ],
+    );
+
+    // show the sheet
+    showBottomSheet(
+        context: _scaffoldKey.currentState.context,
+        builder: (BuildContext context) {
+          return alert;
+        });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    map.checkGPSEnabled();
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Theme.of(context).backgroundColor,
       appBar: AppBar(
         actions: <Widget>[
           IconButton(
-              icon: Icon(Icons.gps_fixed),
+              icon: const Icon(Icons.gps_fixed),
               onPressed: () async {
                 try {
                   map.focusDriver = false;
@@ -44,13 +79,21 @@ class _MapPageState extends State<MapPage> {
                 }
               }),
           IconButton(
-              icon: Icon(
+              icon: const Icon(
                 Icons.directions_bus,
                 color: Colors.white,
               ),
               onPressed: () {
-                map.enableStreamingDriverLocation();
-              })
+                map.focusDriver = true;
+              }),
+          Builder(
+            builder: (context) => IconButton(
+                icon: const Icon(
+                  Icons.info,
+                  color: Colors.white,
+                ),
+                onPressed: showInfo),
+          )
         ],
         title: Text(
           "اختر موقعك",
@@ -64,6 +107,11 @@ class _MapPageState extends State<MapPage> {
         child: Stack(
           children: <Widget>[
             GoogleMap(
+              scrollGesturesEnabled: false,
+              tiltGesturesEnabled: false,
+              cameraTargetBounds: CameraTargetBounds(LatLngBounds(
+                  southwest: LatLng(25.78847, 25.00192),
+                  northeast: LatLng(40.78847, 40.00192))),
               circles: map.circles,
               minMaxZoomPreference: MinMaxZoomPreference(7, 25),
               polylines: map.polylines,
@@ -71,28 +119,75 @@ class _MapPageState extends State<MapPage> {
               mapType: MapType.normal,
               compassEnabled: true,
               zoomGesturesEnabled: true,
+              myLocationEnabled: false,
+              myLocationButtonEnabled: false,
+              mapToolbarEnabled: false,
+              indoorViewEnabled: false,
               onCameraMove: null,
               initialCameraPosition: CameraPosition(
                   target: map.markedLocation['position'], zoom: 12),
               onMapCreated: (GoogleMapController controller) {
+                controller.setMapStyle(
+                    '[  {    "featureType": "administrative.land_parcel",    "elementType": "labels",    "stylers": [      {        "visibility": "off"      }    ]  },  {    "featureType": "poi",    "elementType": "labels.text",    "stylers": [      {        "visibility": "off"      }    ]  },  {    "featureType": "poi.business",    "stylers": [      {        "visibility": "off"      }    ]  },  {    "featureType": "road",    "elementType": "labels.icon",    "stylers": [      {        "visibility": "off"      }    ]  },  {    "featureType": "road.local",    "elementType": "labels",    "stylers": [      {        "visibility": "off"      }    ]  },  {    "featureType": "transit",    "stylers": [      {        "visibility": "off"      }    ]  }]');
                 if (!map.controller.isCompleted)
                   map.controller.complete(controller);
               },
             ),
             Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  width: double.infinity,
-                  color: Theme.of(context).primaryColor,
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  child: Text(
-                    map.markedLocation['name'],
-                    textAlign: TextAlign.center,
-                    strutStyle: StrutStyle(forceStrutHeight: true),
-                    style: Theme.of(context).textTheme.subtitle2.copyWith(
-                        color: Colors.white, fontFamily: "Product Sans"),
-                  ),
-                ))
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                color: Theme.of(context).primaryColor,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                child: map.gpsEnabled
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        textDirection: TextDirection.ltr,
+                        children: <Widget>[
+                          Text(
+                            map.markedLocation['name'],
+                            textAlign: TextAlign.center,
+                            strutStyle: StrutStyle(forceStrutHeight: true),
+                            style: Theme.of(context)
+                                .textTheme
+                                .subtitle2
+                                .copyWith(
+                                    color: Colors.white,
+                                    fontFamily: "Product Sans"),
+                          ),
+                          Text(
+                            '${map.distance}',
+                            textAlign: TextAlign.center,
+                            textDirection: TextDirection.ltr,
+                            strutStyle: StrutStyle(forceStrutHeight: true),
+                            style: Theme.of(context)
+                                .textTheme
+                                .subtitle2
+                                .copyWith(
+                                    color: Colors.white,
+                                    fontFamily: "Product Sans"),
+                          )
+                        ],
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Icon(Icons.location_on,
+                              color: Colors.white, size: 20),
+                          SizedBox(width: 10),
+                          Text(
+                            "فعل نظام الملاحه الخاص بك",
+                            textAlign: TextAlign.center,
+                            strutStyle: StrutStyle(forceStrutHeight: true),
+                            style: Theme.of(context)
+                                .textTheme
+                                .subtitle2
+                                .copyWith(color: Colors.white),
+                          )
+                        ],
+                      ),
+              ),
+            )
           ],
         ),
       ),

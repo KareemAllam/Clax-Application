@@ -4,7 +4,7 @@ import 'package:clax/screens/MakeARide/Components/RideSearching.dart';
 import 'package:flutter/material.dart';
 
 class StartARide extends StatefulWidget {
-  static const routeName = 'startARide';
+  static const routeName = '/startARide';
 
   @override
   _StartARideState createState() => _StartARideState();

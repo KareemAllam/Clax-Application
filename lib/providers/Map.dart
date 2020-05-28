@@ -16,9 +16,9 @@ class MapProvider extends ChangeNotifier {
   GeolocationStatus _permission;
   bool _gpsEnabled = false;
   // Map Controller
-  Completer<GoogleMapController> _controller = Completer();
+  Completer<GoogleMapController> _controller;
   Map<String, dynamic> _markedLocation;
-  bool _focusDriver = true;
+  bool _focusDriver;
   // Markers ID
   String _userId;
   String _driverId;
@@ -31,24 +31,24 @@ class MapProvider extends ChangeNotifier {
   Map<String, Marker> _markers;
   Set<Circle> _circles;
   Set<Polyline> _polylines;
+  String distance;
   // Initializing Realtime Database Connection
   RealtimeDB _realtimeDB;
-  // Setting App to Trip State so User can't make another tirp
-  bool _busy = false;
 
   void init() async {
+    _controller = Completer();
     _markers = {};
     _polylines = Set();
     _circles = Set();
     _userId = 'user';
     _driverId = "driver";
-
+    _focusDriver = true;
     zooming = 16;
     _markedLocation = {"name": "...loading name", "position": LatLng(30, 30)};
     _realtimeDB = RealtimeDB();
     _geolocator = Geolocator();
     await checkPermission();
-    await checkGPSEnabled();
+    _gpsEnabled = await Geolocator().isLocationServiceEnabled();
     if (_permission == GeolocationStatus.granted && _gpsEnabled)
       await currentLocation();
     notifyListeners();
@@ -67,6 +67,7 @@ class MapProvider extends ChangeNotifier {
 
   Future checkGPSEnabled() async {
     _gpsEnabled = await Geolocator().isLocationServiceEnabled();
+    notifyListeners();
   }
 
   void enableStreamingCurrentLocation(String child, int seats, Function cb) {
@@ -93,7 +94,7 @@ class MapProvider extends ChangeNotifier {
         _markers[_userId] = marker;
 
         // Updating Map's current view
-        if (_focusDriver) {
+        if (!_focusDriver) {
           CameraPosition currentMarker = CameraPosition(
             target: LatLng(position.latitude, position.longitude),
             zoom: zooming,
@@ -115,31 +116,49 @@ class MapProvider extends ChangeNotifier {
     streamingLocation.cancel();
   }
 
+  bool isListeningToDriver() {
+    return _realtimeDB.dbRefs[_driverId] != null;
+  }
+
   void enableStreamingDriverLocation() {
+    int i;
     // Reading Database changes of Location
     _realtimeDB.readAsync(_driverId, (value) async {
       try {
         // Parse Location from Database
         LatLng position =
             LatLng.fromJson([value['latitude'], value['longitude']]);
-        Marker marker = Marker(
+
+        // Updating Driver's Marker
+        _markers[_driverId] = Marker(
           markerId: MarkerId(_driverId),
-          position: LatLng(position.latitude, position.longitude),
+          position: position,
           infoWindow: InfoWindow(
             title: "Dynamic Movement",
             snippet: "Lat: ${position.latitude}, Long: ${position.longitude}",
           ),
         );
-        _markers[_driverId] = marker;
 
-        // Updating Map's current view
-        CameraPosition currentMarker = CameraPosition(
-          target: LatLng(position.latitude, position.longitude),
-          zoom: zooming,
-        );
-        final GoogleMapController controller = await _controller.future;
-        controller.animateCamera(CameraUpdate.newCameraPosition(currentMarker));
+        // Update Distance
+        i = (await _geolocator.distanceBetween(
+                _markedLocation["position"].latitude,
+                _markedLocation["position"].longitude,
+                position.latitude,
+                position.longitude))
+            .ceil();
+        i > 999 ? distance = '${i / 1000} km' : distance = '$i m';
 
+        // Animating Camera if app has focus on driver
+        if (_focusDriver) {
+          // Updating Map's current view
+          CameraPosition currentMarker = CameraPosition(
+            target: position,
+            zoom: zooming,
+          );
+          final GoogleMapController controller = await _controller.future;
+          controller.moveCamera(CameraUpdate.newCameraPosition(currentMarker));
+        }
+        // Changing Required Values
         notifyListeners();
       } catch (error) {
         _scaffoldKey.currentState.showSnackBar(SnackBar(
@@ -154,15 +173,19 @@ class MapProvider extends ChangeNotifier {
   }
 
   Future currentLocation() async {
+    if (!_gpsEnabled) {
+      checkGPSEnabled();
+      return;
+    }
     // Retreive current location updates
     if (_permission == GeolocationStatus.granted && _gpsEnabled) {
       Position position = await _geolocator.getCurrentPosition();
       _markedLocation["position"] =
           LatLng(position.latitude, position.longitude);
-
       // Retrieve Info about current location
       List<Placemark> placemark = await _geolocator.placemarkFromCoordinates(
           position.latitude, position.longitude);
+
       // Update global variable
       _markedLocation["name"] = placemark[0].administrativeArea +
           "," +
@@ -174,18 +197,20 @@ class MapProvider extends ChangeNotifier {
         strokeColor: appTheme.primaryColor.withAlpha(100),
         zIndex: 2,
         center: LatLng(position.latitude, position.longitude),
-        radius: 20,
+        radius: 10,
       ));
       // Updating Map's current view
-      CameraPosition currentMarker = CameraPosition(
-        target: LatLng(position.latitude, position.longitude),
-        zoom: 16,
-      );
-      final GoogleMapController controller = await _controller.future;
-      try {
-        controller.animateCamera(CameraUpdate.newCameraPosition(currentMarker));
-      } catch (_) {
-        print(_);
+      if (!_focusDriver) {
+        CameraPosition currentMarker = CameraPosition(
+          target: LatLng(position.latitude, position.longitude),
+          zoom: 16,
+        );
+        GoogleMapController controller = await _controller.future;
+        try {
+          controller.moveCamera(CameraUpdate.newCameraPosition(currentMarker));
+        } catch (_) {
+          print(_);
+        }
       }
       notifyListeners();
     }
@@ -195,16 +220,13 @@ class MapProvider extends ChangeNotifier {
   StreamSubscription<Position> get locationStreaming => streamingLocation;
   Set<Polyline> get polylines => _polylines;
   Set<Circle> get circles => _circles;
-  bool get busy => _busy;
+  bool get driverIsFocused => _focusDriver;
+  bool get gpsEnabled => _gpsEnabled;
   Map<String, Marker> get markers => _markers;
   Completer<GoogleMapController> get controller => _controller;
   set controller(controller) => _controller = controller;
   set focusDriver(boolean) => _focusDriver = boolean;
   set setScaffoldKey(GlobalKey<ScaffoldState> sk) => _scaffoldKey = sk;
-  set setBusy(bool val) {
-    _busy = val;
-  }
-
   set setDriverId(id) {
     _driverId = id;
   }

@@ -82,7 +82,7 @@ class _RidePickLocationState extends State<RidePickLocation> {
       _station.lines.forEach((line) {
         list.add(Container(
           decoration: BoxDecoration(
-              color: Colors.white60,
+              color: Colors.white,
               border: Border(bottom: BorderSide(color: Colors.black26))),
           child: ListTile(
             onTap: () {
@@ -112,10 +112,8 @@ class _RidePickLocationState extends State<RidePickLocation> {
                 Text(line.name, style: Theme.of(context).textTheme.subtitle2),
             subtitle: Text('${_station.cost} جنيه',
                 style: Theme.of(context).textTheme.caption),
-            leading: Icon(
-              Icons.room,
-              color: Theme.of(context).primaryColor,
-            ),
+            leading: Icon(Icons.room,
+                color: Theme.of(context).primaryColor, size: 30),
             trailing: Icon(Icons.navigate_next),
           ),
         ));
@@ -147,25 +145,30 @@ class _RidePickLocationState extends State<RidePickLocation> {
             verticalDirection: VerticalDirection.up,
             children: <Widget>[
                 TextField(
-                    controller: _controllerPlace,
-                    onChanged: (value) => searchStation(value),
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(
-                        counterText: '',
-                        enabledBorder: InputBorder.none,
-                        // contentPadding: EdgeInsets.all(0),
-                        filled: true,
-                        fillColor: Colors.white,
-                        hintText: 'اختار المحطه',
-                        prefixIcon: Icon(
-                          Icons.my_location,
-                        ),
-                        suffixIcon: new IconButton(
-                          icon: new Icon(Icons.cancel),
-                          onPressed: () {
-                            _controllerPlace.clear();
-                          },
-                        ))),
+                  controller: _controllerPlace,
+                  onChanged: (value) => searchStation(value),
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                    counterText: '',
+                    enabledBorder: InputBorder.none,
+                    // contentPadding: EdgeInsets.all(0),
+                    filled: true,
+                    fillColor: Colors.white54,
+                    hintText: 'اختار المحطه',
+                    prefixIcon: Icon(
+                      Icons.my_location,
+                    ),
+                    suffixIcon: _controllerPlace.text != ""
+                        ? IconButton(
+                            icon: new Icon(Icons.cancel),
+                            onPressed: () {
+                              _controllerPlace.clear();
+                              setState(() {});
+                            },
+                          )
+                        : SizedBox(),
+                  ),
+                ),
                 Expanded(
                   child: _searchResult.length == 0
                       ? Center(
@@ -175,6 +178,7 @@ class _RidePickLocationState extends State<RidePickLocation> {
                         ))
                       : ListView.builder(
                           itemCount: lines.length,
+                          itemExtent: 70,
                           physics: AlwaysScrollableScrollPhysics(
                               parent: BouncingScrollPhysics()),
                           itemBuilder: (context, index) => lines[index],

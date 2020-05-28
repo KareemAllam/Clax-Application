@@ -133,7 +133,7 @@ class _WriteAComplainState extends State<WriteAComplain> {
                 icon: Icon(Icons.refresh),
                 onPressed: () async {
                   bool result =
-                      await Provider.of<TripsProvider>(context).fetchData();
+                      await Provider.of<TripsProvider>(context).serverData();
                   if (!result)
                     Scaffold.of(context).showSnackBar(SnackBar(
                         content: Text(

@@ -1,4 +1,6 @@
 // Dart & Other Packages
+import 'package:clax/Providers/Trips.dart';
+import 'package:clax/screens/MakeARide/StartARide.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 // Flutter's Material Components
@@ -9,11 +11,10 @@ import 'package:clax/screens/Home/Components/favourites.dart';
 import 'package:clax/widgets/drawer.dart';
 // Providers
 import 'package:clax/providers/Map.dart';
+import 'package:clax/providers/Payment.dart';
 // Screens
 import 'package:clax/screens/MakeARide/GoogleMap.dart';
 import 'package:clax/screens/MakeARide/RidePickupLocation.dart';
-
-import '../../Providers/Payment.dart';
 
 class Tabs extends StatefulWidget {
   static const routeName = '/homescreen';
@@ -36,10 +37,28 @@ class _TabsState extends State<Tabs> {
 
   void _navigateToItemDetail(Map<String, dynamic> message) {
     // Navigator.of(context).pushNamed(MapPage.routeName);
+    // Navigator.of(context)
+    //     .print("Route Name: ${ModalRoute.of(context).settings.name}");
+    // print("isCurrent: ${ModalRoute.of(context).isCurrent}");
+    // print("isActive: ${ModalRoute.of(context).isActive}");
+    // print("isFirst: ${ModalRoute.of(context).isFirst}");
+
     String type = message['data']['type'];
     switch (type) {
       case "driverArrived":
-        Provider.of<MapProvider>(context, listen: false).setBusy = true;
+        // Retreive DriverID
+        String driverId = message['data']['driverId'];
+        Provider.of<TripsProvider>(context, listen: false).setBusy = true;
+        Provider.of<MapProvider>(context, listen: false).setDriverId = driverId;
+        // Exit Waiting Screen
+        // Github Solution
+        // https://stackoverflow.com/questions/50817086/how-to-check-which-the-current-route-is/50817399
+        if (!ModalRoute.of(context).isCurrent) {
+          Navigator.popUntil(context, (route) {
+            if (route.settings.name == StartARide.routeName) return false;
+            return true;
+          });
+        }
         Navigator.of(context).pushNamed(MapPage.routeName);
         break;
       case "offer":
@@ -47,7 +66,6 @@ class _TabsState extends State<Tabs> {
         Provider.of<PaymentProvider>(context).setDiscount = offerDiscount;
         break;
       default:
-        print("wait what");
       // Default FCM Action
     }
   }
@@ -57,22 +75,22 @@ class _TabsState extends State<Tabs> {
     super.initState();
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
-        print("onMessage: $message");
+        // print("onMessage: $message");
         _navigateToItemDetail(message);
       },
       onLaunch: (Map<String, dynamic> message) async {
-        print("onLaunch: $message");
+        // print("onLaunch: $message");
         _navigateToItemDetail(message);
       },
       onResume: (Map<String, dynamic> message) async {
-        print("onResume: $message");
+        // print("onResume: $message");
         _navigateToItemDetail(message);
       },
     );
 
     _firebaseMessaging.getToken().then((String token) {
       assert(token != null);
-      print("Push Messaging token: $token");
+      // print("Push Messaging token: $token");
     });
   }
 

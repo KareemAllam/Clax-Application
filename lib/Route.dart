@@ -1,8 +1,10 @@
 // Flutter's Material Components
-import 'package:clax/providers/profiles.dart';
 import 'package:flutter/material.dart';
 // Dart & Other Packages
 import 'package:provider/provider.dart';
+// Providers
+import 'package:clax/providers/profiles.dart';
+
 // Screens
 //// Authentication
 import 'package:clax/screens/Login/LoadMainScreen.dart';
@@ -10,29 +12,34 @@ import 'package:clax/screens/Login/Login.dart';
 import 'package:clax/screens/Login/Register.dart';
 import 'package:clax/screens/Login/Verification.dart';
 import 'package:clax/screens/Login/ForgotPassword.dart';
+
+//// Settings
+import 'package:clax/screens/Settings/AccountOverview.dart';
+import 'package:clax/screens/Settings/Family.dart';
+import 'package:clax/screens/Settings/Notifications.dart';
+import 'package:clax/screens/Settings/Settings.dart';
+import 'package:clax/screens/Settings/EditAccount.dart';
+import 'package:clax/screens/Settings/Safety.dart';
+import 'package:clax/screens/Settings/TrustedContacts.dart';
+import 'package:clax/screens/Settings/Components/Members.dart';
+
+//// Help
+import 'package:clax/screens/Help/Bookings.dart';
+import 'package:clax/screens/Help/Guide.dart';
+import 'package:clax/screens/Help/More.dart';
+import 'package:clax/screens/Help/Help.dart';
+import 'package:clax/screens/Help/Cancellations.dart';
+import 'package:clax/screens/Help/CreditCard.dart';
+import 'package:clax/screens/Help/PaymentOptions.dart';
+import 'package:clax/screens/Help/UpfrontPricing.dart';
+import 'package:clax/screens/Help/PromoCodes.dart';
+import 'package:clax/screens/Help/Payments.dart';
+
 //// Home Screens
-import 'package:clax/screens/Home/AccountOverview.dart';
-import 'package:clax/screens/Home/Bookings.dart';
-import 'package:clax/screens/Home/Components/Family.dart';
-import 'package:clax/screens/Home/Components/family_members.dart';
 import 'package:clax/screens/Home/Components/history.dart';
 import 'package:clax/screens/Home/Free_Rides.dart';
-import 'package:clax/screens/Home/Guide.dart';
-import 'package:clax/screens/Home/Members.dart';
-import 'package:clax/screens/Home/More.dart';
-import 'package:clax/screens/Home/Notifications.dart';
 import 'package:clax/screens/Home/Rahalatk.dart';
-import 'package:clax/screens/Home/Safety.dart';
-import 'package:clax/screens/Home/Signout.dart';
-import 'package:clax/screens/Home/cancellations.dart';
-import 'package:clax/screens/Home/creditCard.dart';
-import 'package:clax/screens/Home/help.dart';
-import 'package:clax/screens/Home/payOptions.dart';
-import 'package:clax/screens/Home/promoCodes.dart';
-import 'package:clax/screens/Home/settings.dart';
-import 'package:clax/screens/Home/trusted_contacts.dart';
-import 'package:clax/screens/Home/upfrontPricing.dart';
-import 'package:clax/screens/Home/EditAccount.dart';
+
 //// Payments Screens
 import 'package:clax/screens/Payments/Payment_HomeScreen.dart';
 import 'package:clax/screens/Payments/Payment_Add.dart';
@@ -44,6 +51,7 @@ import 'package:clax/screens/Payments/complains_Historty.dart';
 import 'package:clax/screens/Payments/Complains_Screen.dart';
 import 'package:clax/screens/Payments/Complain_Write.dart';
 import 'package:clax/screens/MakeARide/Clax.dart';
+
 //// Tracking Screens
 import 'package:clax/screens/MakeARide/StartARide.dart';
 import 'package:clax/screens/MakeARide/GoogleMap.dart';
@@ -84,9 +92,6 @@ class Router {
             builder: (_) => Bookings(), settings: settings);
       case Family.routeName:
         return MaterialPageRoute(builder: (_) => Family(), settings: settings);
-      case FamilyMembers.routeName:
-        return MaterialPageRoute(
-            builder: (_) => FamilyMembers(), settings: settings);
       case History.routeName:
         return MaterialPageRoute(builder: (_) => History(), settings: settings);
       case FreeRides.routeName:
@@ -98,6 +103,9 @@ class Router {
         return MaterialPageRoute(builder: (_) => Members(), settings: settings);
       case More.routeName:
         return MaterialPageRoute(builder: (_) => More(), settings: settings);
+      case Payments.routeName:
+        return MaterialPageRoute(
+            builder: (_) => Payments(), settings: settings);
       case Notifications.routeName:
         return MaterialPageRoute(
             builder: (_) => Notifications(), settings: settings);
@@ -105,8 +113,6 @@ class Router {
         return MaterialPageRoute(builder: (_) => Rides(), settings: settings);
       case Safety.routeName:
         return MaterialPageRoute(builder: (_) => Safety(), settings: settings);
-      case Signout.routeName:
-        return MaterialPageRoute(builder: (_) => Signout(), settings: settings);
       case Cancellations.routeName:
         return MaterialPageRoute(
             builder: (_) => Cancellations(), settings: settings);
@@ -132,9 +138,9 @@ class Router {
         return MaterialPageRoute(
             builder: (_) => UpFrontPricing(), settings: settings);
 
-      case YourAccount.routeName:
+      case AccountOverview.routeName:
         return MaterialPageRoute(
-            builder: (_) => YourAccount(), settings: settings);
+            builder: (_) => AccountOverview(), settings: settings);
       case PromoCodes.routeName:
         return MaterialPageRoute(
             builder: (_) => PromoCodes(), settings: settings);
@@ -169,13 +175,7 @@ class Router {
       case PaypalWeb.routeName:
         return MaterialPageRoute(
             builder: (_) => PaypalWeb(), settings: settings);
-      // Tracking
-      // case TripDetails.routeName:
-      //   return MaterialPageRoute(builder: (_) => TripDetails(),settings: settings);
-      // case MapPage.routeName:
-      //   return MaterialPageRoute(builder: (_) => MapPage(),settings: settings);
-      // case LinesPage.routeName:
-      //   return MaterialPageRoute(builder: (_) => LinesPage(),settings: settings);
+
       default:
         return MaterialPageRoute(builder: (_) {
           return Scaffold(

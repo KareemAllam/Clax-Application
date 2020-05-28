@@ -13,19 +13,27 @@ import 'package:clax/services/Backend.dart';
 class TripsProvider extends ChangeNotifier {
   // Last Trips
   List<Trip> _trips;
-
+  // Setting App to Trip State so User can't make another tirp
+  bool _busy;
   // Current Available Stations
   List<Station> _stations;
 
   // Provider Constructor
   TripsProvider() {
+    _busy = false;
     initialize();
   }
 
   // Async Constructor
   void initialize() async {
-    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    // Fetch Data from Cache
+    await cacheData();
+    // Fetch Data from Server
+    await serverData();
+  }
 
+  Future cacheData() async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
     // Get Cached Past Trips
     _trips = _prefs.getString("trips") != null
         ? json
@@ -41,14 +49,10 @@ class TripsProvider extends ChangeNotifier {
         : [];
 
     notifyListeners();
-
-    // Fetch Data from Server
-    await fetchData();
   }
 
-  Future<bool> fetchData() async {
+  Future<bool> serverData() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
-
     try {
       Response trips = await Api.get('user');
       if (trips.statusCode == 200) {
@@ -66,4 +70,8 @@ class TripsProvider extends ChangeNotifier {
   }
 
   List<Trip> get trips => _trips;
+  bool get busy => _busy;
+  set setBusy(bool val) {
+    _busy = val;
+  }
 }
