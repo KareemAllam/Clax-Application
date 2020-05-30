@@ -1,3 +1,4 @@
+import 'package:clax/providers/CurrentTrip.dart';
 import 'package:clax/providers/Payment.dart';
 import 'package:clax/widgets/LinePaint.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,11 @@ class RideInfo extends StatefulWidget {
 
 class _RideInfoState extends State<RideInfo> {
   int _seatsCount = 1;
+  double balance;
+  double finalPrice;
+  Map<String, dynamic> arguments;
+  Map<String, dynamic> line;
+  Map<String, dynamic> destination;
   void areYouSure() {
     // set up the buttons
     Widget cancelButton = FlatButton(
@@ -29,6 +35,8 @@ class _RideInfoState extends State<RideInfo> {
               fontWeight: FontWeight.bold)),
       onPressed: () {
         // Dismiss the Alert Dialoge Box
+        Provider.of<CurrentTripProvider>(context, listen: false)
+            .searchingDriverState(finalPrice);
         widget.changeWidget();
         Navigator.of(context).pop();
       },
@@ -83,16 +91,21 @@ class _RideInfoState extends State<RideInfo> {
     );
   }
 
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    balance = Provider.of<PaymentProvider>(context).balance;
+    arguments =
+        ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
+    line = arguments["line"];
+    destination = arguments["destination"];
+  }
+
   @override
   Widget build(BuildContext context) {
-    Map<String, dynamic> arguments =
-        ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
-    Map<String, dynamic> line = arguments["line"];
-    Map<String, dynamic> destination = arguments["destination"];
     // Balance Informations
-    double balance = Provider.of<PaymentProvider>(context).balance;
-    bool canPay = balance - ((_seatsCount + 1) * line['cost']).toDouble() > 0;
-
+    finalPrice = ((_seatsCount) * line['cost']).toDouble();
+    bool canPay =
+        (balance - ((_seatsCount + 1) * line['cost']).toDouble()) >= 0;
     // Decoration Vars
     ThemeData theme = Theme.of(context);
     TextTheme textTheme = theme.textTheme;
@@ -177,7 +190,6 @@ class _RideInfoState extends State<RideInfo> {
                         color: canPay ? Colors.green : Colors.grey,
                       ),
                       onPressed: () {
-                        print(canPay);
                         if (_seatsCount != 3 && canPay)
                           setState(() {
                             _seatsCount += 1;

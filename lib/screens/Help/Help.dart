@@ -8,7 +8,7 @@ import 'package:clax/screens/Help/Payments.dart';
 // Widgets
 import 'package:clax/widgets/appBar.dart';
 import 'package:clax/widgets/listTile.dart';
-import 'package:clax/widgets/drawer.dart';
+import 'package:clax/screens/Drawer.dart';
 
 class Help extends StatelessWidget {
   static const routeName = '/help';

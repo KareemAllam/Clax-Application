@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -14,21 +14,21 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future firebaseConfig() async {
-    _firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) async {
-        print(
-            "onMessage: Title: ${message['notification']['title']}, Data: ${message['notification']['body']}");
-        // Message Handling Class
-      },
-      onLaunch: (Map<String, dynamic> message) async {
-        print("onLaunch: $message");
-        // Message Handling Class
-      },
-      onResume: (Map<String, dynamic> message) async {
-        print("onResume: $message");
-        // Message Handling Class
-      },
-    );
+    //   _firebaseMessaging.configure(
+    //     onMessage: (Map<String, dynamic> message) async {
+    //       print(
+    //           "onMessage: Title: ${message['notification']['title']}, Data: ${message['notification']['body']}");
+    //       // Message Handling Class
+    //     },
+    //     onLaunch: (Map<String, dynamic> message) async {
+    //       print("onLaunch: $message");
+    //       // Message Handling Class
+    //     },
+    //     onResume: (Map<String, dynamic> message) async {
+    //       print("onResume: $message");
+    //       // Message Handling Class
+    //     },
+    //   );
 
     _firebaseToken = await _firebaseMessaging.getToken();
   }
@@ -75,7 +75,7 @@ class AuthProvider extends ChangeNotifier {
       _prefs.setString("loginToken", originalToken);
       _auth = originalToken;
       notifyListeners();
-      return true;
+      return false;
     }
   }
 

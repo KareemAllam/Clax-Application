@@ -6,7 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 // Providers
 import 'package:clax/providers/Payment.dart';
-import 'package:clax/providers/Profiles.dart';
+import 'package:clax/providers/Profile.dart';
 // Screens
 import 'package:clax/screens/Login/Verification.dart';
 // Components
@@ -44,6 +44,8 @@ class _PaymentAppBarBottomState extends State<PaymentAppBarBottom> {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final width = MediaQuery.of(context).size.width;
+    bool verified =
+        Provider.of<ProfilesProvider>(context, listen: false).phoneVerified;
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       Consumer<PaymentProvider>(
         builder: (context, account, child) => Text(
@@ -66,7 +68,7 @@ class _PaymentAppBarBottomState extends State<PaymentAppBarBottom> {
             onTap: () async {
               bool result = await checkInternet();
               if (result) {
-                if (checkVerification()) {
+                if (verified) {
                   showModalBottomSheet<bool>(
                       context: context,
                       shape: RoundedRectangleBorder(

@@ -7,7 +7,7 @@ class BillModel {
   BillModel({this.amount, this.description, this.type, this.date});
 
   BillModel.fromJson(Map<String, dynamic> json) {
-    amount = json['amount'];
+    amount = int.parse(json['amount']);
     description = json['description'];
     type = json['type'];
     date = DateTime.parse(json['date']);

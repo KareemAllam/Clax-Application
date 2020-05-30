@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 // Providers
-import 'package:clax/providers/Profiles.dart';
+import 'package:clax/providers/Profile.dart';
 // Utils
 import 'package:clax/utils/password.dart';
 // Models

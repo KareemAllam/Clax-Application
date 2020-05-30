@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 class RideSearching extends StatefulWidget {
   static const titleName = 'ابحث عن سائق';
-  final Function changeWidget;
-  RideSearching(this.changeWidget);
   @override
   _RideSearchingState createState() => _RideSearchingState();
 }
@@ -46,19 +44,16 @@ class _RideSearchingState extends State<RideSearching>
               turns: CurvedAnimation(
                   parent: Tween(begin: 0.0, end: 1.0).animate(forwardAnimation),
                   curve: Curves.easeInOutBack),
-              child: GestureDetector(
-                onTap: widget.changeWidget,
-                child: Image(
-                  image: AssetImage('assets/images/logo.png'),
-                  height: 200,
-                ),
+              child: Image(
+                image: AssetImage('assets/images/logo.png'),
+                height: 200,
               ),
             ),
             SizedBox(height: 10),
             Text("جاري البحث عن سائق",
                 style: Theme.of(context).textTheme.headline6),
             Text(
-              "قد يستغرق بعض دقائق",
+              "قد يستغرق البحث بضع دقائق",
               style: Theme.of(context)
                   .textTheme
                   .caption

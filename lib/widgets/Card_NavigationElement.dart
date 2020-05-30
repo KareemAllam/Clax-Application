@@ -1,6 +1,9 @@
-import 'package:flutter/material.dart';
+// Dart & Other Pacages
 import 'package:url_launcher/url_launcher.dart';
-import '../models/card.dart';
+// Flutter Material Componenets
+import 'package:flutter/material.dart';
+// Models
+import 'package:clax/models/Card.dart';
 
 class NavigationCard extends StatelessWidget {
   final CardModel card;
@@ -11,13 +14,8 @@ class NavigationCard extends StatelessWidget {
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
     final double cardHeight = height * 0.11;
-    // final double borderRadius = width * 0.02;
     final double padding = width * 0.04;
-    return
-        // Padding(
-        //   padding: EdgeInsets.symmetric(vertical: padding / 2, horizontal: padding),
-        //   child:
-        Column(
+    return Column(
       children: <Widget>[
         Container(
           decoration: BoxDecoration(
@@ -26,11 +24,8 @@ class NavigationCard extends StatelessWidget {
           width: width,
           height: cardHeight,
           child: Material(
-            // elevation: 2.0,
-            // borderRadius: BorderRadius.all(Radius.circular(width * 0.01)),
             color: Theme.of(context).backgroundColor,
             child: InkWell(
-              // borderRadius: BorderRadius.all(Radius.circular(width * 0.01)),
               onTap: () {
                 if (card.screen.contains(':') == true)
                   launch(card.screen);

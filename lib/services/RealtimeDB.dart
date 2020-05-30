@@ -35,18 +35,17 @@ class RealtimeDB {
   }
 
   void readAsync(String child, Function cb) {
-    print("reading Async");
     _databaseRefrences[child] =
         FirebaseDatabase.instance.reference().child(child);
     events[child] = _databaseRefrences[child].onValue.listen((event) {
       // code on event
-      // print("valueChanged");
       cb(event.snapshot.value);
     });
   }
 
   void cancelReadAsync(String child) {
     events[child].cancel();
+    events[child] = null;
   }
 
   void updateChild(String child) {

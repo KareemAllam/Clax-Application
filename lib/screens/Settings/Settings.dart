@@ -9,7 +9,8 @@ import 'package:clax/screens/Settings/Family.dart';
 // Widgets
 import 'package:clax/widgets/appBar.dart';
 import 'package:clax/widgets/listTile.dart';
-import 'package:clax/widgets/drawer.dart';
+// Drawer
+import 'package:clax/screens/Drawer.dart';
 
 class Settings extends StatelessWidget {
   static const routeName = '/settings';

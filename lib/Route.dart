@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 // Dart & Other Packages
 import 'package:provider/provider.dart';
 // Providers
-import 'package:clax/providers/profiles.dart';
-
+import 'package:clax/providers/Profile.dart';
 // Screens
 //// Authentication
 import 'package:clax/screens/Login/LoadMainScreen.dart';
@@ -40,22 +39,26 @@ import 'package:clax/screens/Home/Components/history.dart';
 import 'package:clax/screens/Home/Free_Rides.dart';
 import 'package:clax/screens/Home/Rahalatk.dart';
 
+//// Complains
+import 'package:clax/screens/Complains/Complaint_Details.dart';
+import 'package:clax/screens/Complains/Complains_Screen.dart';
+import 'package:clax/screens/Complains/Complain_Write.dart';
+import 'package:clax/screens/Complains/Complains_Historty.dart';
+
 //// Payments Screens
 import 'package:clax/screens/Payments/Payment_HomeScreen.dart';
 import 'package:clax/screens/Payments/Payment_Add.dart';
 import 'package:clax/screens/Payments/Payment_PaypalWeb.dart';
 import 'package:clax/screens/Payments/Payment_History.dart';
 import 'package:clax/screens/Payments/Payment_TransferMoney.dart';
-import 'package:clax/screens/Payments/Complaint_Details.dart';
-import 'package:clax/screens/Payments/complains_Historty.dart';
-import 'package:clax/screens/Payments/Complains_Screen.dart';
-import 'package:clax/screens/Payments/Complain_Write.dart';
-import 'package:clax/screens/MakeARide/Clax.dart';
 
 //// Tracking Screens
-import 'package:clax/screens/MakeARide/StartARide.dart';
+import 'package:clax/screens/MakeARide/Clax.dart';
+import 'package:clax/screens/MakeARide/RateTrip.dart';
 import 'package:clax/screens/MakeARide/GoogleMap.dart';
+import 'package:clax/screens/MakeARide/StartARide.dart';
 import 'package:clax/screens/MakeARide/RidePickupLocation.dart';
+import 'package:clax/screens/MakeARide/Components/FlipIcon.dart';
 
 class Router {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -68,6 +71,9 @@ class Router {
       // Home
       case Tabs.routeName:
         return MaterialPageRoute(builder: (_) => Tabs(), settings: settings);
+      case RateTrip.routeName:
+        return MaterialPageRoute(
+            builder: (_) => RateTrip(), settings: settings);
       case StartARide.routeName:
         return MaterialPageRoute(
             builder: (_) => StartARide(), settings: settings);
@@ -101,6 +107,9 @@ class Router {
         return MaterialPageRoute(builder: (_) => Guide(), settings: settings);
       case Members.routeName:
         return MaterialPageRoute(builder: (_) => Members(), settings: settings);
+      case FlipCard.routeName:
+        return MaterialPageRoute(
+            builder: (_) => FlipCard(), settings: settings);
       case More.routeName:
         return MaterialPageRoute(builder: (_) => More(), settings: settings);
       case Payments.routeName:
@@ -137,7 +146,6 @@ class Router {
       case UpFrontPricing.routeName:
         return MaterialPageRoute(
             builder: (_) => UpFrontPricing(), settings: settings);
-
       case AccountOverview.routeName:
         return MaterialPageRoute(
             builder: (_) => AccountOverview(), settings: settings);

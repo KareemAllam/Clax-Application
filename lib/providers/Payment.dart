@@ -33,9 +33,11 @@ class PaymentProvider extends ChangeNotifier {
 
     // Retrieve PaymentLog from cache
     if (prefs.getString('bills') != null) {
-      _bills =
-          List<BillModel>.from(json.decode(prefs.getString('bills')) as List) ??
-              [];
+      print(prefs.getString('bills'));
+      _bills = List<BillModel>.from(json
+              .decode(prefs.getString('bills'))
+              .map((bill) => BillModel.fromJson(bill))).toList() ??
+          [];
     }
 
     notifyListeners();
@@ -98,9 +100,8 @@ class PaymentProvider extends ChangeNotifier {
     }
   }
 
-  set balance(double amount) {
+  set setBalance(double amount) {
     _balance += amount;
-    notifyListeners();
   }
 
   List<CreditCardModel> get cards => _cards;
@@ -138,7 +139,7 @@ class PaymentProvider extends ChangeNotifier {
   Future<String> chargeCredit(String id, String amount) async {
     try {
       Response result = await Api.post(
-          'payments/manage-financials/charge-credit',
+          'passengers/payments/manage-financials/charge-credit',
           {"source": id, "amount": amount});
       if (result.statusCode == 200) {
         _balance += int.parse(amount);

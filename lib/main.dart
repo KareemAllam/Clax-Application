@@ -7,12 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 // Providers
-import 'package:clax/providers/Profiles.dart';
-import 'package:clax/providers/Auth.dart';
+import 'package:clax/providers/Transactions.dart';
+import 'package:clax/providers/CurrentTrip.dart';
 import 'package:clax/providers/Complains.dart';
 import 'package:clax/providers/Payment.dart';
+import 'package:clax/providers/Profile.dart';
 import 'package:clax/providers/Trips.dart';
-import 'package:clax/providers/Transactions.dart';
+import 'package:clax/providers/Auth.dart';
 import 'package:clax/providers/Map.dart';
 
 void main() {
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
         Provider(create: (context) => TripsProvider()),
         Provider(create: (context) => TransactionsProvider()),
         Provider(create: (context) => MapProvider()),
+        Provider(create: (context) => CurrentTripProvider()),
         ChangeNotifierProvider(create: (context) => ProfilesProvider()),
         ChangeNotifierProvider(create: (context) => AuthProvider()),
         ChangeNotifierProvider(create: (context) => PaymentProvider()),
@@ -41,6 +43,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => TripsProvider()),
         ChangeNotifierProvider(create: (context) => TransactionsProvider()),
         ChangeNotifierProvider(create: (context) => MapProvider()),
+        ChangeNotifierProvider(create: (context) => CurrentTripProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

@@ -8,7 +8,7 @@ import 'package:clax/services/Backend.dart';
 // Widgets
 import 'package:clax/widgets/alertDialog.dart';
 import 'package:clax/widgets/appBar.dart';
-import 'package:clax/widgets/drawer.dart';
+import 'package:clax/screens/Drawer.dart';
 
 class FreeRides extends StatefulWidget {
   static const routeName = '/freeRides';

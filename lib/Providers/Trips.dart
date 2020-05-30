@@ -13,14 +13,11 @@ import 'package:clax/services/Backend.dart';
 class TripsProvider extends ChangeNotifier {
   // Last Trips
   List<Trip> _trips;
-  // Setting App to Trip State so User can't make another tirp
-  bool _busy;
+
   // Current Available Stations
   List<Station> _stations;
-
   // Provider Constructor
   TripsProvider() {
-    _busy = false;
     initialize();
   }
 
@@ -70,8 +67,4 @@ class TripsProvider extends ChangeNotifier {
   }
 
   List<Trip> get trips => _trips;
-  bool get busy => _busy;
-  set setBusy(bool val) {
-    _busy = val;
-  }
 }

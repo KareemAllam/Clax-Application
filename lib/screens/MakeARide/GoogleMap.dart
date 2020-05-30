@@ -1,11 +1,13 @@
+// Dart & Other Pacakges
 import 'dart:ui';
-import 'package:clax/providers/Map.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-// import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+// Flutter Material Components
+import 'package:flutter/material.dart';
+// Providers
+import 'package:clax/providers/Map.dart';
+// Components
+import 'package:clax/screens/MakeARide/Components/DriverInfo.dart';
 
 class MapPage extends StatefulWidget {
   static const routeName = "map";
@@ -19,7 +21,6 @@ class _MapPageState extends State<MapPage> {
 
   @override
   void dispose() {
-    map.disableStreamingDriverLocation();
     map.init();
     super.dispose();
   }
@@ -30,40 +31,22 @@ class _MapPageState extends State<MapPage> {
     map = Provider.of<MapProvider>(context);
     map.setScaffoldKey = _scaffoldKey;
     map.setDriverId = 'driver123';
-    if (!map.isListeningToDriver()) map.enableStreamingDriverLocation();
   }
 
-  void showInfo() {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    // Color accentColor = Theme.of(context).accentColor;
-    // set up the button
-    Widget okButton = FlatButton(
-      child: Text("حسنا", style: TextStyle(color: Colors.black54)),
-      onPressed: Navigator.of(context).pop,
-    );
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      // title: Text("عذرب"),
-      contentPadding: EdgeInsets.only(top: 20, right: 15, bottom: 20),
-      content:
-          Text("من فضلك، فعل نظام الملاحه خاصتك", style: textTheme.bodyText2),
-      actions: [
-        okButton,
-      ],
-    );
-
-    // show the sheet
-    showBottomSheet(
-        context: _scaffoldKey.currentState.context,
+  void showInfo(BuildContext contx) async {
+    showModalBottomSheet<void>(
+        enableDrag: true,
+        context: contx,
         builder: (BuildContext context) {
-          return alert;
+          return DriverInfo();
         });
   }
 
   @override
   Widget build(BuildContext context) {
     map.checkGPSEnabled();
+    if (!map.isListeningToDriver()) map.enableStreamingDriverLocation();
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -85,14 +68,17 @@ class _MapPageState extends State<MapPage> {
               ),
               onPressed: () {
                 map.focusDriver = true;
+                map.navigateToDriver();
               }),
           Builder(
-            builder: (context) => IconButton(
+            builder: (contx) => IconButton(
                 icon: const Icon(
                   Icons.info,
                   color: Colors.white,
                 ),
-                onPressed: showInfo),
+                onPressed: () {
+                  showInfo(contx);
+                }),
           )
         ],
         title: Text(
@@ -114,6 +100,7 @@ class _MapPageState extends State<MapPage> {
                   northeast: LatLng(40.78847, 40.00192))),
               circles: map.circles,
               minMaxZoomPreference: MinMaxZoomPreference(7, 25),
+              zoomControlsEnabled: false,
               polylines: map.polylines,
               markers: map.markers.values.toSet(),
               mapType: MapType.normal,
@@ -125,7 +112,9 @@ class _MapPageState extends State<MapPage> {
               indoorViewEnabled: false,
               onCameraMove: null,
               initialCameraPosition: CameraPosition(
-                  target: map.markedLocation['position'], zoom: 12),
+                  target: map.markedLocation['position'] ??
+                      LatLng(31.5812, 30.50037),
+                  zoom: 12),
               onMapCreated: (GoogleMapController controller) {
                 controller.setMapStyle(
                     '[  {    "featureType": "administrative.land_parcel",    "elementType": "labels",    "stylers": [      {        "visibility": "off"      }    ]  },  {    "featureType": "poi",    "elementType": "labels.text",    "stylers": [      {        "visibility": "off"      }    ]  },  {    "featureType": "poi.business",    "stylers": [      {        "visibility": "off"      }    ]  },  {    "featureType": "road",    "elementType": "labels.icon",    "stylers": [      {        "visibility": "off"      }    ]  },  {    "featureType": "road.local",    "elementType": "labels",    "stylers": [      {        "visibility": "off"      }    ]  },  {    "featureType": "transit",    "stylers": [      {        "visibility": "off"      }    ]  }]');

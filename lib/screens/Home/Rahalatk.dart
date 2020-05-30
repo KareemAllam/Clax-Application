@@ -2,9 +2,8 @@
 import 'package:flutter/material.dart';
 // Components
 import 'package:clax/screens/Home/Components/History.dart';
-//import 'package:clax/screens/Home/Components/scheduled.dart';
-// Widgets
-import 'package:clax/widgets/drawer.dart';
+// Drawer
+import 'package:clax/screens/Drawer.dart';
 
 class Rides extends StatefulWidget {
   static const routeName = '/Rahalatk';

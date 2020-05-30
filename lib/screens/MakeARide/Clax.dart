@@ -1,20 +1,20 @@
 // Dart & Other Packages
-import 'package:clax/Providers/Trips.dart';
-import 'package:clax/screens/MakeARide/StartARide.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 // Components
 import 'package:clax/screens/Home/Components/favourites.dart';
-// Widgets
-import 'package:clax/widgets/drawer.dart';
+// Drawer
+import 'package:clax/screens/Drawer.dart';
 // Providers
-import 'package:clax/providers/Map.dart';
 import 'package:clax/providers/Payment.dart';
+import 'package:clax/providers/CurrentTrip.dart';
+import 'package:clax/providers/Map.dart';
 // Screens
 import 'package:clax/screens/MakeARide/GoogleMap.dart';
 import 'package:clax/screens/MakeARide/RidePickupLocation.dart';
+import 'package:clax/screens/MakeARide/StartARide.dart';
 
 class Tabs extends StatefulWidget {
   static const routeName = '/homescreen';
@@ -28,7 +28,10 @@ class _TabsState extends State<Tabs> {
     {'page': Favourites(), 'title': 'رحلاتك المفضلة'},
   ];
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  // double _cost;
+
   int _selectedPageIndex = 0;
+
   void _selectPage(int index) {
     setState(() {
       _selectedPageIndex = index;
@@ -48,11 +51,17 @@ class _TabsState extends State<Tabs> {
       case "driverArrived":
         // Retreive DriverID
         String driverId = message['data']['driverId'];
-        Provider.of<TripsProvider>(context, listen: false).setBusy = true;
+
+        Provider.of<CurrentTripProvider>(context, listen: false)
+            .setTripInfo(driverId);
         Provider.of<MapProvider>(context, listen: false).setDriverId = driverId;
+        double tripPrice =
+            Provider.of<CurrentTripProvider>(context, listen: false).price;
+        Provider.of<PaymentProvider>(context, listen: false).setBalance =
+            -tripPrice;
+
         // Exit Waiting Screen
-        // Github Solution
-        // https://stackoverflow.com/questions/50817086/how-to-check-which-the-current-route-is/50817399
+        // Github Solution: https://stackoverflow.com/questions/50817086/how-to-check-which-the-current-route-is/50817399
         if (!ModalRoute.of(context).isCurrent) {
           Navigator.popUntil(context, (route) {
             if (route.settings.name == StartARide.routeName) return false;
@@ -60,6 +69,7 @@ class _TabsState extends State<Tabs> {
           });
         }
         Navigator.of(context).pushNamed(MapPage.routeName);
+
         break;
       case "offer":
         double offerDiscount = double.parse(message['data']['discount']);

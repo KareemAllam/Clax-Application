@@ -8,7 +8,7 @@ import 'package:clax/utils/password.dart';
 // Models
 import 'package:clax/models/profile.dart';
 // Providers
-import 'package:clax/providers/Profiles.dart';
+import 'package:clax/providers/Profile.dart';
 // Screens
 import 'package:clax/screens/Login/Verification.dart';
 // Components

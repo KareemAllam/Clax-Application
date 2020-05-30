@@ -82,7 +82,7 @@ class MemberInvitationCard extends StatelessWidget {
                         ), cb: () async {
                       String result = await transactions.accept(transaction.id);
                       if (result != 'false') {
-                        account.balance = -transaction.amount.toDouble();
+                        account.setBalance = -transaction.amount.toDouble();
                         payments.add(result);
                       }
                     });

@@ -43,7 +43,7 @@ class LoginState extends State<Login> {
     super.dispose();
   }
 
-  Future<bool> submitform(firebaseToken) async {
+  Future<dynamic> submitform(firebaseToken) async {
     setState(() {
       _loading = true;
     });
@@ -81,7 +81,7 @@ class LoginState extends State<Login> {
       setState(() {
         _loading = false;
       });
-      return false;
+      return 0;
     }
   }
 

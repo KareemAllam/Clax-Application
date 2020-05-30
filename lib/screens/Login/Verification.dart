@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 // Backend
 import 'package:clax/services/Backend.dart';
 // Providers
-import 'package:clax/providers/Profiles.dart';
+import 'package:clax/providers/Profile.dart';
 
 class Verification extends StatefulWidget {
   static const routeName = '/verification';

@@ -1,5 +1,4 @@
 // Dart & Other Packages
-import 'package:clax/widgets/drawer.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 // Flutter's Material Components
@@ -7,13 +6,15 @@ import 'package:flutter/material.dart';
 // Providers
 import 'package:clax/providers/Payment.dart';
 // Models
-import 'package:clax/models/card.dart';
+import 'package:clax/models/Card.dart';
 import 'package:clax/models/CreditCard.dart';
 // Components
 import 'package:clax/screens/Payments/Components/PaymentExtendedAppBar.dart';
 // Widgets
 import 'package:clax/widgets/ExtendedAppBar.dart';
 import 'package:clax/widgets/Card_NavigationElement.dart';
+// Drawer
+import 'package:clax/screens/Drawer.dart';
 
 class PaymentScreen extends StatefulWidget {
   static const routeName = '/payments';
@@ -44,7 +45,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     });
   }
 
-  // remove acard from database using api request.
+  // Removing a Credit Card
   void updateCards(CreditCardModel card, bool add) {
     if (add)
       setState(() {
