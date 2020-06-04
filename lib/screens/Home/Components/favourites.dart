@@ -17,32 +17,32 @@ class Favourites extends StatefulWidget {
 }
 
 class _FavouritesState extends State<Favourites> {
-  int fetched = 0;
-  List trips;
+  int fetched = 1;
+  List trips = [];
 
   void fetch() async {
     try {
       Response response = await Api.get('passengers/past-trips/favourite');
-      if (response.statusCode == 200)
-        setState(() {
-          trips = json.decode(response.body)['_favourites'];
-          fetched = 1;
-        });
-      else
-        setState(() {
-          fetched = 2;
-        });
-    } catch (_) {
-      setState(() {
+      if (response.statusCode == 200) {
+        trips = json.decode(response.body)['_favourites'];
+        fetched = 1;
+      } else
         fetched = 2;
-      });
+    } catch (_) {
+      fetched = 2;
     }
+    setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
-    fetch();
+    // TODO: Enable Feteching once done
+    // fetch();
+  }
+
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   Widget build(BuildContext context) {

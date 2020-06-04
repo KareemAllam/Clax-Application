@@ -16,12 +16,11 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   MapProvider map;
 
   @override
   void dispose() {
-    map.init();
+    map.disposeInit();
     super.dispose();
   }
 
@@ -29,8 +28,6 @@ class _MapPageState extends State<MapPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     map = Provider.of<MapProvider>(context);
-    map.setScaffoldKey = _scaffoldKey;
-    map.setDriverId = 'driver123';
   }
 
   void showInfo(BuildContext contx) async {
@@ -44,11 +41,7 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    map.checkGPSEnabled();
-    if (!map.isListeningToDriver()) map.enableStreamingDriverLocation();
-
     return Scaffold(
-      key: _scaffoldKey,
       appBar: AppBar(
         actions: <Widget>[
           IconButton(
@@ -56,9 +49,9 @@ class _MapPageState extends State<MapPage> {
               onPressed: () async {
                 try {
                   map.focusDriver = false;
-                  await map.currentLocation();
+                  map.navigateToUser();
                 } catch (_) {
-                  await map.currentLocation();
+                  map.navigateToUser();
                 }
               }),
           IconButton(
@@ -93,17 +86,9 @@ class _MapPageState extends State<MapPage> {
         child: Stack(
           children: <Widget>[
             GoogleMap(
+              mapType: MapType.normal,
               scrollGesturesEnabled: false,
               tiltGesturesEnabled: false,
-              cameraTargetBounds: CameraTargetBounds(LatLngBounds(
-                  southwest: LatLng(25.78847, 25.00192),
-                  northeast: LatLng(40.78847, 40.00192))),
-              circles: map.circles,
-              minMaxZoomPreference: MinMaxZoomPreference(7, 25),
-              zoomControlsEnabled: false,
-              polylines: map.polylines,
-              markers: map.markers.values.toSet(),
-              mapType: MapType.normal,
               compassEnabled: true,
               zoomGesturesEnabled: true,
               myLocationEnabled: false,
@@ -111,9 +96,16 @@ class _MapPageState extends State<MapPage> {
               mapToolbarEnabled: false,
               indoorViewEnabled: false,
               onCameraMove: null,
+              zoomControlsEnabled: false,
+              circles: map.circles,
+              polylines: map.polylines,
+              markers: map.markers.values.toSet(),
+              cameraTargetBounds: CameraTargetBounds(LatLngBounds(
+                  southwest: LatLng(25.78847, 25.00192),
+                  northeast: LatLng(40.78847, 40.00192))),
+              minMaxZoomPreference: MinMaxZoomPreference(7, 25),
               initialCameraPosition: CameraPosition(
-                  target: map.markedLocation['position'] ??
-                      LatLng(31.5812, 30.50037),
+                  target: map.coordinates ?? LatLng(31.5812, 30.50037),
                   zoom: 12),
               onMapCreated: (GoogleMapController controller) {
                 controller.setMapStyle(
@@ -134,7 +126,7 @@ class _MapPageState extends State<MapPage> {
                         textDirection: TextDirection.ltr,
                         children: <Widget>[
                           Text(
-                            map.markedLocation['name'],
+                            map.name,
                             textAlign: TextAlign.center,
                             strutStyle: StrutStyle(forceStrutHeight: true),
                             style: Theme.of(context)

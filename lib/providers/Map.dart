@@ -1,4 +1,5 @@
 // FLutter MaterialComponenets
+import 'package:clax/providers/CurrentTrip.dart';
 import 'package:clax/screens/MakeARide/RateTrip.dart';
 import 'package:flutter/material.dart';
 // Dart & Other Packages
@@ -6,6 +7,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // Services
 import 'package:clax/services/RealtimeDB.dart';
@@ -23,11 +25,12 @@ class MapProvider extends ChangeNotifier {
   bool _gpsEnabled = false;
   // Map Controller
   Completer<GoogleMapController> _controller;
-  Map<String, dynamic> _markedLocation;
+  Map<String, dynamic> _userLocation;
   bool _focusDriver;
   // Markers ID
   String _userId;
   String _driverId;
+  String _lineId;
   // Camera Options
   double zooming;
   // Dynamic Location Testing
@@ -44,6 +47,7 @@ class MapProvider extends ChangeNotifier {
   bool ended;
 
   Future init() async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
     _controller = Completer();
     _markers = {};
     _polylines = Set();
@@ -54,18 +58,42 @@ class MapProvider extends ChangeNotifier {
     ended = false;
     zooming = 16;
     distance = 'calculating...';
-    _markedLocation = {
-      "name": "...loading name",
-      "position":
-          (await SharedPreferences.getInstance()).getString("currentLocaiton")
-    };
+    // If previous distance was saved
+    if (_prefs.getString("currentLocaiton") != null) {
+      Map<String, dynamic> decoded = Map<String, dynamic>.from(
+          json.decode(_prefs.getString("currentLocaiton")));
+      _userLocation = {
+        "name": decoded['name'],
+        "position": LatLng.fromJson(decoded['position'])
+      };
+    }
+    // If no distance was saved before
+    else
+      _userLocation = {"name": "...loading name", "position": null};
+
     _realtimeDB = RealtimeDB();
     _geolocator = Geolocator();
     await checkPermission();
     _gpsEnabled = await Geolocator().isLocationServiceEnabled();
     if (_permission == GeolocationStatus.granted && _gpsEnabled)
       await currentLocation();
+
     notifyListeners();
+  }
+
+  Future disposeInit() async {
+    _controller = Completer();
+    // _markers = {};
+    // _polylines = Set();
+    // _circles = Set();
+    // _realtimeDB = RealtimeDB();
+  }
+
+  void setDriverId(String driverId, String lineId) {
+    _driverId = driverId;
+    _lineId = lineId;
+    notifyListeners();
+    enableStreamingDriverLocation();
   }
 
   Future checkPermission() async {
@@ -142,12 +170,14 @@ class MapProvider extends ChangeNotifier {
     int i;
     ended = false;
     // Reading Database changes of Location
-    if (_realtimeDB == null) _realtimeDB = RealtimeDB();
-    _realtimeDB.readAsync(_driverId, (value) async {
+    // if (_realtimeDB == null) _realtimeDB = RealtimeDB();
+    print('clax-lines/$_lineId/$_driverId');
+    _realtimeDB.readAsync('clax-lines/$_lineId/$_driverId', (value) async {
+      print("Got Value: $value");
       try {
         // Parse Location from Database
         LatLng position =
-            LatLng.fromJson([value['latitude'], value['longitude']]);
+            LatLng.fromJson([value['loc']['lat'], value['loc']['lng']]);
         // Updating Driver's Marker
         _markers[_driverId] = Marker(
           markerId: MarkerId(_driverId),
@@ -158,11 +188,11 @@ class MapProvider extends ChangeNotifier {
           ),
         );
         // Update Distance
-        if (_markedLocation["position"] == null) await currentLocation();
-
+        if (_userLocation == null || _userLocation["position"] == null)
+          await currentLocation();
         i = (await _geolocator.distanceBetween(
-                _markedLocation["position"].latitude,
-                _markedLocation["position"].longitude,
+                _userLocation["position"].latitude,
+                _userLocation["position"].longitude,
                 position.latitude,
                 position.longitude))
             .ceil();
@@ -173,7 +203,7 @@ class MapProvider extends ChangeNotifier {
           disableStreamingDriverLocation();
           driverArrived();
         }
-        navigateToDriver();
+        if (_controller.isCompleted) navigateToDriver();
         // Changing Required Values
         notifyListeners();
       } catch (error) {
@@ -188,7 +218,7 @@ class MapProvider extends ChangeNotifier {
   }
 
   void disableStreamingDriverLocation() {
-    _realtimeDB.cancelReadAsync(_driverId);
+    _realtimeDB.cancelReadAsync('clax-lines/$_lineId/$_driverId');
   }
 
   void navigateToDriver() async {
@@ -207,6 +237,17 @@ class MapProvider extends ChangeNotifier {
     }
   }
 
+  void navigateToUser() async {
+    CameraPosition currentMarker = CameraPosition(
+      target: _userLocation['position'],
+      zoom: 16,
+    );
+    GoogleMapController controller = await _controller.future;
+    // controller.moveCamera(CameraUpdate.newCameraPosition(currentMarker));
+    // Slower
+    controller.animateCamera(CameraUpdate.newCameraPosition(currentMarker));
+  }
+
   Future currentLocation() async {
     if (!_gpsEnabled) {
       checkGPSEnabled();
@@ -214,74 +255,44 @@ class MapProvider extends ChangeNotifier {
     }
     // Retreive current location updates
     if (_permission == GeolocationStatus.granted && _gpsEnabled) {
-      Position position;
-      if (_markedLocation['position'] == null) {
-        position = await _geolocator.getCurrentPosition();
-        _markedLocation["position"] =
-            LatLng(position.latitude, position.longitude);
-        // Retrieve Info about current location
-        List<Placemark> placemark = await _geolocator.placemarkFromCoordinates(
-            position.latitude, position.longitude);
+      SharedPreferences _prefs = await SharedPreferences.getInstance();
 
-        // Update global variable
-        _markedLocation["name"] = placemark[0].administrativeArea +
-            "," +
-            placemark[0].subAdministrativeArea;
-        notifyListeners();
-        // Update Camera's Current Location Circle
-        circles.add(Circle(
-          circleId: CircleId(_userId),
-          fillColor: appTheme.primaryColor,
-          strokeColor: appTheme.primaryColor.withAlpha(100),
-          zIndex: 2,
-          center: LatLng(position.latitude, position.longitude),
-          radius: 10,
-        ));
-        SharedPreferences _prefs = await SharedPreferences.getInstance();
-        _prefs.setString("currentLocation", json.encode(position));
-        CameraPosition currentMarker = CameraPosition(
-          target: _markedLocation['position'],
-          zoom: 16,
-        );
-        GoogleMapController controller = await _controller.future;
-        // controller.moveCamera(CameraUpdate.newCameraPosition(currentMarker));
-        // Slower
-        controller.animateCamera(CameraUpdate.newCameraPosition(currentMarker));
-      }
-      // Updating Map's current view
-      else {
-        CameraPosition currentMarker = CameraPosition(
-          target: _markedLocation['position'],
-          zoom: 16,
-        );
-        GoogleMapController controller = await _controller.future;
-        // controller.moveCamera(CameraUpdate.newCameraPosition(currentMarker));
-        // Slower
-        controller.animateCamera(CameraUpdate.newCameraPosition(currentMarker));
-      }
-      print(_markedLocation['position']);
+      // Using GPS to retrieve current location
+      Position position = await _geolocator.getCurrentPosition();
+      // Retrieve Info about current location
+      List<Placemark> placemark = await _geolocator.placemarkFromCoordinates(
+          position.latitude, position.longitude);
+
+      //// Update global variable
+      // Location Name
+      _userLocation["name"] = placemark[0].administrativeArea +
+          "," +
+          placemark[0].subAdministrativeArea;
+      // Location Coordinates
+      _userLocation["position"] = LatLng(position.latitude, position.longitude);
+      // Updating Cache
+      _prefs.setString("currentLocaiton", json.encode(_userLocation));
+
+      // Update Camera's Current Location Circle
+      circles.add(Circle(
+        circleId: CircleId(_userId),
+        fillColor: appTheme.primaryColor,
+        strokeColor: appTheme.primaryColor.withAlpha(100),
+        zIndex: 2,
+        center: LatLng(position.latitude, position.longitude),
+        radius: 10,
+      ));
+      notifyListeners();
+      // print(_userLocation['position']);
     }
   }
 
-  Map<String, dynamic> get markedLocation => _markedLocation;
-  StreamSubscription<Position> get locationStreaming => streamingLocation;
-  Set<Polyline> get polylines => _polylines;
-  Set<Circle> get circles => _circles;
-  bool get driverIsFocused => _focusDriver;
-  bool get gpsEnabled => _gpsEnabled;
-  Map<String, Marker> get markers => _markers;
-  Completer<GoogleMapController> get controller => _controller;
-  set initController(_) => _controller = Completer();
-  set controller(controller) => _controller = controller;
-  set focusDriver(boolean) => _focusDriver = boolean;
-  set setScaffoldKey(GlobalKey<ScaffoldState> sk) => _scaffoldKey = sk;
-  set setDriverId(id) {
-    _driverId = id;
-  }
-
   void driverArrived() async {
-    // set up the buttons
+    // Clear Trip state
+    Provider.of<CurrentTripProvider>(_scaffoldKey.currentContext, listen: false)
+        .clearTripInfo();
 
+    // Setting up the button
     Widget continueButton = FlatButton(
       child: Text("حسنا",
           style: TextStyle(
@@ -289,7 +300,6 @@ class MapProvider extends ChangeNotifier {
               fontWeight: FontWeight.bold)),
       onPressed: () {
         // Dismiss the Alert Dialoge Box
-
         Navigator.of(_scaffoldKey.currentContext)
             .pushReplacementNamed(RateTrip.routeName);
       },
@@ -340,4 +350,21 @@ class MapProvider extends ChangeNotifier {
     ).then((value) => Navigator.of(_scaffoldKey.currentContext)
         .pushReplacementNamed(RateTrip.routeName));
   }
+
+  // Getters
+  LatLng get coordinates => _userLocation['position'];
+  String get name => _userLocation['name'];
+  StreamSubscription<Position> get locationStreaming => streamingLocation;
+  Set<Polyline> get polylines => _polylines;
+  Set<Circle> get circles => _circles;
+  bool get driverIsFocused => _focusDriver;
+  bool get gpsEnabled => _gpsEnabled;
+  Map<String, Marker> get markers => _markers;
+  Completer<GoogleMapController> get controller => _controller;
+
+  // Setters
+  set initController(_) => _controller = Completer();
+  set controller(controller) => _controller = controller;
+  set focusDriver(boolean) => _focusDriver = boolean;
+  set setScaffoldKey(GlobalKey<ScaffoldState> sk) => _scaffoldKey = sk;
 }

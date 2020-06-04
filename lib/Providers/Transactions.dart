@@ -12,7 +12,7 @@ class TransactionsProvider extends ChangeNotifier {
   }
 
   // Import Local Data
-  void initialize() async {
+  Future initialize() async {
     // Cheeck if Cache is empty
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     if (_prefs.getString("transactions") != null) {
@@ -26,7 +26,8 @@ class TransactionsProvider extends ChangeNotifier {
   Future<bool> fetchData() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     try {
-      Response response = await Api.get('transactions');
+      Response response =
+          await Api.get('passengers/payments/manage-financials/get-balance');
       if (response.statusCode == 200) {
         _transactions = List<TransactionModel>.from((json
                 .decode(response.body)

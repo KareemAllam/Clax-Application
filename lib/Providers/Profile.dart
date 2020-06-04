@@ -14,7 +14,7 @@ class ProfilesProvider with ChangeNotifier {
     init();
   }
   // Async Constructor
-  void init() async {
+  Future init() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getString('profile') != null) {
       _profile = ProfileModel.fromJson(json.decode(prefs.getString('profile')));

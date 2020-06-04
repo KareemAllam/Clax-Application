@@ -64,10 +64,11 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  bool logOut() {
+  Future<bool> logOut() async {
+    _prefs = await SharedPreferences.getInstance();
+    await _prefs.clear();
     String originalToken = _auth;
     try {
-      _prefs.remove("loginToken");
       _auth = "";
       notifyListeners();
       return true;

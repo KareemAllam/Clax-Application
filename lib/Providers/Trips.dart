@@ -22,7 +22,7 @@ class TripsProvider extends ChangeNotifier {
   }
 
   // Async Constructor
-  void initialize() async {
+  Future initialize() async {
     // Fetch Data from Cache
     await cacheData();
     // Fetch Data from Server
@@ -51,7 +51,7 @@ class TripsProvider extends ChangeNotifier {
   Future<bool> serverData() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     try {
-      Response trips = await Api.get('user');
+      Response trips = await Api.get('passengers/past-trips/');
       if (trips.statusCode == 200) {
         _trips = List<Trip>.from((json
             .decode(trips.body)['_pastTrips']

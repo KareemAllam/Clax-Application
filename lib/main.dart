@@ -28,16 +28,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider(create: (context) => ProfilesProvider()),
         Provider(create: (context) => AuthProvider()),
+        Provider(create: (context) => ProfilesProvider()),
         Provider(create: (context) => PaymentProvider()),
         Provider(create: (context) => ComplainsProvider()),
         Provider(create: (context) => TripsProvider()),
         Provider(create: (context) => TransactionsProvider()),
         Provider(create: (context) => MapProvider()),
         Provider(create: (context) => CurrentTripProvider()),
-        ChangeNotifierProvider(create: (context) => ProfilesProvider()),
         ChangeNotifierProvider(create: (context) => AuthProvider()),
+        ChangeNotifierProvider(create: (context) => ProfilesProvider()),
         ChangeNotifierProvider(create: (context) => PaymentProvider()),
         ChangeNotifierProvider(create: (context) => ComplainsProvider()),
         ChangeNotifierProvider(create: (context) => TripsProvider()),

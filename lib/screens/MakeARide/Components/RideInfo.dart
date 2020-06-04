@@ -33,10 +33,16 @@ class _RideInfoState extends State<RideInfo> {
           style: TextStyle(
               color: Theme.of(context).accentColor,
               fontWeight: FontWeight.bold)),
-      onPressed: () {
+      onPressed: () async {
         // Dismiss the Alert Dialoge Box
-        Provider.of<CurrentTripProvider>(context, listen: false)
-            .searchingDriverState(finalPrice);
+        Provider.of<CurrentTripProvider>(context, listen: false).setTripInfo(
+            {"finalPrice": finalPrice, "requiredSeats": _seatsCount});
+        bool result =
+            await Provider.of<CurrentTripProvider>(context, listen: false)
+                .searchingDriverState();
+        if (!result)
+          Scaffold.of(context)
+              .showSnackBar(SnackBar(content: Text("erroR ocu")));
         widget.changeWidget();
         Navigator.of(context).pop();
       },
@@ -105,177 +111,187 @@ class _RideInfoState extends State<RideInfo> {
     // Balance Informations
     finalPrice = ((_seatsCount) * line['cost']).toDouble();
     bool canPay =
-        (balance - ((_seatsCount + 1) * line['cost']).toDouble()) >= 0;
+        (balance - ((_seatsCount + 1) * line['cost']).toDouble()) >= 0 &&
+            _seatsCount <= 2;
     // Decoration Vars
     ThemeData theme = Theme.of(context);
     TextTheme textTheme = theme.textTheme;
     Color primaryColor = theme.primaryColor;
     double width = MediaQuery.of(context).size.width;
-    return Container(
-      child: Column(
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            color: Colors.white,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              // mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  "خط الرحلة:",
-                  style:
-                      textTheme.headline6.copyWith(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.right,
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Icon(Icons.close, color: primaryColor),
-                    Stack(alignment: Alignment.center, children: <Widget>[
-                      CustomPaint(
-                          willChange: false,
-                          isComplex: false,
-                          painter: LineDashedPainter(),
-                          size: Size(width - 100, 0)),
-                      Container(
-                        color: Colors.white,
-                        child: Icon(Icons.gps_fixed, color: primaryColor),
+    return WillPopScope(
+      onWillPop: () async {
+        Provider.of<CurrentTripProvider>(context, listen: false)
+            .clearCurrentTripInfo;
+        return true;
+      },
+      child: Container(
+        child: Column(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              color: Colors.white,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                // mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "خط الرحلة:",
+                    style: textTheme.headline6
+                        .copyWith(fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.right,
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(Icons.close, color: primaryColor),
+                      Stack(alignment: Alignment.center, children: <Widget>[
+                        CustomPaint(
+                            willChange: false,
+                            isComplex: false,
+                            painter: LineDashedPainter(),
+                            size: Size(width - 100, 0)),
+                        Container(
+                          color: Colors.white,
+                          child: Icon(Icons.gps_fixed, color: primaryColor),
+                        )
+                      ]),
+                      Icon(
+                        Icons.location_on,
+                        size: 30,
+                        color: primaryColor,
+                      )
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        line['from'],
+                        style: textTheme.bodyText1.copyWith(
+                            fontWeight: FontWeight.bold, color: Colors.black87),
+                      ),
+                      Text(destination['name']),
+                      Text(line['to'],
+                          style: textTheme.bodyText1.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87))
+                    ],
+                  )
+                ],
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.only(top: 10),
+              color: Colors.white,
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    "عدد الكراسي:",
+                    style: Theme.of(context).textTheme.subtitle2,
+                  ),
+                  Row(children: <Widget>[
+                    IconButton(
+                        alignment: Alignment.centerRight,
+                        iconSize: 30,
+                        padding: EdgeInsets.all(0),
+                        icon: Icon(
+                          Icons.add_box,
+                          color: canPay ? Colors.green : Colors.grey,
+                        ),
+                        onPressed: () {
+                          if (_seatsCount != 3 && canPay)
+                            setState(() {
+                              _seatsCount += 1;
+                            });
+                        }),
+                    Text(
+                      _seatsCount.toString(),
+                      style: Theme.of(context)
+                          .textTheme
+                          .subtitle2
+                          .copyWith(fontFamily: "Product Sans"),
+                    ),
+                    IconButton(
+                        alignment: Alignment.centerLeft,
+                        iconSize: 30,
+                        padding: EdgeInsets.all(0),
+                        icon: Icon(
+                          Icons.indeterminate_check_box,
+                          color: _seatsCount > 1 ? Colors.red : Colors.grey,
+                        ),
+                        onPressed: () {
+                          if (_seatsCount != 1)
+                            setState(() {
+                              _seatsCount -= 1;
+                            });
+                        })
+                  ])
+                ],
+              ),
+            ),
+            Spacer(),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              color: Colors.white,
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        "هتدفع اجمالي:",
+                        style: textTheme.subtitle2.copyWith(color: Colors.grey),
+                      ),
+                      Spacer(),
+                      Text(
+                        '${(_seatsCount * line['cost']).toDouble()} جنية',
+                        style: textTheme.subtitle2.copyWith(
+                            color: Colors.grey, fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Text("هيبقى معاك:",
+                          style:
+                              textTheme.subtitle2.copyWith(color: Colors.grey)),
+                      Spacer(),
+                      Text(
+                        '${balance - (_seatsCount * line['cost']).toDouble()} جنية',
+                        style: textTheme.subtitle2.copyWith(
+                            color: Colors.grey, fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ),
+            GestureDetector(
+              onTap: areYouSure,
+              child: Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 15),
+                color: primaryColor,
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(Icons.search, color: Theme.of(context).accentColor),
+                      SizedBox(width: 5),
+                      Text(
+                        "ابحث عن سائق",
+                        style:
+                            textTheme.subtitle2.copyWith(color: Colors.white),
                       )
                     ]),
-                    Icon(
-                      Icons.location_on,
-                      size: 30,
-                      color: primaryColor,
-                    )
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                      line['from'],
-                      style: textTheme.bodyText1.copyWith(
-                          fontWeight: FontWeight.bold, color: Colors.black87),
-                    ),
-                    Text(destination['name']),
-                    Text(line['to'],
-                        style: textTheme.bodyText1.copyWith(
-                            fontWeight: FontWeight.bold, color: Colors.black87))
-                  ],
-                )
-              ],
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(top: 10),
-            color: Colors.white,
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  "عدد الكراسي:",
-                  style: Theme.of(context).textTheme.subtitle2,
-                ),
-                Row(children: <Widget>[
-                  IconButton(
-                      alignment: Alignment.centerRight,
-                      iconSize: 30,
-                      padding: EdgeInsets.all(0),
-                      icon: Icon(
-                        Icons.add_box,
-                        color: canPay ? Colors.green : Colors.grey,
-                      ),
-                      onPressed: () {
-                        if (_seatsCount != 3 && canPay)
-                          setState(() {
-                            _seatsCount += 1;
-                          });
-                      }),
-                  Text(
-                    _seatsCount.toString(),
-                    style: Theme.of(context)
-                        .textTheme
-                        .subtitle2
-                        .copyWith(fontFamily: "Product Sans"),
-                  ),
-                  IconButton(
-                      alignment: Alignment.centerLeft,
-                      iconSize: 30,
-                      padding: EdgeInsets.all(0),
-                      icon: Icon(
-                        Icons.indeterminate_check_box,
-                        color: _seatsCount > 1 ? Colors.red : Colors.grey,
-                      ),
-                      onPressed: () {
-                        if (_seatsCount != 1)
-                          setState(() {
-                            _seatsCount -= 1;
-                          });
-                      })
-                ])
-              ],
-            ),
-          ),
-          Spacer(),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            color: Colors.white,
-            child: Column(
-              children: <Widget>[
-                Row(
-                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                      "هتدفع اجمالي:",
-                      style: textTheme.subtitle2.copyWith(color: Colors.grey),
-                    ),
-                    Spacer(),
-                    Text(
-                      '${(_seatsCount * line['cost']).toDouble()} جنية',
-                      style: textTheme.subtitle2.copyWith(
-                          color: Colors.grey, fontWeight: FontWeight.bold),
-                    )
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Text("هيبقى معاك:",
-                        style:
-                            textTheme.subtitle2.copyWith(color: Colors.grey)),
-                    Spacer(),
-                    Text(
-                      '${balance - (_seatsCount * line['cost']).toDouble()} جنية',
-                      style: textTheme.subtitle2.copyWith(
-                          color: Colors.grey, fontWeight: FontWeight.bold),
-                    )
-                  ],
-                )
-              ],
-            ),
-          ),
-          GestureDetector(
-            onTap: areYouSure,
-            child: Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(vertical: 15),
-              color: primaryColor,
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Icon(Icons.search, color: Theme.of(context).accentColor),
-                    SizedBox(width: 5),
-                    Text(
-                      "ابحث عن سائق",
-                      style: textTheme.subtitle2.copyWith(color: Colors.white),
-                    )
-                  ]),
-            ),
-          )
-        ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

@@ -24,6 +24,7 @@ class RealtimeDB {
         .set({"firstname": "Kareem", 'Lastname': "Raid"});
   }
 
+  /// Reading a snapshot from firebase once.
   void readOnce(String child) async {
     _databaseRefrences[child] =
         FirebaseDatabase.instance.reference().child(child);
@@ -34,21 +35,27 @@ class RealtimeDB {
     }
   }
 
+  /// Reading a snapshot from firebase on value changed.
   void readAsync(String child, Function cb) {
     _databaseRefrences[child] =
         FirebaseDatabase.instance.reference().child(child);
+    print("Listening to child: $child");
     events[child] = _databaseRefrences[child].onValue.listen((event) {
-      // code on event
+      // code on event change
       cb(event.snapshot.value);
     });
   }
 
+  /// Cancel reading asynchronously from db
+  /// with specified child.
   void cancelReadAsync(String child) {
+    print("canceled successfully...");
     events[child].cancel();
     events[child] = null;
   }
 
-  void updateChild(String child) {
+  /// Updating the value of a specified child.
+  void updateChild(String child, dynamic value) {
     _databaseRefrences[child] =
         FirebaseDatabase.instance.reference().child(child);
     _databaseRefrences[child].update({"value": ++_counter});
@@ -64,6 +71,7 @@ class RealtimeDB {
     });
   }
 
+  /// Deleting a specified child.
   void deleteMainNode(String child) {
     _databaseRefrences.remove(child);
   }

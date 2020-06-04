@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:clax/providers/Auth.dart';
 
 // Screens
-import 'package:clax/screens/MakeARide/Clax.dart';
+import 'package:clax/screens/MakeARide/HomeTaps.dart';
 import 'package:clax/screens/Login/SplashScreen.dart';
 import 'package:clax/screens/Login/Login.dart';
 

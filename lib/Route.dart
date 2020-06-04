@@ -53,12 +53,12 @@ import 'package:clax/screens/Payments/Payment_History.dart';
 import 'package:clax/screens/Payments/Payment_TransferMoney.dart';
 
 //// Tracking Screens
-import 'package:clax/screens/MakeARide/Clax.dart';
+import 'package:clax/screens/MakeARide/HomeTaps.dart';
 import 'package:clax/screens/MakeARide/RateTrip.dart';
 import 'package:clax/screens/MakeARide/GoogleMap.dart';
-import 'package:clax/screens/MakeARide/StartARide.dart';
-import 'package:clax/screens/MakeARide/RidePickupLocation.dart';
-import 'package:clax/screens/MakeARide/Components/FlipIcon.dart';
+import 'package:clax/screens/MakeARide/RideConfig.dart';
+import 'package:clax/screens/MakeARide/NewRide.dart';
+import 'package:clax/screens/MakeARide/widgets/FlipIcon.dart';
 
 class Router {
   static Route<dynamic> generateRoute(RouteSettings settings) {

@@ -33,7 +33,6 @@ class PaymentProvider extends ChangeNotifier {
 
     // Retrieve PaymentLog from cache
     if (prefs.getString('bills') != null) {
-      print(prefs.getString('bills'));
       _bills = List<BillModel>.from(json
               .decode(prefs.getString('bills'))
               .map((bill) => BillModel.fromJson(bill))).toList() ??

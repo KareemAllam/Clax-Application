@@ -10,7 +10,7 @@ import 'package:clax/services/Backend.dart';
 // Providers
 import 'package:clax/providers/Auth.dart';
 // Screens
-import 'package:clax/screens/MakeARide/Clax.dart';
+import 'package:clax/screens/MakeARide/HomeTaps.dart';
 import 'package:clax/screens/Login/ForgotPassword.dart';
 // Widgets
 // import 'package:clax/widgets/ExtendedAppBar.dart';

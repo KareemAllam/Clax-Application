@@ -4,8 +4,13 @@ import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 // Providers
 import 'package:clax/providers/Auth.dart';
+// import 'package:clax/providers/Trips.dart';
+// import 'package:clax/providers/Payment.dart';
+// import 'package:clax/providers/Profile.dart';
+// import 'package:clax/providers/CurrentTrip.dart';
+// import 'package:clax/providers/Transactions.dart';
 // Screens
-import 'package:clax/screens/MakeARide/Clax.dart';
+import 'package:clax/screens/MakeARide/HomeTaps.dart';
 import 'package:clax/screens/Home/Rahalatk.dart';
 import 'package:clax/screens/Home/free_rides.dart';
 import 'package:clax/screens/Help/Help.dart';
@@ -38,9 +43,17 @@ class _MainDrawerState extends State<MainDrawer> {
     {"title": 'مساعدة', "icon": Icons.help, "route": Help.routeName},
   ];
 
-  void logout() {
-    bool logout = Provider.of<AuthProvider>(context, listen: false).logOut();
+  void logout() async {
+    bool logout =
+        await Provider.of<AuthProvider>(context, listen: false).logOut();
     if (logout) {
+      // await Provider.of<PaymentProvider>(context, listen: false).init();
+      // await Provider.of<ProfilesProvider>(context, listen: false).init();
+      // await Provider.of<TripsProvider>(context, listen: false).initialize();
+      // await Provider.of<TransactionsProvider>(context, listen: false)
+      //     .initialize();
+      // await Provider.of<CurrentTripProvider>(context, listen: false).init();
+
       // Pop Current Screens
       Navigator.popUntil(context, (route) {
         if (route.settings.name == Tabs.routeName) return true;
@@ -95,11 +108,12 @@ class _MainDrawerState extends State<MainDrawer> {
                         Navigator.of(context).pop();
                         return;
                       } else {
-                        // Item => Clax
                         // Dismiss Drawer
                         Navigator.of(context).pop();
-                        Navigator.of(context)
-                            .pushReplacementNamed(index['route']);
+                        // Item => Clax
+                        Navigator.of(context).pop();
+                        // Navigator.of(context)
+                        //     .pop(index['route']);
                         return;
                       }
                     }
@@ -110,12 +124,19 @@ class _MainDrawerState extends State<MainDrawer> {
                       return;
                     }
                     // Navigating to Different Screen
+                    if (currentRoute == Tabs.routeName) {
+                      // Dismiss Drawer
+                      Navigator.of(context).pop();
+                      // Navigate to Screen
+                      Navigator.of(context).pushNamed(index['route']);
+                    }
                     // "Item => Item2"
                     else {
                       // Dismiss Drawer
                       Navigator.of(context).pop();
                       // Navigate to Screen
-                      Navigator.of(context).pushNamed(index['route']);
+                      Navigator.of(context)
+                          .pushReplacementNamed(index['route']);
                     }
                   },
                 )),

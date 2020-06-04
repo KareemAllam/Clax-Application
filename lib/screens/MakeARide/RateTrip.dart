@@ -1,5 +1,6 @@
 // Dart & Other Pacakges
 import 'dart:convert';
+import 'package:clax/screens/MakeARide/HomeTaps.dart';
 import 'package:provider/provider.dart';
 // Flutter Material Components
 import 'package:flutter/material.dart';
@@ -23,19 +24,21 @@ class _RateTripState extends State<RateTrip> {
   TextEditingController _description = TextEditingController();
 
   void submitForm() async {
-    String driverId =
-        Provider.of<CurrentTripProvider>(context, listen: false).driverId;
-    Map<String, dynamic> body = {
-      'driverId': driverId,
-      'rate': driverRate,
-      'description': _description.text
-    };
-    await Api.post('pairing/driverRate', json.encode(body));
+    // String driverId = Provider.of<CurrentTripProvider>(context, listen: false)
+    //     .currentDriverInfo['driverId'];
+    // Map<String, dynamic> body = {
+    //   'driverId': driverId,
+    //   'rate': driverRate,
+    //   'description': _description.text
+    // };
+    // await Api.post('pairing/driverRate', json.encode(body));
+    await Provider.of<CurrentTripProvider>(context, listen: false)
+        .clearTripInfo();
 
-    Provider.of<CurrentTripProvider>(context, listen: false).clearTripInfo();
-    Provider.of<CurrentTripProvider>(context, listen: false).idleState();
-    Navigator.of(context).pop();
-    Navigator.of(context).pop();
+    Navigator.of(context).popUntil((route) {
+      if (route.settings.name == Tabs.routeName) return true;
+      return false;
+    });
   }
 
   void didChangeDependencies() {
@@ -70,12 +73,8 @@ class _RateTripState extends State<RateTrip> {
         children: <Widget>[for (int i = 1; i <= 5; i++) star(i)]);
     return WillPopScope(
       onWillPop: () async {
-        Provider.of<CurrentTripProvider>(context, listen: false)
-            .clearTripInfo();
-        Provider.of<CurrentTripProvider>(context, listen: false).idleState();
-        Navigator.of(context).pop();
-        Navigator.of(context).pop();
-        return true;
+        submitForm();
+        return false;
       },
       child: Scaffold(
           appBar: AppBar(
