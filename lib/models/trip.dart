@@ -1,36 +1,50 @@
+// Dart
 import 'dart:core';
+// Models
 import 'package:clax/models/Driver.dart';
-import 'package:clax/models/Line.dart';
+import 'package:clax/models/Station.dart';
 
 class Trip {
   String id;
-  DateTime start;
-  LineModel line;
+  String lineId;
+  StationModel station;
   DriverModel driver;
-  int price;
-  Trip({this.id, this.start, this.line, this.driver, this.price});
+  DateTime start;
+  double price;
+  int rate;
+  Trip(
+      {this.id,
+      this.start,
+      this.lineId,
+      this.driver,
+      this.price,
+      this.station,
+      this.rate});
 
   Trip.fromJson(Map<String, dynamic> json) {
-    id = json['_id'];
+    id = json['_d'];
     start = DateTime.parse(json['start']) ?? DateTime.now();
-    line = json['_line'] != null ? new LineModel.fromJson(json['_line']) : null;
-    driver = json['_driver'] != null
-        ? new DriverModel.fromJson(json['_driver'])
+    lineId = json['lineId'] ?? null;
+    station = StationModel.fromJson(json['station']) ?? null;
+    driver = json['driver'] != null
+        ? new DriverModel.fromJson(json['driver'])
         : null;
-    price = json['price'];
+    price = double.parse(json['price'].toString());
+    rate = json['rate'] ?? 0;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['_id'] = this.id;
+    data['id'] = this.id;
     data['start'] = this.start.toString();
-    if (this.line != null) {
-      data['_line'] = this.line.toJson();
-    }
+    data['lineId'] = this.lineId.toString();
+    StationModel _station = this.station;
+    data['station'] = _station.toJson();
     if (this.driver != null) {
-      data['_driver'] = this.driver.toJson();
+      data['driver'] = this.driver.toJson();
     }
     data['price'] = this.price;
+    data['rate'] = this.rate ?? "0";
     return data;
   }
 }

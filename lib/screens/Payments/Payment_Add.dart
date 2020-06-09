@@ -37,11 +37,6 @@ class _PaymentAddState extends State<PaymentAdd> {
               color: Colors.deepPurple,
               fontFamily: "Product Sans")));
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   void dispose() {
     super.dispose();
     _cardNumber.dispose();
@@ -156,6 +151,7 @@ class _PaymentAddState extends State<PaymentAdd> {
                     .bodyText1
                     .copyWith(color: Colors.white))),
         body: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
           child: SingleChildScrollView(
               child: Column(
             mainAxisAlignment: MainAxisAlignment.start,

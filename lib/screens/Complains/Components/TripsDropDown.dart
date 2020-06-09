@@ -72,10 +72,7 @@ class TripsDropDownMenuState extends State<TripsDropDownMenu> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Text(
-                                  trip.line == null
-                                      ? "حد خطا ف قاعدة البيانات"
-                                      : trip.line.from + " > " + trip.line.to,
+                              Text(trip.station.name,
                                   strutStyle:
                                       StrutStyle(forceStrutHeight: true),
                                   style: Theme.of(context)

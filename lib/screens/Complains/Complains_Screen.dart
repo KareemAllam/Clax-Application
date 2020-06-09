@@ -6,7 +6,7 @@ import 'package:clax/screens/Drawer.dart';
 import 'package:clax/models/Card.dart';
 // Widgets
 import 'package:clax/widgets/ExtendedAppBar.dart';
-import 'package:clax/widgets/Card_NavigationElement.dart';
+import 'package:clax/widgets/Cards.dart';
 
 class Complains extends StatelessWidget {
   static const routeName = '/complains';
@@ -53,7 +53,8 @@ class Complains extends StatelessWidget {
         itemCount: menuCards.length,
         physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
         controller: new ScrollController(),
-        itemBuilder: (context, index) => NavigationCard(card: menuCards[index]),
+        itemBuilder: (context, index) =>
+            Cards.navigationCard(context, card: menuCards[index]),
       ),
     );
   }

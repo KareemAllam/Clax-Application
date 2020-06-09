@@ -1,3 +1,6 @@
+// Models
+import 'package:clax/models/Name.dart';
+
 class ProfileModel {
   NameModel name;
   String mail;
@@ -35,22 +38,6 @@ class ProfileModel {
     data['passLength'] = this.passLength;
     data['mail_verified'] = this.mailVerified;
     data['phone_verified'] = this.phoneVerified;
-    return data;
-  }
-}
-
-class NameModel {
-  String first;
-  String last;
-  NameModel({this.first, this.last});
-  NameModel.fromJson(Map<String, dynamic> json) {
-    first = json['first'];
-    last = json['last'];
-  }
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['first'] = this.first;
-    data['last'] = this.last;
     return data;
   }
 }

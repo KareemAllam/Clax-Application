@@ -1,4 +1,6 @@
 // Dart & Other Packages
+import 'package:clax/models/Error.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
@@ -8,7 +10,8 @@ import 'package:clax/providers/Profile.dart';
 // Utils
 import 'package:clax/utils/password.dart';
 // Models
-import 'package:clax/models/profile.dart';
+import 'package:clax/models/Name.dart';
+import 'package:clax/models/Profile.dart';
 // Screens
 import 'package:clax/screens/Login/Verification.dart';
 
@@ -20,6 +23,7 @@ class Account extends StatefulWidget {
 
 class _AccountState extends State<Account> {
   final _form = GlobalKey<FormState>();
+  bool loading = false;
   ProfileModel _originalProfile;
   String pass = '';
   String email = '';
@@ -29,9 +33,14 @@ class _AccountState extends State<Account> {
   String confirmPass;
   TextEditingController passwordController = TextEditingController();
 
-  Future<String> _saveForm() async {
+  Future<ServerResponse> _saveForm() async {
+    setState(() {
+      loading = true;
+    });
     final isValid = _form.currentState.validate();
-    if (!isValid) return 'FormError';
+    if (!isValid)
+      return ServerResponse(
+          status: false, message: 'تاكد من ادخال البيانات بشكل صحيح');
 
     Map<String, dynamic> finalData = {};
     _form.currentState.save();
@@ -39,35 +48,37 @@ class _AccountState extends State<Account> {
     if (name.first != '' || name.last != '') {
       finalData['firstName'] =
           name.first == "" ? _originalProfile.name.first : name.first;
-      _originalProfile.name.first = finalData['firstName'];
 
       finalData['lastName'] =
           name.last == "" ? _originalProfile.name.last : name.last;
-      _originalProfile.name.last = finalData['lastName'];
     }
 
     if (phone != '') {
       finalData['phone'] = phone == '' ? _originalProfile.phone : phone;
-      _originalProfile.phone = phone;
     }
     if (email != '')
       finalData['mail'] = email == '' ? _originalProfile.mail : email;
 
     if (verifyPassword(pass, _originalProfile.passHashed)) {
-      _originalProfile.passHashed = hashedPassword(pass);
-      _originalProfile.passLength = pass.length;
       finalData['pass'] = pass;
       finalData['passLength'] = pass.length.toString();
     }
 
     if (finalData.isNotEmpty) {
-      String result =
+      ServerResponse result =
           await Provider.of<ProfilesProvider>(context, listen: false)
-              .updateProfile(finalData, _originalProfile);
+              .updateProfile(finalData);
+      setState(() {
+        loading = false;
+      });
+      if (result.status) Navigator.pop(context);
       return result;
-    } else
-      Navigator.pop(context);
-    return "";
+    }
+    setState(() {
+      loading = false;
+    });
+    Navigator.pop(context);
+    return ServerResponse(status: true);
   }
 
   void initState() {
@@ -79,6 +90,7 @@ class _AccountState extends State<Account> {
 
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
           ' تعديل حسابك',
@@ -90,25 +102,33 @@ class _AccountState extends State<Account> {
         actions: <Widget>[
           Builder(builder: (BuildContext context) {
             return IconButton(
-                icon: Icon(Icons.save),
-                onPressed: () async {
-                  String result = await _saveForm();
-                  // Internet Connection
-                  if (result == "error")
-                    Scaffold.of(context).showSnackBar(SnackBar(
-                        content: Text(
-                            "تأكد من اتصالك بالإنترنت و حاول مره اخرى.",
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyText2
-                                .copyWith(color: Colors.white))));
-                  // Phone Data Changed
-                  else {
-                    if (phone != '')
-                      Navigator.of(context)
-                          .pushReplacementNamed(Verification.routeName);
-                  }
-                });
+                icon: loading
+                    ? SpinKitThreeBounce(color: Colors.white, size: 15)
+                    : Icon(Icons.save),
+                onPressed: loading
+                    ? () {}
+                    : () async {
+                        ServerResponse result = await _saveForm();
+                        // Internet Connection
+                        if (!result.status)
+                          Scaffold.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.red,
+                              content: Text(
+                                "لقد تعذر الوصول للخادم. حاول مره اخرى في وقت لاحق",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyText2
+                                    .copyWith(color: Colors.white),
+                                strutStyle: StrutStyle(forceStrutHeight: true),
+                              ),
+                            ),
+                          );
+                        // Phone Data Changed
+                        else if (phone != '')
+                          Navigator.of(context)
+                              .pushReplacementNamed(Verification.routeName);
+                      });
           })
         ],
       ),
@@ -142,9 +162,9 @@ class _AccountState extends State<Account> {
                 value = value.trimRight();
                 if (value !=
                     '${_originalProfile.name.first} ${_originalProfile.name.last}') {
-                  List<String> name = value.split(' ');
-                  name.first = name[0];
-                  name.last = name[1];
+                  List<String> _name = value.split(' ');
+                  name.first = _name[0];
+                  name.last = _name[1];
                 }
               },
             ),

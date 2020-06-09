@@ -1,11 +1,12 @@
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 // Screens
-import 'package:clax/screens/Settings/Components/Members.dart';
+import 'package:clax/screens/Settings/Family.dart';
 
 class FamilyPreview2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    double _width = MediaQuery.of(context).size.width;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
@@ -21,11 +22,14 @@ class FamilyPreview2 extends StatelessWidget {
           ),
         ),
         Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.symmetric(horizontal: _width * 0.15),
             child: Text(
-              'يمكنك إضافة أفراد عائلتك حتى تتمكن من تتبعهم بأمان.',
+              'يمكنك إضافة أفراد عائلتك حتى تتمكن من تتبعهم بأمان في اي وقت و اي مكان.',
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyText2,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyText2
+                  .copyWith(color: Colors.grey),
             )),
         Spacer(flex: 1),
         Text(
@@ -33,53 +37,62 @@ class FamilyPreview2 extends StatelessWidget {
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyText2,
         ),
-        Container(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: Colors.transparent,
-                backgroundImage: AssetImage('assets/images/logo.png'),
+        Stack(
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(top: 10),
+              color: Theme.of(context).scaffoldBackgroundColor,
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Colors.transparent,
+                  backgroundImage: AssetImage('assets/images/logo.png'),
+                ),
+                title: Text(
+                  "كلاكس",
+                  strutStyle: StrutStyle(forceStrutHeight: true),
+                  style: Theme.of(context).textTheme.subtitle2,
+                ),
+                subtitle: Text(
+                  "بدء احمد رحلة جديدة. اضغط لتعرف المزيد",
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText2
+                      .copyWith(color: Colors.grey),
+                ),
               ),
-              title: Text(
-                "كلاكس",
-                strutStyle: StrutStyle(forceStrutHeight: true),
-                style: Theme.of(context).textTheme.subtitle2,
-              ),
-              subtitle: Text(
-                "بدء احمد رحلة جديدة. اضغط لتعرف المزيد",
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyText2
-                    .copyWith(color: Colors.grey),
-              ),
-            )),
-        Spacer(flex: 5),
-        RaisedButton(
-          child: Text(
-            'دعوة العائلة',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
             ),
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.00),
-            side: BorderSide(
-              width: 1.0,
-              color: Theme.of(context).primaryColor,
+            Align(
+              alignment: Alignment(-0.8, 0),
+              child: Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1)),
+                child: Text(
+                  "1",
+                  style: Theme.of(context).textTheme.caption.copyWith(
+                      fontFamily: "Product Sans",
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
             ),
-          ),
-          padding: EdgeInsets.symmetric(
-            vertical: 5,
-            horizontal: MediaQuery.of(context).size.width / 4,
-          ),
-          color: Theme.of(context).primaryColor,
-          textColor: Colors.white,
-          onPressed: () {
-            Navigator.of(context).pushReplacementNamed(Members.routeName);
-          },
+          ],
         ),
-        Spacer()
+        Spacer(flex: 2),
+        GestureDetector(
+          onTap: () =>
+              Navigator.of(context).pushReplacementNamed(Members.routeName),
+          child: Container(
+              padding: EdgeInsets.symmetric(vertical: 20),
+              color: Theme.of(context).primaryColor,
+              alignment: Alignment.center,
+              width: double.infinity,
+              child: Text('دعوة العائلة',
+                  style: Theme.of(context).textTheme.bodyText2.copyWith(
+                      color: Colors.white, fontWeight: FontWeight.bold))),
+        )
       ],
     );
   }

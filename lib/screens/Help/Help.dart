@@ -1,4 +1,5 @@
 // Flutter's Material Components
+import 'package:clax/widgets/Cards.dart';
 import 'package:flutter/material.dart';
 // Screens
 import 'package:clax/screens/Help/Bookings.dart';
@@ -6,8 +7,6 @@ import 'package:clax/screens/Help/Guide.dart';
 import 'package:clax/screens/Help/More.dart';
 import 'package:clax/screens/Help/Payments.dart';
 // Widgets
-import 'package:clax/widgets/appBar.dart';
-import 'package:clax/widgets/listTile.dart';
 import 'package:clax/screens/Drawer.dart';
 
 class Help extends StatelessWidget {
@@ -18,21 +17,33 @@ class Help extends StatelessWidget {
       "route": Payments.routeName,
       "icon": Icons.payment
     },
-    {"title": "مشاويرك", "route": Bookings.routeName, "icon": Icons.gps_fixed},
+    {
+      "title": "مشاويرك",
+      "route": Bookings.routeName,
+      "icon": Icons.directions_bus
+    },
     {"title": "الإرشادات", "route": Guide.routeName, "icon": Icons.live_help},
     {"title": "أخرى", "route": More.routeName, "icon": Icons.info}
   ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: buildAppBar(context, 'مساعدة'),
+      appBar: AppBar(
+        elevation: 0.0,
+        title: Text('مساعده',
+            style: Theme.of(context)
+                .textTheme
+                .bodyText1
+                .copyWith(color: Colors.white)),
+      ),
       drawer: MainDrawer(),
       body: ListView.builder(
-        itemBuilder: (context, index) => buildListTile(
+        itemBuilder: (context, index) => Cards.listTile(
           context,
-          menu[index]["title"],
-          menu[index]["icon"],
-          () => Navigator.of(context).pushNamed(menu[index]["route"]),
+          title: menu[index]["title"],
+          icon: menu[index]["icon"],
+          tapHandler: () =>
+              Navigator.of(context).pushNamed(menu[index]["route"]),
         ),
         itemCount: menu.length,
         controller: ScrollController(),

@@ -1,18 +1,33 @@
-class DriverModel {
-  String img;
-  String name;
+// Models
+import 'package:clax/models/Car.dart';
+import 'package:clax/models/Name.dart';
 
-  DriverModel({this.img, this.name});
+class DriverModel {
+  NameModel name;
+  String phone;
+  String img;
+  CarInfo carInfo;
+
+  DriverModel({this.name, this.phone, this.img, this.carInfo});
 
   DriverModel.fromJson(Map<String, dynamic> json) {
+    name = json['name'] != null ? new NameModel.fromJson(json['name']) : null;
+    phone = json['phone'];
     img = json['img'];
-    name = json['name'] ?? "404";
+    carInfo =
+        json['carInfo'] != null ? new CarInfo.fromJson(json['carInfo']) : null;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.name != null) {
+      data['name'] = this.name.toJson();
+    }
+    data['phone'] = this.phone;
     data['img'] = this.img;
-    data['name'] = this.name;
+    if (this.carInfo != null) {
+      data['carInfo'] = this.carInfo.toJson();
+    }
     return data;
   }
 }

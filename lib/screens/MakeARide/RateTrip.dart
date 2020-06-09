@@ -1,13 +1,20 @@
 // Dart & Other Pacakges
-import 'dart:convert';
-import 'package:clax/screens/MakeARide/HomeTaps.dart';
+import 'dart:math';
 import 'package:provider/provider.dart';
 // Flutter Material Components
 import 'package:flutter/material.dart';
+// Models
+import 'package:clax/models/Trip.dart';
+import 'package:clax/models/Bill.dart';
+import 'package:clax/models/Driver.dart';
+import 'package:clax/models/Station.dart';
+// Providers
+import 'package:clax/providers/Trips.dart';
+import 'package:clax/providers/Payment.dart';
+// Screens
+import 'package:clax/screens/MakeARide/Clax.dart';
 // Providers
 import 'package:clax/providers/CurrentTrip.dart';
-// Services
-import 'package:clax/services/Backend.dart';
 
 class RateTrip extends StatefulWidget {
   static const routeName = '/rateTrip';
@@ -23,7 +30,7 @@ class _RateTripState extends State<RateTrip> {
   bool feedbackProvided = false;
   TextEditingController _description = TextEditingController();
 
-  void submitForm() async {
+  Future submitForm(bool userSubmitted) async {
     // String driverId = Provider.of<CurrentTripProvider>(context, listen: false)
     //     .currentDriverInfo['driverId'];
     // Map<String, dynamic> body = {
@@ -32,11 +39,42 @@ class _RateTripState extends State<RateTrip> {
     //   'description': _description.text
     // };
     // await Api.post('pairing/driverRate', json.encode(body));
+
+    Map<String, dynamic> tripInfo =
+        Provider.of<CurrentTripProvider>(context, listen: false)
+            .currentTripInfo;
+
+    // Adjusting Payment History
+    BillModel bill = BillModel(
+        amount: tripInfo["finalPrice"],
+        date: DateTime.now(),
+        type: "Pay",
+        description: tripInfo['station']['name']);
+    await Provider.of<PaymentProvider>(context, listen: false).add(bill);
+
+    // Adjusting Trips History
+    Trip _trip = Trip(
+        station: StationModel.fromJson(tripInfo['station']),
+        driver: DriverModel.fromJson(tripInfo),
+        id: Random(2).toString(),
+        lineId: tripInfo['lindId'],
+        price: tripInfo['finalPrice'],
+        start: tripInfo['start'],
+        rate: userSubmitted ? driverRate * 10 : 30);
+
+    await Provider.of<TripsProvider>(context, listen: false).addTrip(_trip);
+
+    // Adjusting Payment Balance
+    Provider.of<PaymentProvider>(context, listen: false).setBalance =
+        -tripInfo["finalPrice"];
+
+    // Clear Trip State
     await Provider.of<CurrentTripProvider>(context, listen: false)
         .clearTripInfo();
 
+    // Return to Main Screen
     Navigator.of(context).popUntil((route) {
-      if (route.settings.name == Tabs.routeName) return true;
+      if (route.settings.name == Clax.routeName) return true;
       return false;
     });
   }
@@ -73,7 +111,7 @@ class _RateTripState extends State<RateTrip> {
         children: <Widget>[for (int i = 1; i <= 5; i++) star(i)]);
     return WillPopScope(
       onWillPop: () async {
-        submitForm();
+        await submitForm(false);
         return false;
       },
       child: Scaffold(
@@ -90,7 +128,7 @@ class _RateTripState extends State<RateTrip> {
             child: GestureDetector(
               onTap: () => FocusScope.of(context).unfocus(),
               child: Container(
-                height: height - height * 0.12,
+                height: height - height * 0.109,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -184,7 +222,7 @@ class _RateTripState extends State<RateTrip> {
                     ]),
                     Spacer(),
                     GestureDetector(
-                        onTap: submitForm,
+                        onTap: () => submitForm(true),
                         child: Container(
                             width: double.infinity,
                             padding: EdgeInsets.symmetric(

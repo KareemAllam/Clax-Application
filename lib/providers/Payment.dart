@@ -1,11 +1,17 @@
+// Dart & Other Pacakges
 import 'dart:convert';
-import 'package:clax/models/Bill.dart';
-import 'package:flutter/material.dart';
-import 'package:clax/utils/nameAdjustment.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:clax/models/CreditCard.dart';
-import '../services/Backend.dart';
+import 'package:clax/models/Error.dart';
 import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+// Flutter Foundation
+import 'package:flutter/foundation.dart';
+// Models
+import 'package:clax/models/Bill.dart';
+import 'package:clax/models/CreditCard.dart';
+// Services
+import 'package:clax/services/Backend.dart';
+// Utils
+import 'package:clax/utils/nameAdjustment.dart';
 
 class PaymentProvider extends ChangeNotifier {
   double _balance = 0.0;
@@ -135,28 +141,26 @@ class PaymentProvider extends ChangeNotifier {
   }
 
   // Charge a Credit Card ==> Increase Blanace
-  Future<String> chargeCredit(String id, String amount) async {
-    try {
-      Response result = await Api.post(
-          'passengers/payments/manage-financials/charge-credit',
-          {"source": id, "amount": amount});
-      if (result.statusCode == 200) {
-        _balance += int.parse(amount);
-        notifyListeners();
-        return result.body;
-      } else {
-        return "400";
-      }
-    } catch (_) {
-      return "408";
-    }
+  Future<ServerResponse> chargeCredit(String id, String amount) async {
+    Response result = await Api.post(
+        'passengers/payments/manage-financials/charge-credit',
+        {"source": id, "amount": amount});
+    if (result.statusCode == 200) {
+      _balance += int.parse(amount);
+      notifyListeners();
+      return ServerResponse(status: true, message: result.body);
+    } else if (result.statusCode == 408)
+      return ServerResponse(status: true, message: "تعذر الوصول للخادم");
+    else
+      return ServerResponse(
+          status: true, message: "لا يوجد لديك رصيد لعملية التحويل.");
   }
 
   // Charge user via Paypal ==> Increase Blanace
   Future<String> chargePaypal(String amount) async {
     try {
       Response result = await Api.post(
-          'payments/manage-financials/paypal/charge-paypal',
+          'passengers/payments/manage-financials/paypal/charge-paypal',
           {"amount": amount});
       if (result.statusCode == 200) {
         _balance += int.parse(amount);
@@ -176,8 +180,8 @@ class PaymentProvider extends ChangeNotifier {
 
     String brand = brandName(body['number']);
     try {
-      Response response =
-          await Api.post('payments/manage-financials/add-card', body);
+      Response response = await Api.post(
+          'passengers/payments/manage-financials/add-card', body);
       if (response.statusCode == 200) {
         _cards.add(CreditCardModel(
             brand: brand,
@@ -198,8 +202,7 @@ class PaymentProvider extends ChangeNotifier {
   }
 
   // Add a bill
-  void add(String billJson) async {
-    BillModel bill = BillModel.fromJson(json.decode(billJson));
+  Future add(BillModel bill) async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     _bills.add(bill);
     _prefs.setString("bills", json.encode(_bills));

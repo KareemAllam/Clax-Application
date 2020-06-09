@@ -3,81 +3,38 @@ import 'package:provider/provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
-// Components
-import 'package:clax/screens/Home/Components/favourites.dart';
-// Drawer
-import 'package:clax/screens/Drawer.dart';
+// Utils
+import 'package:clax/utils/MessageHandling.dart';
 // Providers
-import 'package:clax/providers/Payment.dart';
-import 'package:clax/providers/CurrentTrip.dart';
 import 'package:clax/providers/Map.dart';
+import 'package:clax/providers/CurrentTrip.dart';
 // Screens
 import 'package:clax/screens/MakeARide/GoogleMap.dart';
-import 'package:clax/screens/MakeARide/RidePickupLocation.dart';
-import 'package:clax/screens/MakeARide/StartARide.dart';
+// Components
+import 'package:clax/screens/MakeARide/Components/RideConfig.dart';
+import 'package:clax/screens/MakeARide/Components/RideSearching.dart';
+// Widgets
+import 'package:clax/screens/MakeARide/widgets/FlipIcon.dart';
+// Drawer
+import 'package:clax/screens/Drawer.dart';
 
-class Tabs extends StatefulWidget {
+class Clax extends StatefulWidget {
   static const routeName = '/homescreen';
   @override
-  _TabsState createState() => _TabsState();
+  _ClaxState createState() => _ClaxState();
 }
 
-class _TabsState extends State<Tabs> {
-  final List<Map<String, Object>> _pages = [
-    {'page': RidePickLocation(), 'title': 'رحلة جديدة'},
-    {'page': Favourites(), 'title': 'رحلاتك المفضلة'},
-  ];
+class _ClaxState extends State<Clax> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  NotificationHandler handler = NotificationHandler();
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-  // double _cost;
-
-  int _selectedPageIndex = 0;
-
-  void _selectPage(int index) {
-    setState(() {
-      _selectedPageIndex = index;
-    });
-  }
+  bool onATrip = false;
+  bool searching = false;
+  String driverId;
+  ThemeData theme;
 
   void _navigateToItemDetail(Map<String, dynamic> message) {
-    // Navigator.of(context).pushNamed(MapPage.routeName);
-    // Navigator.of(context)
-    //     .print("Route Name: ${ModalRoute.of(context).settings.name}");
-    // print("isCurrent: ${ModalRoute.of(context).isCurrent}");
-    // print("isActive: ${ModalRoute.of(context).isActive}");
-    // print("isFirst: ${ModalRoute.of(context).isFirst}");
-
-    String type = message['data']['type'];
-    switch (type) {
-      case "driverArrived":
-        // Retreive DriverID
-        String driverId = message['data']['driverId'];
-
-        Provider.of<CurrentTripProvider>(context, listen: false)
-            .setTripInfo(driverId);
-        Provider.of<MapProvider>(context, listen: false).setDriverId = driverId;
-        double tripPrice =
-            Provider.of<CurrentTripProvider>(context, listen: false).price;
-        Provider.of<PaymentProvider>(context, listen: false).setBalance =
-            -tripPrice;
-
-        // Exit Waiting Screen
-        // Github Solution: https://stackoverflow.com/questions/50817086/how-to-check-which-the-current-route-is/50817399
-        if (!ModalRoute.of(context).isCurrent) {
-          Navigator.popUntil(context, (route) {
-            if (route.settings.name == StartARide.routeName) return false;
-            return true;
-          });
-        }
-        Navigator.of(context).pushNamed(MapPage.routeName);
-
-        break;
-      case "offer":
-        double offerDiscount = double.parse(message['data']['discount']);
-        Provider.of<PaymentProvider>(context).setDiscount = offerDiscount;
-        break;
-      default:
-      // Default FCM Action
-    }
+    handler.handle(context, message);
   }
 
   @override
@@ -85,7 +42,6 @@ class _TabsState extends State<Tabs> {
     super.initState();
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
-        // print("onMessage: $message");
         _navigateToItemDetail(message);
       },
       onLaunch: (Map<String, dynamic> message) async {
@@ -105,44 +61,58 @@ class _TabsState extends State<Tabs> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    Provider.of<CurrentTripProvider>(context, listen: false).setScaffoldKey =
+        _scaffoldKey;
+    Provider.of<MapProvider>(context, listen: false).setScaffoldKey =
+        _scaffoldKey;
+    searching = Provider.of<CurrentTripProvider>(context).searching;
+    onATrip = Provider.of<CurrentTripProvider>(context).onATrip;
+    theme = Theme.of(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          title: Text(
-        _pages[_selectedPageIndex]['title'],
-        style:
-            Theme.of(context).textTheme.bodyText1.copyWith(color: Colors.white),
-      )),
-      drawer: MainDrawer(),
-      body: _pages[_selectedPageIndex]['page'],
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: _selectPage,
-        backgroundColor: Theme.of(context).primaryColor,
-        unselectedItemColor: Colors.white60,
-        selectedItemColor: Theme.of(context).accentColor,
-        currentIndex: _selectedPageIndex,
-        // type: BottomNavigationBarType.shifting,
-        items: [
-          BottomNavigationBarItem(
-            backgroundColor: Theme.of(context).primaryColor,
-            icon: Icon(Icons.airline_seat_recline_extra),
+        key: _scaffoldKey,
+        appBar: AppBar(
             title: Text(
-              'رحلة جديدة',
-              style: TextStyle(
-                  fontFamily: 'Cairo', fontSize: 14.0, color: Colors.white),
-            ),
-          ),
-          BottomNavigationBarItem(
-            backgroundColor: Theme.of(context).primaryColor,
-            icon: Icon(Icons.star),
-            title: Text(
-              'الرحلات المفضلة',
-              style: TextStyle(
-                  fontFamily: 'Cairo', fontSize: 14.0, color: Colors.white),
-            ),
-          ),
-        ],
-      ),
-    );
+          "",
+          style: Theme.of(context)
+              .textTheme
+              .bodyText1
+              .copyWith(color: Colors.white),
+        )),
+        drawer: MainDrawer(),
+        body: !searching
+            ? PickLocation()
+            : onATrip
+                ? Container(
+                    color: Colors.white,
+                    width: double.infinity,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pushNamed(MapPage.routeName);
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          FlipCard(),
+                          Text(
+                            "تتبع رحلتك",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText1
+                                .copyWith(fontWeight: FontWeight.bold)
+                                .copyWith(
+                                    color: Theme.of(context).primaryColor),
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                : RideSearching());
   }
 }

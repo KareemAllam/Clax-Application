@@ -33,7 +33,6 @@ class _TransferMoneyState extends State<TransferMoney>
   }
 
   Widget build(BuildContext context) {
-    var transactions = Provider.of<TransactionsProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('تحويل فلوس',
@@ -52,7 +51,9 @@ class _TransferMoneyState extends State<TransferMoney>
                   setState(() {
                     loading = true;
                   });
-                  bool result = await transactions.fetchData();
+                  bool result = await Provider.of<TransactionsProvider>(context,
+                          listen: false)
+                      .getRequests();
                   setState(() {
                     loading = false;
                   });

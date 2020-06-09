@@ -1,6 +1,8 @@
-import 'package:flutter/foundation.dart';
+// Dart & Other Pacakges
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+// Flutter Foundation
+import 'package:flutter/foundation.dart';
 
 class AuthProvider extends ChangeNotifier {
   String _auth = "";
@@ -14,23 +16,8 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future firebaseConfig() async {
-    //   _firebaseMessaging.configure(
-    //     onMessage: (Map<String, dynamic> message) async {
-    //       print(
-    //           "onMessage: Title: ${message['notification']['title']}, Data: ${message['notification']['body']}");
-    //       // Message Handling Class
-    //     },
-    //     onLaunch: (Map<String, dynamic> message) async {
-    //       print("onLaunch: $message");
-    //       // Message Handling Class
-    //     },
-    //     onResume: (Map<String, dynamic> message) async {
-    //       print("onResume: $message");
-    //       // Message Handling Class
-    //     },
-    //   );
-
     _firebaseToken = await _firebaseMessaging.getToken();
+    // print(_firebaseToken);
   }
 
   Future<String> getSharedPrefrence() async {

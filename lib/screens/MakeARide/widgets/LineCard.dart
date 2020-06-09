@@ -1,8 +1,10 @@
-import 'package:clax/models/Station.dart';
+// FLutter's Material Compoenents
 import 'package:flutter/material.dart';
+// Models
+import 'package:clax/models/Line.dart';
 
 class LineCard extends StatelessWidget {
-  final Line line;
+  final LineModel line;
   final Function onTap;
   LineCard({this.line, this.onTap});
   @override

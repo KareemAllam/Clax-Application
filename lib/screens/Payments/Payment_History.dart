@@ -8,7 +8,7 @@ import 'package:clax/providers/Payment.dart';
 import 'package:clax/models/Bill.dart';
 import 'package:clax/models/CreditCard.dart';
 // Widgets
-import 'package:clax/widgets/Card_PaymentHistory.dart';
+import 'package:clax/screens/Payments/widgets/Card_PaymentHistory.dart';
 import 'package:clax/widgets/null.dart';
 
 class PaymentHistory extends StatefulWidget {
@@ -32,8 +32,7 @@ class _PaymentHistoryState extends State<PaymentHistory> {
 
   Widget build(BuildContext context) {
     List<CreditCardModel> cards = Provider.of<PaymentProvider>(context).cards;
-    var billsProvider = Provider.of<PaymentProvider>(context, listen: false);
-    List<BillModel> bills = billsProvider.bills;
+    List<BillModel> bills = Provider.of<PaymentProvider>(context).bills;
     bills.sort((a, b) => b.date.compareTo(a.date));
 
     double height = MediaQuery.of(context).size.height;
@@ -42,7 +41,7 @@ class _PaymentHistoryState extends State<PaymentHistory> {
       setState(() {
         loading = true;
       });
-      await billsProvider.fetchData();
+      await Provider.of<PaymentProvider>(context, listen: false).fetchData();
       setState(() {
         loading = false;
       });

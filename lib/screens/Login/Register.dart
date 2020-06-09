@@ -97,7 +97,6 @@ class _RegisterFormState extends State<RegisterForm> {
         'pass': _password.text,
         'fireBaseId': firebaseToken
       };
-      print(body);
       // Disable Register Button
       setState(() {
         _loading = true;
@@ -105,7 +104,6 @@ class _RegisterFormState extends State<RegisterForm> {
 
       // Register The User from on Server
       Response result = await Api.post("signing/passengers/register", body);
-      print(result.body);
       // If User's info is correct
       if (result.statusCode == 200) {
         Provider.of<AuthProvider>(context, listen: false)
@@ -123,7 +121,7 @@ class _RegisterFormState extends State<RegisterForm> {
       else if (result.statusCode == 409) {
         // Enable Register Button
         setState(() {
-          _loading = true;
+          _loading = false;
         });
         return result.body;
       }
@@ -132,7 +130,7 @@ class _RegisterFormState extends State<RegisterForm> {
       else {
         // Enable Register Button
         setState(() {
-          _loading = true;
+          _loading = false;
         });
         return 2;
       }
@@ -177,15 +175,15 @@ class _RegisterFormState extends State<RegisterForm> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Container(
-                            margin: EdgeInsets.symmetric(vertical: 10),
-                            padding: EdgeInsets.only(right: 10),
+                            margin: EdgeInsets.only(top: 10),
                             child: Row(
                               children: <Widget>[
                                 Text((index + 1).toString() + ". ",
-                                    style: textTheme.headline6),
+                                    style: textTheme.bodyText1),
                                 Text(
                                   titles[index],
-                                  style: textTheme.headline6,
+                                  style: textTheme.bodyText1
+                                      .copyWith(fontWeight: FontWeight.bold),
                                 )
                               ],
                             ),
@@ -408,7 +406,9 @@ class _RegisterFormState extends State<RegisterForm> {
                               borderSide: BorderSide(
                                   color: _nameError
                                       ? Colors.red
-                                      : _nameFocused ? purple : Colors.grey)),
+                                      : _nameFocused
+                                          ? purple
+                                          : Colors.black26)),
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 15, vertical: 0),
                         ),
@@ -455,7 +455,8 @@ class _RegisterFormState extends State<RegisterForm> {
                     fillColor: Colors.white,
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 15, vertical: 0),
-                    border: OutlineInputBorder(
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black26),
                         borderRadius: BorderRadius.circular(30)),
                     prefixIcon: Icon(
                       Icons.phone,
@@ -503,7 +504,8 @@ class _RegisterFormState extends State<RegisterForm> {
                     fillColor: Colors.white,
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 15, vertical: 0),
-                    border: OutlineInputBorder(
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black26),
                         borderRadius: BorderRadius.circular(30)),
                     prefixIcon: Icon(
                       Icons.mail,
@@ -553,7 +555,8 @@ class _RegisterFormState extends State<RegisterForm> {
                     fillColor: Colors.white,
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 15, vertical: 0),
-                    border: OutlineInputBorder(
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black26),
                         borderRadius: BorderRadius.circular(30)),
                     prefixIcon: Icon(
                       Icons.lock,
@@ -612,7 +615,8 @@ class _RegisterFormState extends State<RegisterForm> {
                     fillColor: Colors.white,
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 15, vertical: 0),
-                    border: OutlineInputBorder(
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black26),
                         borderRadius: BorderRadius.circular(30)),
                     prefixIcon: Icon(
                       Icons.lock,
@@ -672,8 +676,12 @@ class _RegisterFormState extends State<RegisterForm> {
                                 Scaffold.of(context).showSnackBar(SnackBar(
                                     content: Text("تعذر الوصول للانترنت.")));
                               else if (result != 0)
-                                Scaffold.of(context).showSnackBar(
-                                    SnackBar(content: Text("$result")));
+                                Scaffold.of(context).showSnackBar(SnackBar(
+                                    content: Text(
+                                  "$result",
+                                  style: textTheme.bodyText2
+                                      .copyWith(color: Colors.white),
+                                )));
                             },
                             shape: StadiumBorder(),
                             color: purple,

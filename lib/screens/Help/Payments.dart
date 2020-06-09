@@ -7,8 +7,7 @@ import 'package:clax/screens/Help/PaymentOptions.dart';
 import 'package:clax/screens/Help/UpfrontPricing.dart';
 import 'package:clax/screens/Help/PromoCodes.dart';
 // Widgets
-import 'package:clax/widgets/appBar.dart';
-import 'package:clax/widgets/listTile.dart';
+import 'package:clax/widgets/Cards.dart';
 
 class Payments extends StatelessWidget {
   static const routeName = '/Payments';
@@ -42,13 +41,21 @@ class Payments extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: buildAppBar(context, 'المدفوعات والإيصالات'),
+      appBar: AppBar(
+        elevation: 0.0,
+        title: Text('المدفوعات والإيصالات',
+            style: Theme.of(context)
+                .textTheme
+                .bodyText1
+                .copyWith(color: Colors.white)),
+      ),
       body: ListView.builder(
-        itemBuilder: (context, index) => buildListTile(
+        itemBuilder: (context, index) => Cards.listTile(
           context,
-          menu[index]["title"],
-          menu[index]['icon'],
-          () => Navigator.of(context).pushNamed(menu[index]["route"]),
+          title: menu[index]["title"],
+          icon: menu[index]['icon'],
+          tapHandler: () =>
+              Navigator.of(context).pushNamed(menu[index]["route"]),
         ),
         itemCount: menu.length,
         controller: ScrollController(),

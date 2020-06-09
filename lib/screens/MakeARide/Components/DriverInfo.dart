@@ -18,11 +18,12 @@ class _DriverInfoState extends State<DriverInfo> {
   }
 
   ImageProvider<dynamic> image() {
-    try {
-      return NetworkImage(_driverInfo['driver_info']['img']);
-    } catch (_) {
-      return AssetImage('assets/images/404.png');
-    }
+    // try {
+    //   return NetworkImage(_driverInfo['img']);
+    // } catch (_) {
+    //   return AssetImage('assets/images/404.png');
+    // }
+    return AssetImage('assets/images/404.png');
   }
 
   Widget pieceOfInfo(String title, String subtitle, IconData icon) => Row(
@@ -84,10 +85,10 @@ class _DriverInfoState extends State<DriverInfo> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 child: Row(children: <Widget>[
-                  CircleAvatar(
-                    backgroundImage: image(),
-                    backgroundColor: Colors.transparent,
-                    radius: MediaQuery.of(context).size.height * 0.04,
+                  Expanded(
+                    child: Image(
+                      image: image(),
+                    ),
                   ),
                   // SizedBox(width: 20),
                   SizedBox(width: 20),
@@ -96,14 +97,13 @@ class _DriverInfoState extends State<DriverInfo> {
                     children: <Widget>[
                       pieceOfInfo(
                           "الأسم",
-                          '${_driverInfo['driver_info']['name']['first']} ${_driverInfo['driver_info']['name']['last']}',
+                          '${_driverInfo['name']['first']} ${_driverInfo['name']['last']}',
                           Icons.person),
                       SizedBox(height: 10),
                       GestureDetector(
-                        onTap: () => launch(
-                            "tel://${_driverInfo['driver_info']['phone']}"),
-                        child: pieceOfInfo("رقم الهاتف",
-                            _driverInfo['driver_info']['phone'], Icons.call),
+                        onTap: () => launch("tel://${_driverInfo['phone']}"),
+                        child: pieceOfInfo(
+                            "رقم الهاتف", _driverInfo['phone'], Icons.call),
                       ),
                       SizedBox(height: 10),
                     ],
@@ -112,11 +112,13 @@ class _DriverInfoState extends State<DriverInfo> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      pieceOfInfo("رقم الميكروباص",
-                          _driverInfo['car']["number"], Icons.directions_bus),
+                      pieceOfInfo(
+                          "رقم الميكروباص",
+                          _driverInfo['carInfo']["number"],
+                          Icons.directions_bus),
                       SizedBox(height: 10),
-                      pieceOfInfo("لون المكروباص", _driverInfo['car']["color"],
-                          Icons.format_paint)
+                      pieceOfInfo("لون المكروباص",
+                          _driverInfo['carInfo']["color"], Icons.format_paint)
                     ],
                   )
                 ]),

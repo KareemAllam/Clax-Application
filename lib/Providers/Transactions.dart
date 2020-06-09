@@ -1,9 +1,13 @@
-import 'package:clax/models/Transaction.dart';
-import 'package:clax/services/Backend.dart';
+// Dart & Other Pacakges
+import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/material.dart';
-import 'dart:convert';
+// Flutter Foundation
+import 'package:flutter/foundation.dart';
+// Models
+import 'package:clax/models/Transaction.dart';
+// Services
+import 'package:clax/services/Backend.dart';
 
 class TransactionsProvider extends ChangeNotifier {
   List<TransactionModel> _transactions = [];
@@ -20,14 +24,15 @@ class TransactionsProvider extends ChangeNotifier {
           _transactions.add(TransactionModel.fromJson(transaction)));
       notifyListeners();
     }
-    fetchData();
+    getRequests();
   }
 
-  Future<bool> fetchData() async {
+  /// Get Transfer Requests
+  Future<bool> getRequests() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     try {
       Response response =
-          await Api.get('passengers/payments/manage-financials/get-balance');
+          await Api.get('passengers/payments/loaning/fetch-requests');
       if (response.statusCode == 200) {
         _transactions = List<TransactionModel>.from((json
                 .decode(response.body)
@@ -44,7 +49,8 @@ class TransactionsProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> cancel(String transactionId, type) async {
+  /// Cancel a Transfer Request
+  Future<bool> cancelARequest(String transactionId, type) async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     TransactionModel transaction = (_transactions
         .where((element) => element.id == transactionId)
@@ -52,7 +58,8 @@ class TransactionsProvider extends ChangeNotifier {
     _transactions.remove(transaction);
     Map<String, String> body = {"transactionId": transactionId, "type": type};
     try {
-      Response result = await Api.post("transactions/cancel", body);
+      Response result =
+          await Api.post("passengers/payments/loaning/reject-request", body);
       if (result.statusCode == 200) {
         _prefs.setString("transactions", json.encode(_transactions));
         notifyListeners();
@@ -69,9 +76,11 @@ class TransactionsProvider extends ChangeNotifier {
     }
   }
 
-  Future<String> add(body) async {
+  /// Make a Transfer Request
+  Future<String> makeARequest(body) async {
     try {
-      Response response = await Api.post('transactions/add', body);
+      Response response =
+          await Api.post('passengers/payments/loaning/request-loan', body);
       if (response.statusCode == 408)
         return "تعذر الوصول للإنترنت. تأكد من اتصالك بالإنترنت و حاول مره اخرى.";
       else
@@ -81,7 +90,8 @@ class TransactionsProvider extends ChangeNotifier {
     }
   }
 
-  Future<String> accept(String transactionId) async {
+  /// Accept a Transfer Request
+  Future<String> acceptARequest(String transactionId) async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     TransactionModel transaction = (_transactions
         .where((element) => element.id == transactionId)
@@ -93,19 +103,21 @@ class TransactionsProvider extends ChangeNotifier {
       "loanerNamed": "Kareem Allam"
     };
     try {
-      Response result = await Api.post("transactions/accept", body);
+      Response result = await Api.put(
+          "passengers/payments/loaning/accept-request",
+          reqBody: body);
       if (result.statusCode == 200) {
         _prefs.setString("transactions", json.encode(_transactions));
         return result.body;
       } else {
         _transactions.add(transaction);
         notifyListeners();
-        return "false";
+        return "Error";
       }
     } catch (_) {
       _transactions.add(transaction);
       notifyListeners();
-      return "false";
+      return "Error";
     }
   }
 

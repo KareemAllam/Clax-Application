@@ -50,7 +50,9 @@ class RealtimeDB {
   /// with specified child.
   void cancelReadAsync(String child) {
     print("canceled successfully...");
-    events[child].cancel();
+    try {
+      events[child].cancel();
+    } catch (_) {}
     events[child] = null;
   }
 

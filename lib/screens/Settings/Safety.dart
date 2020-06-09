@@ -3,14 +3,20 @@ import 'package:flutter/material.dart';
 // Components
 import 'package:clax/screens/Settings/TrustedContacts.dart';
 // Widgets
-import 'package:clax/widgets/appBar.dart';
 
 class Safety extends StatelessWidget {
   static const routeName = '/Safety';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: buildAppBar(context, 'الأمان'),
+        appBar: AppBar(
+          elevation: 0.0,
+          title: Text('الأمان',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyText1
+                  .copyWith(color: Colors.white)),
+        ),
         body: Container(
             alignment: Alignment.topCenter,
             child: Column(

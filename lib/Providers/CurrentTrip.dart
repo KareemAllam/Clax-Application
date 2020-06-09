@@ -1,25 +1,33 @@
 // Dart & Other Pacakges
+import 'dart:math';
 import 'dart:convert';
-import 'package:clax/providers/Map.dart';
-import 'package:clax/screens/MakeARide/Components/DriverInfo.dart';
-import 'package:clax/screens/MakeARide/GoogleMap.dart';
-import 'package:clax/screens/MakeARide/RideConfig.dart';
-import 'package:clax/screens/Settings/Settings.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // Flutter Material Componenets
 import 'package:flutter/material.dart';
 // Models
+import 'package:clax/models/Trip.dart';
+import 'package:clax/models/Driver.dart';
 import 'package:clax/models/Station.dart';
+// Providers
+import 'package:clax/providers/Map.dart';
+import 'package:clax/providers/Trips.dart';
+// Screens
+import 'package:clax/screens/Settings/Settings.dart';
+import 'package:clax/screens/MakeARide/GoogleMap.dart';
+import 'package:clax/screens/MakeARide/RideSeats.dart';
+import 'package:clax/screens/MakeARide/Components/DriverInfo.dart';
 // Services
 import 'package:clax/services/Backend.dart';
 import 'package:clax/services/RealtimeDB.dart';
+// Widgets
+import 'package:clax/widgets/Notification.dart';
 
 class CurrentTripProvider extends ChangeNotifier {
   // Setting App to Trip State so User can't make another tirp
   RealtimeDB db;
-  String _requestId;
   GlobalKey<ScaffoldState> _scaffoldKey;
 
   /// driverId - driverInfo: {name: first-last, phone, img, car:{number,color}}
@@ -45,14 +53,16 @@ class CurrentTripProvider extends ChangeNotifier {
 
     if (_prefs.getString("tripInfo") != null)
       currentTripInfo = json.decode(_prefs.getString("tripInfo"));
+    notifyListeners();
 
     if (currentDriverInfo.length == 0 && currentTripInfo.length > 3) {
       startListeningToRequest();
+    } else if (currentDriverInfo.length > 0) {
+      startTracking();
     }
-    notifyListeners();
   }
 
-  /// "lindId" - "station" - "pricePerSeat" - "requiredSeats" - finalPrice
+  /// "lindId" - "station" - "pricePerSeat" - "requiredSeats" - "finalPrice" - "start"
   void setTripInfo(Map<String, dynamic> keyValue) {
     currentTripInfo.addAll(keyValue);
     notifyListeners();
@@ -70,6 +80,7 @@ class CurrentTripProvider extends ChangeNotifier {
   /// Cancel a trip request recently made.
   Future cancelTripRequest() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
+    String _requestId = currentTripInfo['requestId'];
     db.cancelReadAsync('clax-requests/$_requestId');
     currentTripInfo = Map();
     _prefs.remove("tripInfo");
@@ -83,15 +94,16 @@ class CurrentTripProvider extends ChangeNotifier {
   Future<bool> searchingDriverState() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     // Preparing data for post request
-    String endodeBody = json.encode({
-      "lindId": currentTripInfo["lindId"],
-      "requiredSeats": currentTripInfo['requiredSeats'],
-      "stationLoc": {
-        "lat": currentTripInfo['station']['coordinates'][0],
-        "lng": currentTripInfo['station']['coordinates'][1]
-      }
-    });
     // TODO: شغله بالسيرفر
+    // String endodeBody = json.encode({
+    //   "lindId": currentTripInfo["lindId"],
+    //   "requiredSeats": currentTripInfo['requiredSeats'],
+    //   "stationLoc": {
+    //     "lat": currentTripInfo['station']['coordinates'][0],
+    //     "lng": currentTripInfo['station']['coordinates'][1]
+    //   }
+    // });
+
     // Trip Info Cached
     currentTripInfo['requestId'] = 'request123';
     _prefs.setString("tripInfo", json.encode(currentTripInfo));
@@ -112,20 +124,23 @@ class CurrentTripProvider extends ChangeNotifier {
   }
 
   Future startListeningToRequest() async {
+    String lineId = currentTripInfo['lindId'];
+    String requestId = currentTripInfo['requestId'];
     // Listing to changes on RequestId
-    _requestId = currentTripInfo['requestId'];
-    db.readAsync('clax-requests/$_requestId', (value) {
-      print(value);
+    print(requestId);
+    // db.readAsync('clax-requests/$lineId/$requestId', (value) {
+    db.readAsync('b3d-ezn-raaed/$lineId/$requestId', (value) async {
+      String _requestId = currentTripInfo['requestId'];
       if (value['status'] == "meeting") {
+        currentTripInfo['start'] = DateTime.now();
         db.cancelReadAsync('clax-requests/$_requestId');
         // Navigator Propelry to another screen
-        print("Driver id: ${value['driverId']} arrived!");
-        getDriverInfo(value['driverId']);
+        await getDriverInfo("value['driverId']");
       }
     });
   }
 
-  void getDriverInfo(String driverId) async {
+  Future getDriverInfo(String driverId) async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     // TODO: شغله بالسيرفر
     // Response result = await Api.post("pairing/driver-info", driverId);
@@ -138,24 +153,40 @@ class CurrentTripProvider extends ChangeNotifier {
       "carInfo": {"number": "2314", "color": "red"}
     };
     currentDriverInfo['driverId'] = driverId;
-    _prefs.setString('driver', json.encode(currentDriverInfo));
+    _prefs.setString('driverInfo', json.encode(currentDriverInfo));
     notifyListeners();
-    // Assign it to MapProvider's driverId
-    Provider.of<MapProvider>(_scaffoldKey.currentContext, listen: false)
-        .setDriverId(driverId, currentTripInfo['lindId']);
-    // Navigator to Map
-    if (!ModalRoute.of(_scaffoldKey.currentContext).isCurrent) {
-      Navigator.of(_scaffoldKey.currentContext).popUntil((route) {
-        if (route.settings.name == StartARide.routeName) return false;
-        return true;
-      });
-    }
-    Navigator.of(_scaffoldKey.currentContext).pushNamed(MapPage.routeName);
+    await startTracking();
   }
 
   Future startTracking() async {
-    // Retreieve Information First
-    // Provider.of<MapProvider>(_scaffoldKey.currentContext).setDriverId=
+    // String driverId = currentDriverInfo['driverId'];
+    String driverId = "5e5667e3e781d4395c633b43";
+    // Assign it to MapProvider's driverId
+    Provider.of<MapProvider>(_scaffoldKey.currentContext, listen: false)
+        .setDriverId(driverId, currentTripInfo['lindId']);
+
+    showNotification(
+      _scaffoldKey.currentContext,
+      "السائق في الطريق إليك",
+      "اضغط لتتبع السائق",
+      cb: () => Navigator.of(_scaffoldKey.currentContext)
+          .pushNamed(MapPage.routeName),
+    );
+    // // Navigator to Map
+    // if (!ModalRoute.of(_scaffoldKey.currentContext).isCurrent) {
+    //   Navigator.of(_scaffoldKey.currentContext).popUntil((route) {
+    //     if (route.settings.name == StartARide.routeName) return false;
+    //     return true;
+    //   });
+    // }
+    // Navigator.of(_scaffoldKey.currentContext).pushNamed(MapPage.routeName);
+
+    // Fluttertoast.showToast(
+    //   gravity: ToastGravity.TOP,
+    //   msg: "السائق في الطريق إليك",
+    //   backgroundColor: Colors.deepPurple,
+    //   toastLength: Toast.LENGTH_LONG,
+    // );
   }
 
   // Getters

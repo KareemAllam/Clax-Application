@@ -153,17 +153,17 @@ class _VerificationState extends State<Verification> {
                         fillColor: Colors.white),
                     sms: SmsListener(
                         from:
-                            '01024839987', // address that the message will come from
+                            'NXSMS', // address that the message will come from
                         formatBody: (String body) {
-                          print(body);
                           // incoming message type
                           // from: "6505551212"
                           // body: "Your verification code is: 123-456"
                           // with this function, we format body to only contain
                           // the pin itself
                           String codeRaw = body.split(": ")[1];
-                          List<String> code = codeRaw.split("-");
-                          return code.join(); // 341430
+                          _userCode = codeRaw.substring(0, 6);
+                          validateCode();
+                          return; // 341430
                         }),
                     count: 6, // describes the field number
                     autoFocusFirstField: true, // defaults to true

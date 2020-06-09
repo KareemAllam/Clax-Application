@@ -1,5 +1,6 @@
+/// Type: Punishment - Pay - Charge - Lend
 class BillModel {
-  int amount;
+  double amount;
   String description;
   String type;
   DateTime date;
@@ -7,10 +8,10 @@ class BillModel {
   BillModel({this.amount, this.description, this.type, this.date});
 
   BillModel.fromJson(Map<String, dynamic> json) {
-    amount = int.parse(json['amount']);
+    amount = double.parse(json['amount'].toString());
     description = json['description'];
     type = json['type'];
-    date = DateTime.parse(json['date']);
+    date = DateTime.now();
   }
 
   Map<String, dynamic> toJson() {

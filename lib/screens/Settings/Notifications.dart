@@ -1,9 +1,7 @@
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 // Widgets
-import 'package:clax/widgets/appBar.dart';
-import 'package:clax/widgets/switchListTile.dart';
-// import 'package:clax/widgets/drawer.dart';
+import 'package:clax/widgets/Cards.dart';
 
 class Notifications extends StatefulWidget {
   static const routeName = '/Notifications';
@@ -19,31 +17,37 @@ class _NotificationsState extends State<Notifications> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: buildAppBar(context, 'الإشعارات'),
+      appBar: AppBar(
+        elevation: 0.0,
+        title: Text('الإشعارات',
+            style: Theme.of(context)
+                .textTheme
+                .bodyText1
+                .copyWith(color: Colors.white)),
+      ),
       body: Column(
         children: <Widget>[
           Expanded(
             child: ListView(
               children: <Widget>[
-                buildSwitchListTile(
-                  context,
-                  'العروض الخاصه',
-                  'عند وجود عروض أو رحلات مجانية',
-                  _not1,
-                  (newValue) {
-                    setState(
-                      () {
-                        _not1 = newValue;
-                      },
-                    );
-                  },
-                ),
-                buildSwitchListTile(
-                  context,
-                  'تتبع الرحلة',
-                  'تتبع خطوات الرحلة',
-                  _not2,
-                  (newValue) {
+                Cards.switchListTile(
+                    context: context,
+                    title: 'العروض الخاصه',
+                    description: 'عند وجود عروض أو رحلات مجانية',
+                    currentValue: _not1,
+                    updatedValue: (newValue) {
+                      setState(
+                        () {
+                          _not1 = newValue;
+                        },
+                      );
+                    }),
+                Cards.switchListTile(
+                  context: context,
+                  title: 'تتبع الرحلة',
+                  description: 'تتبع خطوات الرحلة',
+                  currentValue: _not2,
+                  updatedValue: (newValue) {
                     setState(
                       () {
                         _not2 = newValue;

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 // Utils
 import 'package:clax/utils/password.dart';
 // Models
-import 'package:clax/models/profile.dart';
+import 'package:clax/models/Profile.dart';
 // Providers
 import 'package:clax/providers/Profile.dart';
 // Screens
@@ -22,6 +22,7 @@ class AccountOverview extends StatefulWidget {
 }
 
 class _AccountOverviewState extends State<AccountOverview> {
+  bool _refreshing = false;
   @override
   Widget build(BuildContext context) {
     ProfileModel profileData = Provider.of<ProfilesProvider>(context).profile;
@@ -42,9 +43,18 @@ class _AccountOverviewState extends State<AccountOverview> {
               },
             ),
             IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: () {
-                Provider.of<ProfilesProvider>(context, listen: false).init();
+              icon: _refreshing
+                  ? SpinKitThreeBounce(color: Colors.white, size: 12)
+                  : Icon(Icons.refresh),
+              onPressed: () async {
+                setState(() {
+                  _refreshing = true;
+                });
+                await Provider.of<ProfilesProvider>(context, listen: false)
+                    .init();
+                setState(() {
+                  _refreshing = false;
+                });
               },
             ),
           ],
@@ -82,9 +92,7 @@ class _AccountOverviewState extends State<AccountOverview> {
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodyText2
-                                            .copyWith(
-                                                fontSize: 18,
-                                                color: Colors.black54)),
+                                            .copyWith(color: Colors.black54)),
                                     Text(
                                       profileData.name.first +
                                           " " +
@@ -137,7 +145,6 @@ class _AccountOverviewState extends State<AccountOverview> {
                                                 .textTheme
                                                 .bodyText2
                                                 .copyWith(
-                                                    fontSize: 18,
                                                     color: Colors.black54)),
                                         Text(
                                           profileData.phone,
@@ -199,9 +206,7 @@ class _AccountOverviewState extends State<AccountOverview> {
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodyText2
-                                            .copyWith(
-                                                fontSize: 18,
-                                                color: Colors.black54)),
+                                            .copyWith(color: Colors.black54)),
                                     Text(
                                       profileData.mail,
                                       style: Theme.of(context)
@@ -247,7 +252,6 @@ class _AccountOverviewState extends State<AccountOverview> {
                                             .textTheme
                                             .bodyText2
                                             .copyWith(
-                                              fontSize: 18,
                                               color: Colors.black54,
                                             )),
                                     Text(password(profileData.passLength),

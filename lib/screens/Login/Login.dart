@@ -10,7 +10,7 @@ import 'package:clax/services/Backend.dart';
 // Providers
 import 'package:clax/providers/Auth.dart';
 // Screens
-import 'package:clax/screens/MakeARide/HomeTaps.dart';
+import 'package:clax/screens/MakeARide/Clax.dart';
 import 'package:clax/screens/Login/ForgotPassword.dart';
 // Widgets
 // import 'package:clax/widgets/ExtendedAppBar.dart';
@@ -61,7 +61,7 @@ class LoginState extends State<Login> {
         //  Update Cache with id
         Provider.of<AuthProvider>(context, listen: false)
             .logIn(response.headers['x-login-token']);
-        Navigator.of(context).pushReplacementNamed(Tabs.routeName);
+        Navigator.of(context).pushReplacementNamed(Clax.routeName);
         setState(() {
           _loading = false;
         });
@@ -177,7 +177,14 @@ class LoginState extends State<Login> {
                                     FloatingLabelBehavior.never,
                                 contentPadding: EdgeInsets.symmetric(
                                     horizontal: 15, vertical: 0),
-                                border: OutlineInputBorder(
+                                enabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.black26),
+                                    borderRadius: BorderRadius.circular(30)),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Theme.of(context).primaryColor,
+                                        width: 1.2),
                                     borderRadius: BorderRadius.circular(30)),
                                 fillColor: Colors.white,
                                 prefixIcon: Icon(
@@ -213,12 +220,21 @@ class LoginState extends State<Login> {
                                     FloatingLabelBehavior.never,
                                 contentPadding: EdgeInsets.symmetric(
                                     horizontal: 15, vertical: 0),
-                                border: OutlineInputBorder(
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Theme.of(context).primaryColor,
+                                        width: 1.2),
+                                    borderRadius: BorderRadius.circular(30)),
+                                enabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.black26),
                                     borderRadius: BorderRadius.circular(30)),
                                 fillColor: Colors.white,
                                 prefixIcon: Icon(
                                   Icons.lock_outline,
                                 ),
+                                labelStyle: theme.textTheme.bodyText1
+                                    .copyWith(color: Colors.grey),
                                 labelText: 'كلمة المرور',
                               ),
                             ),
@@ -245,7 +261,7 @@ class LoginState extends State<Login> {
                                         color: theme.primaryColor,
                                         highlightElevation: 0.1,
                                         onPressed: () async {
-                                          bool result =
+                                          var result =
                                               await submitform(firebaseToken);
                                           if (result == false)
                                             Scaffold.of(context).showSnackBar(
@@ -288,7 +304,7 @@ class LoginState extends State<Login> {
                                     GestureDetector(
                                       onTap: () => Navigator.of(context)
                                           .pushNamed(ForgetPass.routeName),
-                                      child: Text('يوجد لديك مشكله؟',
+                                      child: Text('لا تستطيع الوصول لحسابك؟',
                                           style: TextStyle(
                                             color: theme.primaryColor,
                                           )),

@@ -9,9 +9,10 @@ import 'package:clax/providers/Trips.dart';
 // Models
 import 'package:clax/models/Complain.dart';
 import 'package:clax/models/Trip.dart';
+import 'package:clax/models/Error.dart';
 // Widgets
 import 'package:clax/widgets/null.dart';
-import 'package:clax/widgets/Card_ComplainHistory.dart';
+import 'package:clax/screens/Complains/widgets/Card_ComplainHistory.dart';
 
 class ComplaintsHistory extends StatefulWidget {
   static const routeName = '/complaints/complaintsHistory';
@@ -50,23 +51,18 @@ class _ComplaintsHistoryState extends State<ComplaintsHistory> {
                     setState(() {
                       loading = true;
                     });
-                    bool result = await _complainsProvider.fetchData();
-                    if (result)
-                      setState(() {
-                        loading = false;
-                      });
-                    else {
-                      setState(() {
-                        loading = false;
-                      });
+                    ServerResponse result =
+                        await _complainsProvider.serverData();
+                    setState(() {
+                      loading = false;
+                    });
+                    if (!result.status)
                       Scaffold.of(context).showSnackBar(SnackBar(
-                          content: Text(
-                              "تعذر الوصول للإنترنت. تأكد من اتصالك بالإنترنت و حاول مره اخرى.",
+                          content: Text(result.message,
                               style: Theme.of(context)
                                   .textTheme
                                   .caption
                                   .copyWith(color: Colors.white))));
-                    }
                   }),
             ),
           ],

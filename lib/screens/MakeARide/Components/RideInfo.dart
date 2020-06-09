@@ -136,17 +136,15 @@ class _RideInfoState extends State<RideInfo> {
                 // mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  Text(
-                    "خط الرحلة:",
-                    style: textTheme.headline6
-                        .copyWith(fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.right,
-                  ),
+                  SizedBox(height: 10),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Icon(Icons.close, color: primaryColor),
+                      Icon(
+                        Icons.close,
+                        color: Colors.black54,
+                      ),
                       Stack(alignment: Alignment.center, children: <Widget>[
                         CustomPaint(
                             willChange: false,
@@ -155,13 +153,13 @@ class _RideInfoState extends State<RideInfo> {
                             size: Size(width - 100, 0)),
                         Container(
                           color: Colors.white,
-                          child: Icon(Icons.gps_fixed, color: primaryColor),
+                          child: Icon(Icons.location_on,
+                              size: 30, color: primaryColor),
                         )
                       ]),
                       Icon(
-                        Icons.location_on,
-                        size: 30,
-                        color: primaryColor,
+                        Icons.gps_fixed,
+                        color: Colors.black54,
                       )
                     ],
                   ),
@@ -170,14 +168,19 @@ class _RideInfoState extends State<RideInfo> {
                     children: <Widget>[
                       Text(
                         line['from'],
+                        strutStyle: StrutStyle(forceStrutHeight: true),
+                        style:
+                            textTheme.bodyText2.copyWith(color: Colors.black87),
+                      ),
+                      Text(
+                        destination['name'],
                         style: textTheme.bodyText1.copyWith(
                             fontWeight: FontWeight.bold, color: Colors.black87),
                       ),
-                      Text(destination['name']),
                       Text(line['to'],
-                          style: textTheme.bodyText1.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87))
+                          strutStyle: StrutStyle(forceStrutHeight: true),
+                          style: textTheme.bodyText2
+                              .copyWith(color: Colors.black87))
                     ],
                   )
                 ],
@@ -249,9 +252,9 @@ class _RideInfoState extends State<RideInfo> {
                       ),
                       Spacer(),
                       Text(
-                        '${(_seatsCount * line['cost']).toDouble()} جنية',
+                        '- ${(_seatsCount * line['cost']).toDouble()} جنية',
                         style: textTheme.subtitle2.copyWith(
-                            color: Colors.grey, fontWeight: FontWeight.bold),
+                            color: Colors.red, fontWeight: FontWeight.bold),
                       )
                     ],
                   ),
@@ -264,7 +267,7 @@ class _RideInfoState extends State<RideInfo> {
                       Text(
                         '${balance - (_seatsCount * line['cost']).toDouble()} جنية',
                         style: textTheme.subtitle2.copyWith(
-                            color: Colors.grey, fontWeight: FontWeight.bold),
+                            color: Colors.black54, fontWeight: FontWeight.bold),
                       )
                     ],
                   )

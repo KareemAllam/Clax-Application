@@ -1,9 +1,14 @@
-import 'package:flutter/material.dart';
-import 'package:clax/models/Complain.dart';
+// Dart & Other Pacakges
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../services/Backend.dart';
+import 'package:clax/models/Error.dart';
 import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+// Flutter Foundation
+import 'package:flutter/foundation.dart';
+// Models
+import 'package:clax/models/Complain.dart';
+// Services
+import 'package:clax/services/Backend.dart';
 
 class ComplainsProvider extends ChangeNotifier {
   List<ComplainModel> _complains = [];
@@ -19,45 +24,36 @@ class ComplainsProvider extends ChangeNotifier {
           (complain) => _complains.add(ComplainModel.fromJson(complain)));
       notifyListeners();
     }
-    fetchData();
+    serverData();
   }
 
   // Fetch Data from Server
-  Future<bool> fetchData() async {
+  Future<ServerResponse> serverData() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
-    try {
-      Response response = await Api.get('user/mycomplaint');
-      if (response.statusCode == 200) {
-        _complains = List<ComplainModel>.from((json
-            .decode(response.body)
-            .map((trip) => ComplainModel.fromJson(trip))).toList());
-        _prefs.setString("complains", json.encode(_complains));
-        notifyListeners();
-        return true;
-      } else {
-        return false;
-      }
-    } catch (_) {
-      return false;
+    Response response = await Api.get('user/mycomplaint');
+    if (response.statusCode == 200) {
+      _complains = List<ComplainModel>.from((json
+          .decode(response.body)
+          .map((trip) => ComplainModel.fromJson(trip))).toList());
+      _prefs.setString("complains", json.encode(_complains));
+      notifyListeners();
+      return ServerResponse(status: true);
+    } else {
+      return ServerResponse(status: false, message: "تعذر الوصول للخادم");
     }
   }
 
-  Future<bool> add(body) async {
+  Future<ServerResponse> add(body) async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
-    try {
-      Response result = await Api.post("user/complaint", body);
-      if (result.statusCode == 200) {
-        ComplainModel complain =
-            ComplainModel.fromJson(json.decode(result.body));
-        _complains.add(complain);
-        _prefs.setString("complains", json.encode(_complains));
-        notifyListeners();
-        return true;
-      } else
-        return false;
-    } catch (e) {
-      return false;
-    }
+    Response result = await Api.post("user/complaint", body);
+    if (result.statusCode == 200) {
+      ComplainModel complain = ComplainModel.fromJson(json.decode(result.body));
+      _complains.add(complain);
+      _prefs.setString("complains", json.encode(_complains));
+      notifyListeners();
+      return ServerResponse(status: true);
+    } else
+      return ServerResponse(status: false, message: "تعذر الوصول للخادم");
   }
 
   List<ComplainModel> get complains => _complains;

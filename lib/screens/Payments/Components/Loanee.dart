@@ -4,10 +4,13 @@ import 'package:contact_picker/contact_picker.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+// Models
+import 'package:clax/models/Name.dart';
 // Utils
 import 'package:clax/utils/nameAdjustment.dart';
 // Providers
 import 'package:clax/providers/Transactions.dart';
+import 'package:clax/providers/Profile.dart';
 // Widgets
 import 'package:clax/widgets/LoadingButton.dart';
 import 'package:clax/widgets/FormGeneral.dart';
@@ -57,15 +60,16 @@ class _LoaneeState extends State<Loanee> {
       });
       return "تأكد من بياناتك و حاول مره اخرى.";
     }
-
+    NameModel name =
+        Provider.of<ProfilesProvider>(context, listen: false).profile.name;
     Map<String, String> body = {
       "phone": getNumber(_contact.phoneNumber.number),
-      "name": "Kareem Allam",
+      "name": '${name.first} ${name.last}',
       "amount": _amountController.text
     };
     String result =
         await Provider.of<TransactionsProvider>(context, listen: false)
-            .add(body);
+            .makeARequest(body);
     return result;
   }
 

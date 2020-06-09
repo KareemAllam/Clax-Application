@@ -1,8 +1,7 @@
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 // Widgets
-import 'package:clax/widgets/appBar.dart';
-import 'package:clax/widgets/listTile.dart';
+import 'package:clax/widgets/Cards.dart';
 
 class Bookings extends StatelessWidget {
   static const routeName = '/Bookings';
@@ -31,12 +30,19 @@ class Bookings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: buildAppBar(context, 'مشاويرك'),
+      appBar: AppBar(
+        elevation: 0.0,
+        title: Text('مشاويرك',
+            style: Theme.of(context)
+                .textTheme
+                .bodyText1
+                .copyWith(color: Colors.white)),
+      ),
       body: ListView.builder(
-        itemBuilder: (context, index) => buildListTile1(
+        itemBuilder: (context, index) => Cards.listTile1(
           context,
-          menu[index]['title'],
-          () {
+          title: menu[index]['title'],
+          tapHandler: () {
             // Navigator.of(context).pushNamed(editTrip.routeName);
           },
         ),

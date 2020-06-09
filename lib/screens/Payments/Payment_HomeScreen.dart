@@ -11,8 +11,8 @@ import 'package:clax/models/CreditCard.dart';
 // Components
 import 'package:clax/screens/Payments/Components/PaymentExtendedAppBar.dart';
 // Widgets
+import 'package:clax/widgets/Cards.dart';
 import 'package:clax/widgets/ExtendedAppBar.dart';
-import 'package:clax/widgets/Card_NavigationElement.dart';
 // Drawer
 import 'package:clax/screens/Drawer.dart';
 
@@ -116,7 +116,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   parent: BouncingScrollPhysics()),
               controller: new ScrollController(),
               itemBuilder: (context, index) =>
-                  NavigationCard(card: menuCards[index]),
+                  Cards.navigationCard(context, card: menuCards[index]),
             ),
             onRefresh: updateData));
   }

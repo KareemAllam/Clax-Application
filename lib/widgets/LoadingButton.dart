@@ -1,9 +1,12 @@
-import 'package:flutter/material.dart';
+// Dart & Other Packages
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+// Flutter's Material Components
+import 'package:flutter/material.dart';
+// Models
+import 'package:clax/models/Error.dart';
 
 class LoadingButton extends StatefulWidget {
   final String label;
-
   final Function handleTap;
   const LoadingButton({Key key, @required this.handleTap, this.label})
       : super(key: key);
@@ -31,17 +34,16 @@ class _LoadingButtonState extends State<LoadingButton> {
                   setState(() {
                     sending = true;
                   });
-                  int result = await widget.handleTap();
-                  if (result == 200)
+                  ServerResponse result = await widget.handleTap();
+                  if (result.status)
                     Navigator.pop(context);
                   else {
                     setState(() {
                       sending = false;
                     });
-                    if (result == 404)
+                    if (result.message != "")
                       Scaffold.of(context).showSnackBar(SnackBar(
-                          content: Text(
-                              "تعذر الوصول للإنترنت. تأكد من اتصالك بالإنترنت و حاول مره اخرى.",
+                          content: Text(result.message,
                               style: Theme.of(context)
                                   .textTheme
                                   .caption

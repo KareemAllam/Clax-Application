@@ -5,10 +5,9 @@ import 'package:clax/screens/Settings/AccountOverview.dart';
 import 'package:clax/screens/Settings/Notifications.dart';
 import 'package:clax/screens/Settings/Safety.dart';
 // Components
-import 'package:clax/screens/Settings/Family.dart';
+import 'package:clax/screens/Settings/FamilyPreviews.dart';
 // Widgets
-import 'package:clax/widgets/appBar.dart';
-import 'package:clax/widgets/listTile.dart';
+import 'package:clax/widgets/Cards.dart';
 // Drawer
 import 'package:clax/screens/Drawer.dart';
 
@@ -17,41 +16,48 @@ class Settings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: buildAppBar(context, 'الإعدادات'),
+      appBar: AppBar(
+        elevation: 0.0,
+        title: Text('الإعدادات',
+            style: Theme.of(context)
+                .textTheme
+                .bodyText1
+                .copyWith(color: Colors.white)),
+      ),
       drawer: MainDrawer(),
       body: ListView(
         physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
         controller: ScrollController(),
         children: <Widget>[
-          buildListTile(
+          Cards.listTile(
             context,
-            'الحساب',
-            Icons.person_pin,
-            () {
+            title: 'الحساب',
+            icon: Icons.person_pin,
+            tapHandler: () {
               Navigator.of(context).pushNamed(AccountOverview.routeName);
             },
           ),
-          buildListTile(
+          Cards.listTile(
             context,
-            'الأمان',
-            Icons.security,
-            () {
+            title: 'الأمان',
+            icon: Icons.security,
+            tapHandler: () {
               Navigator.of(context).pushNamed(Safety.routeName);
             },
           ),
-          buildListTile(
+          Cards.listTile(
             context,
-            'العائلة',
-            Icons.person_add,
-            () {
+            title: 'العائلة',
+            icon: Icons.person_add,
+            tapHandler: () {
               Navigator.of(context).pushNamed(Family.routeName);
             },
           ),
-          buildListTile(
+          Cards.listTile(
             context,
-            'الإشعارات',
-            Icons.notifications,
-            () {
+            title: 'الإشعارات',
+            icon: Icons.notifications,
+            tapHandler: () {
               Navigator.of(context).pushNamed(Notifications.routeName);
             },
           ),

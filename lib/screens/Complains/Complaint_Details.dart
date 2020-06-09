@@ -101,7 +101,7 @@ class _ComplainDetailsState extends State<ComplainDetails> {
                           child: Icon(Icons.location_on,
                               color: Theme.of(context).primaryColor)),
                       SizedBox(width: 10),
-                      Text('${trip.line.from} > ${trip.line.to}',
+                      Text('${trip.station.name}',
                           strutStyle: StrutStyle(forceStrutHeight: true),
                           style: Theme.of(context).textTheme.subtitle2.copyWith(
                               color: Color(0xff212121),

@@ -1,61 +1,73 @@
 // Flutter's Material Components
+import 'package:clax/providers/Family.dart';
 import 'package:flutter/material.dart';
 // Components
-import 'package:clax/screens/Settings/Components/FamilyPreview1.dart';
-import 'package:clax/screens/Settings/Components/FamilyPreview2.dart';
-// Widgets
-import 'package:clax/widgets/appBar.dart';
+import 'package:clax/screens/Settings/Components/SentInvitations.dart';
+import 'package:clax/screens/Settings/Components/ReceivedInvitations.dart';
+import 'package:clax/screens/Settings/Components/CurrentFamilyMembers.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:provider/provider.dart';
 
-class Family extends StatefulWidget {
-  static const routeName = '/Family';
-
+class Members extends StatefulWidget {
+  static const routeName = '/members';
   @override
-  _FamilyState createState() => _FamilyState();
+  _MembersState createState() => _MembersState();
 }
 
-class _FamilyState extends State<Family> with SingleTickerProviderStateMixin {
-  Widget _myAnimatedWidget;
-  AnimationController _controller;
-  Animation<Offset> _offsetFloat;
-
-  @override
-  void initState() {
-    super.initState();
-    _myAnimatedWidget = FamilyPreview1(changeWidget);
-    // Animation Configuration
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    );
-    _offsetFloat = Tween<Offset>(begin: Offset(1, 0.0), end: Offset(0, 0.0))
-        .animate(_controller);
-    _offsetFloat.addListener(() {
-      setState(() {});
-    });
-  }
-
-  void changeWidget() {
-    setState(() {
-      _myAnimatedWidget =
-          SlideTransition(position: _offsetFloat, child: FamilyPreview2());
-    });
-    _controller.forward();
-  }
-
-  void dispose() {
-    super.dispose();
-    _controller.stop();
-    _controller.dispose();
-  }
-
-  @override
+class _MembersState extends State<Members> {
+  bool loading = false;
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: buildAppBar(context, 'العائلة'),
-      body: Container(
-        color: Colors.white,
-        child: _myAnimatedWidget,
-      ),
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+          appBar: AppBar(
+            actions: <Widget>[
+              IconButton(
+                  icon: loading
+                      ? SpinKitCircle(color: Colors.white, size: 25)
+                      : Icon(Icons.refresh),
+                  onPressed: loading
+                      ? () {}
+                      : () async {
+                          setState(() {
+                            loading = true;
+                          });
+                          await Provider.of<FamilyProvider>(context,
+                                  listen: false)
+                              .serverData();
+                          setState(() {
+                            loading = false;
+                          });
+                        })
+            ],
+            title: Text(
+              "العائلة",
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyText1
+                  .copyWith(color: Colors.white),
+            ),
+            bottom: TabBar(
+              tabs: [
+                Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: Text("العائلة")),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 5),
+                  child: Text("الواردات"),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 5),
+                  child: Text("الصادرات"),
+                )
+              ],
+            ),
+          ),
+          body: TabBarView(children: [
+            CurrentFamilyMembers(),
+            FamilyMembersInvitations(),
+            SentInvitations()
+          ])),
     );
   }
 }

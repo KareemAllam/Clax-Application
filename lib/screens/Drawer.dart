@@ -10,9 +10,9 @@ import 'package:clax/providers/Auth.dart';
 // import 'package:clax/providers/CurrentTrip.dart';
 // import 'package:clax/providers/Transactions.dart';
 // Screens
-import 'package:clax/screens/MakeARide/HomeTaps.dart';
+import 'package:clax/screens/MakeARide/Clax.dart';
 import 'package:clax/screens/Home/Rahalatk.dart';
-import 'package:clax/screens/Home/free_rides.dart';
+import 'package:clax/screens/Home/FreeRides.dart';
 import 'package:clax/screens/Help/Help.dart';
 import 'package:clax/screens/Settings/Settings.dart';
 import 'package:clax/screens/Complains/Complains_Screen.dart';
@@ -26,7 +26,7 @@ class MainDrawer extends StatefulWidget {
 
 class _MainDrawerState extends State<MainDrawer> {
   List<Map<String, dynamic>> menu = [
-    {"title": 'كلاكس', "icon": Icons.local_taxi, "route": Tabs.routeName},
+    {"title": 'كلاكس', "icon": Icons.local_taxi, "route": Clax.routeName},
     {"title": 'رحلاتك', "icon": Icons.calendar_today, "route": Rides.routeName},
     {
       "title": 'الرحلات المجانية',
@@ -56,7 +56,7 @@ class _MainDrawerState extends State<MainDrawer> {
 
       // Pop Current Screens
       Navigator.popUntil(context, (route) {
-        if (route.settings.name == Tabs.routeName) return true;
+        if (route.settings.name == Clax.routeName) return true;
         return false;
       });
       // Push Login Screen
@@ -101,9 +101,9 @@ class _MainDrawerState extends State<MainDrawer> {
                     // Get Current Route Name
                     String currentRoute = ModalRoute.of(context).settings.name;
                     // () => Clax
-                    if (index['route'] == Tabs.routeName) {
+                    if (index['route'] == Clax.routeName) {
                       // Clax => Clax
-                      if (currentRoute == Tabs.routeName) {
+                      if (currentRoute == Clax.routeName) {
                         // Dismiss Drawer
                         Navigator.of(context).pop();
                         return;
@@ -124,7 +124,7 @@ class _MainDrawerState extends State<MainDrawer> {
                       return;
                     }
                     // Navigating to Different Screen
-                    if (currentRoute == Tabs.routeName) {
+                    if (currentRoute == Clax.routeName) {
                       // Dismiss Drawer
                       Navigator.of(context).pop();
                       // Navigate to Screen

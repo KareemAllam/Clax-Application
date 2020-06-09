@@ -1,3 +1,4 @@
+// Dart & Other Packages
 import 'dart:io';
 import 'dart:async';
 import 'package:http/http.dart' as http;
@@ -18,13 +19,12 @@ class Api {
           .get(BaseUrl + url, headers: configHeaders)
           .timeout(Duration(seconds: 5));
     } on TimeoutException {
-      return http.Response('T', 404);
+      return http.Response('T', 408);
     } on SocketException catch (_) {
       return http.Response('NIC', 408);
     } on Exception {
       return http.Response('NIC', 408);
     } catch (error) {
-      print(error);
       return http.Response('T', 408);
     }
   }
@@ -38,7 +38,7 @@ class Api {
           .post(BaseUrl + url, headers: configHeaders, body: reqBody ?? {})
           .timeout(Duration(seconds: 5));
     } on TimeoutException {
-      return http.Response('T', 404);
+      return http.Response('T', 408);
     } on SocketException catch (_) {
       return http.Response('NIC', 408);
     } on Exception {
@@ -58,7 +58,7 @@ class Api {
           .put(BaseUrl + url, headers: configHeaders, body: reqBody)
           .timeout(Duration(seconds: 5));
     } on TimeoutException {
-      return http.Response('T', 404);
+      return http.Response('T', 408);
     } on SocketException catch (_) {
       return http.Response('NIC', 408);
     } on Exception {
@@ -78,7 +78,7 @@ class Api {
           .delete(BaseUrl + url, headers: configHeaders)
           .timeout(Duration(seconds: 5));
     } on TimeoutException {
-      return http.Response('T', 404);
+      return http.Response('T', 408);
     } on SocketException catch (_) {
       return http.Response('NIC', 408);
     } on Exception {

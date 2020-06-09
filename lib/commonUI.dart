@@ -4,15 +4,19 @@ ThemeData appTheme = ThemeData(
   brightness: Brightness.light,
   scaffoldBackgroundColor: Color(0xffe3e8ee),
   dividerColor: Colors.black12,
-  // primaryColor: Colors.deepPurple,
-  primaryColor: Colors.black,
+  primaryColor: Colors.deepPurple,
+  // primaryColor: Colors.deepPurpleAccent[400],
+  // primaryColor: Color(0xff6f36ff),
+  // primaryColor: Colors.black,
   primaryColorLight: Colors.deepPurple[300],
   accentColor: Colors.amber,
   backgroundColor: Colors.white,
   secondaryHeaderColor: Colors.grey,
   canvasColor: Colors.white,
   fontFamily: 'Cairo',
-  snackBarTheme: SnackBarThemeData(),
+  snackBarTheme: SnackBarThemeData(
+      contentTextStyle: TextStyle(
+          fontSize: 15, letterSpacing: 0.1, fontWeight: FontWeight.w600)),
   textTheme: TextTheme(
     headline1: TextStyle(
       fontSize: 102,

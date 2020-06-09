@@ -14,13 +14,13 @@ import 'package:clax/screens/Login/ForgotPassword.dart';
 
 //// Settings
 import 'package:clax/screens/Settings/AccountOverview.dart';
-import 'package:clax/screens/Settings/Family.dart';
+import 'package:clax/screens/Settings/FamilyPreviews.dart';
 import 'package:clax/screens/Settings/Notifications.dart';
 import 'package:clax/screens/Settings/Settings.dart';
 import 'package:clax/screens/Settings/EditAccount.dart';
 import 'package:clax/screens/Settings/Safety.dart';
 import 'package:clax/screens/Settings/TrustedContacts.dart';
-import 'package:clax/screens/Settings/Components/Members.dart';
+import 'package:clax/screens/Settings/Family.dart';
 
 //// Help
 import 'package:clax/screens/Help/Bookings.dart';
@@ -35,8 +35,7 @@ import 'package:clax/screens/Help/PromoCodes.dart';
 import 'package:clax/screens/Help/Payments.dart';
 
 //// Home Screens
-import 'package:clax/screens/Home/Components/history.dart';
-import 'package:clax/screens/Home/Free_Rides.dart';
+import 'package:clax/screens/Home/FreeRides.dart';
 import 'package:clax/screens/Home/Rahalatk.dart';
 
 //// Complains
@@ -53,11 +52,10 @@ import 'package:clax/screens/Payments/Payment_History.dart';
 import 'package:clax/screens/Payments/Payment_TransferMoney.dart';
 
 //// Tracking Screens
-import 'package:clax/screens/MakeARide/HomeTaps.dart';
+import 'package:clax/screens/MakeARide/Clax.dart';
 import 'package:clax/screens/MakeARide/RateTrip.dart';
 import 'package:clax/screens/MakeARide/GoogleMap.dart';
-import 'package:clax/screens/MakeARide/RideConfig.dart';
-import 'package:clax/screens/MakeARide/NewRide.dart';
+import 'package:clax/screens/MakeARide/RideSeats.dart';
 import 'package:clax/screens/MakeARide/widgets/FlipIcon.dart';
 
 class Router {
@@ -69,17 +67,15 @@ class Router {
       case Login.routeName:
         return MaterialPageRoute(builder: (_) => Login(), settings: settings);
       // Home
-      case Tabs.routeName:
-        return MaterialPageRoute(builder: (_) => Tabs(), settings: settings);
+      case Clax.routeName:
+        return MaterialPageRoute(builder: (_) => Clax(), settings: settings);
       case RateTrip.routeName:
         return MaterialPageRoute(
             builder: (_) => RateTrip(), settings: settings);
       case StartARide.routeName:
         return MaterialPageRoute(
             builder: (_) => StartARide(), settings: settings);
-      case RidePickLocation.routeName:
-        return MaterialPageRoute(
-            builder: (_) => RidePickLocation(), settings: settings);
+
       case MapPage.routeName:
         return MaterialPageRoute(builder: (_) => MapPage(), settings: settings);
       case RegisterForm.routeName:
@@ -98,8 +94,7 @@ class Router {
             builder: (_) => Bookings(), settings: settings);
       case Family.routeName:
         return MaterialPageRoute(builder: (_) => Family(), settings: settings);
-      case History.routeName:
-        return MaterialPageRoute(builder: (_) => History(), settings: settings);
+
       case FreeRides.routeName:
         return MaterialPageRoute(
             builder: (_) => FreeRides(), settings: settings);

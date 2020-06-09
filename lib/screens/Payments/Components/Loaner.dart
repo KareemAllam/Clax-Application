@@ -8,7 +8,7 @@ import 'package:clax/providers/Transactions.dart';
 import 'package:clax/models/Transaction.dart';
 // Widgets
 import 'package:clax/widgets/null.dart';
-import 'package:clax/widgets/Card_Loan.dart';
+import 'package:clax/screens/Payments/widgets/Card_Loan.dart';
 
 class Loaner extends StatelessWidget {
   @override

@@ -1,4 +1,8 @@
 // Dart & Other Packages
+import 'dart:convert';
+
+import 'package:clax/models/Bill.dart';
+import 'package:clax/models/Error.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 // Flutter's Material Components
@@ -30,6 +34,7 @@ class _PaymentPopupState extends State<PaymentPopup> {
   TextEditingController amount = TextEditingController();
   bool loading = false;
   bool error = false;
+
   Future<bool> creditCardCharge(id) async {
     setState(() {
       loading = true;
@@ -42,15 +47,16 @@ class _PaymentPopupState extends State<PaymentPopup> {
       });
       return false;
     } else {
-      //Api request
       setState(() {
         error = false;
         loading = true;
       });
-      String result = await Provider.of<PaymentProvider>(context, listen: false)
-          .chargeCredit(id, amount.text);
-      if (result != '400' || result != "408") {
-        Provider.of<PaymentProvider>(context, listen: false).add(result);
+      ServerResponse result =
+          await Provider.of<PaymentProvider>(context, listen: false)
+              .chargeCredit(id, amount.text);
+      if (result.status) {
+        BillModel bill = BillModel.fromJson(json.decode(result.message));
+        Provider.of<PaymentProvider>(context, listen: false).add(bill);
         setState(() {
           loading = false;
           error = false;
@@ -61,6 +67,8 @@ class _PaymentPopupState extends State<PaymentPopup> {
           loading = false;
           error = false;
         });
+        Scaffold.of(context)
+            .showSnackBar(SnackBar(content: Text(result.message)));
         return false;
       }
     }

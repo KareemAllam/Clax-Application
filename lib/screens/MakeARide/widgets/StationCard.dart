@@ -3,7 +3,7 @@ import 'package:clax/models/Station.dart';
 
 class StationCard extends StatelessWidget {
   final dynamic position;
-  final Station station;
+  final StationModel station;
   final Function onSelect;
   StationCard({this.position, this.station, this.onSelect});
   @override

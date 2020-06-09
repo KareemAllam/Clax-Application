@@ -1,9 +1,14 @@
-import 'package:flutter/material.dart';
-import 'package:clax/models/profile.dart';
+// Dart & Other Pacakges
 import 'dart:convert';
+import 'package:clax/models/Error.dart';
 import 'package:http/http.dart';
-import 'package:clax/services/Backend.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+// Flutter Foundation
+import 'package:flutter/foundation.dart';
+// Models
+import 'package:clax/models/Profile.dart';
+// Services
+import 'package:clax/services/Backend.dart';
 
 class ProfilesProvider with ChangeNotifier {
   // Initial Data
@@ -31,28 +36,21 @@ class ProfilesProvider with ChangeNotifier {
     } catch (_) {}
   }
 
-  Future<String> updateProfile(
-      Map<String, dynamic> changes, ProfileModel editiedProfile) async {
+  Future<ServerResponse> updateProfile(Map<String, dynamic> changes) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    print(editiedProfile.name.first);
-    ProfileModel originalAccount = _profile;
-    try {
-      Response account =
-          await Api.put('passengers/settings/me', reqBody: changes);
-      if (account.statusCode == 200) {
-        _profile = editiedProfile;
-        prefs.setString('profile', json.encode(editiedProfile));
-        notifyListeners();
-        return 'success';
-      } else {
-        _profile = originalAccount;
-        notifyListeners();
-        return "error";
-      }
-    } catch (_) {
-      _profile = originalAccount;
+    Map<String, dynamic> originalAccount = _profile.toJson();
+    Response account =
+        await Api.put('passengers/settings/me', reqBody: changes);
+    if (account.statusCode == 200) {
+      changes.forEach((key, value) => originalAccount["$key"] = value);
+      _profile = ProfileModel.fromJson(originalAccount);
+      prefs.setString('profile', json.encode(originalAccount));
       notifyListeners();
-      return "error";
+      return ServerResponse(status: true);
+    } else {
+      _profile = ProfileModel.fromJson(originalAccount);
+      notifyListeners();
+      return ServerResponse(status: false, message: "تعذر الوصول للخادم");
     }
   }
 

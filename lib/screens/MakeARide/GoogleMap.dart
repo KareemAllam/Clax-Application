@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:clax/providers/Map.dart';
 // Components
 import 'package:clax/screens/MakeARide/Components/DriverInfo.dart';
+// Map Styles
+import 'package:clax/mapstyles.dart';
 
 class MapPage extends StatefulWidget {
   static const routeName = "map";
@@ -17,11 +19,16 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   MapProvider map;
-
+  bool built = false;
   @override
   void dispose() {
     map.disposeInit();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -41,6 +48,10 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (!built) {
+      map.checkPermission();
+      built = true;
+    }
     return Scaffold(
       appBar: AppBar(
         actions: <Widget>[
@@ -75,7 +86,7 @@ class _MapPageState extends State<MapPage> {
           )
         ],
         title: Text(
-          "اختر موقعك",
+          "تابع رحلتك",
           style: Theme.of(context)
               .textTheme
               .bodyText1
@@ -108,8 +119,7 @@ class _MapPageState extends State<MapPage> {
                   target: map.coordinates ?? LatLng(31.5812, 30.50037),
                   zoom: 12),
               onMapCreated: (GoogleMapController controller) {
-                controller.setMapStyle(
-                    '[  {    "featureType": "administrative.land_parcel",    "elementType": "labels",    "stylers": [      {        "visibility": "off"      }    ]  },  {    "featureType": "poi",    "elementType": "labels.text",    "stylers": [      {        "visibility": "off"      }    ]  },  {    "featureType": "poi.business",    "stylers": [      {        "visibility": "off"      }    ]  },  {    "featureType": "road",    "elementType": "labels.icon",    "stylers": [      {        "visibility": "off"      }    ]  },  {    "featureType": "road.local",    "elementType": "labels",    "stylers": [      {        "visibility": "off"      }    ]  },  {    "featureType": "transit",    "stylers": [      {        "visibility": "off"      }    ]  }]');
+                controller.setMapStyle(uber);
                 if (!map.controller.isCompleted)
                   map.controller.complete(controller);
               },

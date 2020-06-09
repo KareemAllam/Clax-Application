@@ -1,8 +1,7 @@
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 // Widgets
-import 'package:clax/widgets/appBar.dart';
-import 'package:clax/widgets/listTile.dart';
+import 'package:clax/widgets/Cards.dart';
 
 class More extends StatelessWidget {
   static const routeName = '/More';
@@ -21,13 +20,21 @@ class More extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: buildAppBar(context, 'أخرى'),
+      appBar: AppBar(
+        elevation: 0.0,
+        title: Text('اخرى',
+            style: Theme.of(context)
+                .textTheme
+                .bodyText1
+                .copyWith(color: Colors.white)),
+      ),
       body: ListView.builder(
-        itemBuilder: (context, index) => buildListTile(
+        itemBuilder: (context, index) => Cards.listTile(
           context,
-          menu[index]["title"],
-          menu[index]["icon"],
-          () => Navigator.of(context).pushNamed(menu[index]["route"]),
+          title: menu[index]["title"],
+          icon: menu[index]["icon"],
+          tapHandler: () =>
+              Navigator.of(context).pushNamed(menu[index]["route"]),
         ),
         itemCount: menu.length,
         controller: ScrollController(),

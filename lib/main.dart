@@ -1,6 +1,7 @@
 // Dart & Other Packages;
 import 'package:clax/Route.dart';
 import 'package:clax/commonUI.dart';
+import 'package:clax/providers/Family.dart';
 import 'package:provider/provider.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
@@ -15,6 +16,8 @@ import 'package:clax/providers/Profile.dart';
 import 'package:clax/providers/Trips.dart';
 import 'package:clax/providers/Auth.dart';
 import 'package:clax/providers/Map.dart';
+// UI
+import 'package:overlay_support/overlay_support.dart';
 
 void main() {
   Provider.debugCheckInvalidValueType = null;
@@ -36,6 +39,7 @@ class MyApp extends StatelessWidget {
         Provider(create: (context) => TransactionsProvider()),
         Provider(create: (context) => MapProvider()),
         Provider(create: (context) => CurrentTripProvider()),
+        Provider(create: (context) => FamilyProvider()),
         ChangeNotifierProvider(create: (context) => AuthProvider()),
         ChangeNotifierProvider(create: (context) => ProfilesProvider()),
         ChangeNotifierProvider(create: (context) => PaymentProvider()),
@@ -44,20 +48,23 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => TransactionsProvider()),
         ChangeNotifierProvider(create: (context) => MapProvider()),
         ChangeNotifierProvider(create: (context) => CurrentTripProvider()),
+        ChangeNotifierProvider(create: (context) => FamilyProvider()),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        localizationsDelegates: [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        supportedLocales: [
-          Locale('ar', 'AE')
-        ], // OR Locale('ar', 'AE') OR Other RTL locales
+      child: OverlaySupport(
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          localizationsDelegates: [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          supportedLocales: [
+            Locale('ar', 'AE')
+          ], // OR Locale('ar', 'AE') OR Other RTL locales
 
-        title: 'Clax',
-        theme: appTheme,
-        onGenerateRoute: Router.generateRoute,
+          title: 'Clax',
+          theme: appTheme,
+          onGenerateRoute: Router.generateRoute,
+        ),
       ),
     );
   }

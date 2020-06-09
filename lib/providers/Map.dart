@@ -1,14 +1,13 @@
-// FLutter MaterialComponenets
-import 'package:clax/providers/CurrentTrip.dart';
-import 'package:clax/screens/MakeARide/RateTrip.dart';
-import 'package:flutter/material.dart';
 // Dart & Other Packages
 import 'dart:async';
 import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+// FLutter MaterialComponenets
+import 'package:flutter/material.dart';
+// Screens
+import 'package:clax/screens/MakeARide/RateTrip.dart';
 // Services
 import 'package:clax/services/RealtimeDB.dart';
 // Application Theme
@@ -70,14 +69,9 @@ class MapProvider extends ChangeNotifier {
     // If no distance was saved before
     else
       _userLocation = {"name": "...loading name", "position": null};
-
-    _realtimeDB = RealtimeDB();
-    _geolocator = Geolocator();
-    await checkPermission();
+    if (_realtimeDB == null) _realtimeDB = RealtimeDB();
+    if (_geolocator == null) _geolocator = Geolocator();
     _gpsEnabled = await Geolocator().isLocationServiceEnabled();
-    if (_permission == GeolocationStatus.granted && _gpsEnabled)
-      await currentLocation();
-
     notifyListeners();
   }
 
@@ -97,6 +91,7 @@ class MapProvider extends ChangeNotifier {
   }
 
   Future checkPermission() async {
+    if (_geolocator == null) _geolocator = Geolocator();
     GeolocationStatus result =
         await _geolocator.checkGeolocationPermissionStatus();
 
@@ -172,6 +167,7 @@ class MapProvider extends ChangeNotifier {
     // Reading Database changes of Location
     // if (_realtimeDB == null) _realtimeDB = RealtimeDB();
     print('clax-lines/$_lineId/$_driverId');
+    if (_realtimeDB == null) _realtimeDB = RealtimeDB();
     _realtimeDB.readAsync('clax-lines/$_lineId/$_driverId', (value) async {
       print("Got Value: $value");
       try {
@@ -191,8 +187,8 @@ class MapProvider extends ChangeNotifier {
         if (_userLocation == null || _userLocation["position"] == null)
           await currentLocation();
         i = (await _geolocator.distanceBetween(
-                _userLocation["position"].latitude,
-                _userLocation["position"].longitude,
+                _userLocation["position"].latitude ?? 30.3944923,
+                _userLocation["position"].longitude ?? 30.127593,
                 position.latitude,
                 position.longitude))
             .ceil();
@@ -210,7 +206,15 @@ class MapProvider extends ChangeNotifier {
         print("Error: $error");
         if (_scaffoldKey.currentState != null)
           _scaffoldKey.currentState.showSnackBar(SnackBar(
-            content: Text("حدث خطأ ما"),
+            backgroundColor: Colors.red,
+            content: Text(
+              "حدث خطأ ما",
+              style: Theme.of(_scaffoldKey.currentContext)
+                  .textTheme
+                  .bodyText2
+                  .copyWith(color: Colors.white),
+              strutStyle: StrutStyle(forceStrutHeight: true),
+            ),
           ));
         // throw error;
       }
@@ -253,6 +257,16 @@ class MapProvider extends ChangeNotifier {
       checkGPSEnabled();
       return;
     }
+    if (_permission == null) {
+      if (_geolocator == null) _geolocator = Geolocator();
+      GeolocationStatus result =
+          await _geolocator.checkGeolocationPermissionStatus();
+
+      if (result == GeolocationStatus.denied) {
+        await _geolocator.getCurrentPosition();
+      }
+      _permission = result;
+    }
     // Retreive current location updates
     if (_permission == GeolocationStatus.granted && _gpsEnabled) {
       SharedPreferences _prefs = await SharedPreferences.getInstance();
@@ -283,15 +297,10 @@ class MapProvider extends ChangeNotifier {
         radius: 10,
       ));
       notifyListeners();
-      // print(_userLocation['position']);
     }
   }
 
   void driverArrived() async {
-    // Clear Trip state
-    Provider.of<CurrentTripProvider>(_scaffoldKey.currentContext, listen: false)
-        .clearTripInfo();
-
     // Setting up the button
     Widget continueButton = FlatButton(
       child: Text("حسنا",
