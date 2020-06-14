@@ -26,17 +26,6 @@ class _RideSearchingState extends State<RideSearching>
   }
 
   @override
-  void didChangeDependencies() {
-    Map<String, dynamic> currentDriverInfo =
-        Provider.of<CurrentTripProvider>(context, listen: false)
-            .currentDriverInfo;
-    if (currentDriverInfo.length > 0) {
-      Provider.of<CurrentTripProvider>(context, listen: false).startTracking();
-    }
-    super.didChangeDependencies();
-  }
-
-  @override
   bool get mounted => super.mounted;
 
   @override

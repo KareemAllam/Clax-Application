@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:clax/models/Trip.dart';
 
 class FavTripCard extends StatefulWidget {
-  static const routeName = '/fav_trip_card';
   final Trip trip;
   FavTripCard(this.trip);
   @override
@@ -29,7 +28,7 @@ class _FavTripCardState extends State<FavTripCard> {
                   height: MediaQuery.of(context).size.height * 0.075,
                   alignment: Alignment.centerRight,
                   child: Text(
-                    widget.trip.station.name,
+                    widget.trip.lineName,
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
@@ -48,7 +47,7 @@ class _FavTripCardState extends State<FavTripCard> {
                         Text(
                           intl.DateFormat.EEEE()
                               .add_jm()
-                              .format(widget.trip.start),
+                              .format(widget.trip.startDate),
                           textDirection: TextDirection.ltr,
                           style: TextStyle(fontFamily: 'Product Sans'),
                         ),

@@ -1,18 +1,21 @@
-class CarInfo {
-  String number;
+/// 1. *String* **color**
+/// 2. *String* **plateNumber**
+///
+class Car {
   String color;
+  String plateNumber;
 
-  CarInfo({this.number, this.color});
+  Car({this.color, this.plateNumber});
 
-  CarInfo.fromJson(Map<String, dynamic> json) {
-    number = json['number'];
+  Car.fromJson(Map<String, dynamic> json) {
     color = json['color'];
+    plateNumber = json['plateNumber'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['number'] = this.number;
     data['color'] = this.color;
+    data['plateNumber'] = this.plateNumber;
     return data;
   }
 }

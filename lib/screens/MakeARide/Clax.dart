@@ -1,4 +1,6 @@
 // Dart & Other Packages
+import 'package:clax/models/CurrentDriver.dart';
+import 'package:clax/models/CurrentTrip.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 // Flutter's Material Components
@@ -8,15 +10,10 @@ import 'package:clax/utils/MessageHandling.dart';
 // Providers
 import 'package:clax/providers/Map.dart';
 import 'package:clax/providers/CurrentTrip.dart';
-// Screens
-import 'package:clax/screens/MakeARide/GoogleMap.dart';
 // Components
-import 'package:clax/screens/MakeARide/Components/RideConfig.dart';
-import 'package:clax/screens/MakeARide/Components/RideSearching.dart';
-// Widgets
-import 'package:clax/screens/MakeARide/widgets/FlipIcon.dart';
-// Drawer
-import 'package:clax/screens/Drawer.dart';
+import 'package:clax/screens/MakeARide/OnATrip.dart';
+import 'package:clax/screens/MakeARide/NewRide.dart';
+import 'package:clax/screens/MakeARide/RideSearching.dart';
 
 class Clax extends StatefulWidget {
   static const routeName = '/homescreen';
@@ -28,6 +25,8 @@ class _ClaxState extends State<Clax> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   NotificationHandler handler = NotificationHandler();
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  CurrentTrip tripInfo;
+  CurrentDriver driverInfo;
   bool onATrip = false;
   bool searching = false;
   String driverId;
@@ -63,56 +62,21 @@ class _ClaxState extends State<Clax> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    Provider.of<CurrentTripProvider>(context, listen: false).setScaffoldKey =
+    Provider.of<MapProvider>(context, listen: false).scaffoldKey = _scaffoldKey;
+    Provider.of<CurrentTripProvider>(context, listen: false).scaffoldKey =
         _scaffoldKey;
-    Provider.of<MapProvider>(context, listen: false).setScaffoldKey =
-        _scaffoldKey;
-    searching = Provider.of<CurrentTripProvider>(context).searching;
-    onATrip = Provider.of<CurrentTripProvider>(context).onATrip;
+    tripInfo = Provider.of<CurrentTripProvider>(context).currentTripInfo;
+    driverInfo = Provider.of<CurrentTripProvider>(context).currentDriverInfo;
     theme = Theme.of(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-            title: Text(
-          "",
-          style: Theme.of(context)
-              .textTheme
-              .bodyText1
-              .copyWith(color: Colors.white),
-        )),
-        drawer: MainDrawer(),
-        body: !searching
-            ? PickLocation()
-            : onATrip
-                ? Container(
-                    color: Colors.white,
-                    width: double.infinity,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pushNamed(MapPage.routeName);
-                      },
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          FlipCard(),
-                          Text(
-                            "تتبع رحلتك",
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyText1
-                                .copyWith(fontWeight: FontWeight.bold)
-                                .copyWith(
-                                    color: Theme.of(context).primaryColor),
-                          )
-                        ],
-                      ),
-                    ),
-                  )
-                : RideSearching());
+    searching = tripInfo != null;
+    onATrip = driverInfo != null;
+    return Container(
+      key: _scaffoldKey,
+      child: !searching ? StartARide() : onATrip ? OnATrip() : RideSearching(),
+    );
   }
 }

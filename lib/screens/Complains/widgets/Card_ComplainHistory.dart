@@ -29,7 +29,7 @@ class ComplainHistoryCard extends StatelessWidget {
             Container(
               alignment: Alignment.centerRight,
               child: Text(
-                trip.station.name,
+                trip.lineName,
                 style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontFamily: "Cairo",

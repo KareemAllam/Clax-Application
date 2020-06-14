@@ -2,30 +2,29 @@
 import 'dart:core';
 // Models
 import 'package:clax/models/Driver.dart';
-import 'package:clax/models/Station.dart';
 
 class Trip {
   String id;
   String lineId;
-  StationModel station;
+  String lineName;
   DriverModel driver;
-  DateTime start;
+  DateTime startDate;
   double price;
   int rate;
   Trip(
       {this.id,
-      this.start,
+      this.startDate,
       this.lineId,
       this.driver,
       this.price,
-      this.station,
+      this.lineName,
       this.rate});
 
   Trip.fromJson(Map<String, dynamic> json) {
     id = json['_d'];
-    start = DateTime.parse(json['start']) ?? DateTime.now();
+    startDate = DateTime.parse(json['start']) ?? DateTime.now();
     lineId = json['lineId'] ?? null;
-    station = StationModel.fromJson(json['station']) ?? null;
+    lineName = json['lineName'] ?? null;
     driver = json['driver'] != null
         ? new DriverModel.fromJson(json['driver'])
         : null;
@@ -36,10 +35,9 @@ class Trip {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
-    data['start'] = this.start.toString();
-    data['lineId'] = this.lineId.toString();
-    StationModel _station = this.station;
-    data['station'] = _station.toJson();
+    data['lineId'] = this.lineId;
+    data['lineName'] = this.lineName;
+    data['start'] = this.startDate.toString();
     if (this.driver != null) {
       data['driver'] = this.driver.toJson();
     }

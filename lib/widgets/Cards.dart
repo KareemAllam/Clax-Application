@@ -196,4 +196,87 @@ class Cards {
       ),
     );
   }
+
+  /// List Tile
+  static Widget listX2Tile(BuildContext context,
+      {String title, IconData icon, Function tapHandler}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          top: BorderSide(color: Theme.of(context).scaffoldBackgroundColor),
+        ),
+      ),
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16.0),
+      child: Row(children: <Widget>[
+        Icon(icon, color: Theme.of(context).primaryColor),
+        SizedBox(width: 16.0),
+        Text(
+          title,
+          strutStyle: StrutStyle(forceStrutHeight: true),
+          style: Theme.of(context)
+              .textTheme
+              .subtitle2
+              .copyWith(fontWeight: FontWeight.w600),
+        )
+      ]),
+    );
+  }
+
+  static Widget listTileX2(BuildContext context,
+      {String title, IconData icon, Function tapHandler}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          top: BorderSide(color: Theme.of(context).scaffoldBackgroundColor),
+        ),
+      ),
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16.0),
+      child: Row(children: <Widget>[
+        Icon(icon, color: Theme.of(context).primaryColor),
+        SizedBox(width: 16.0),
+        Text(
+          title,
+          strutStyle: StrutStyle(forceStrutHeight: true),
+          style: Theme.of(context)
+              .textTheme
+              .subtitle2
+              .copyWith(fontWeight: FontWeight.w600),
+        )
+      ]),
+    );
+  }
+
+  static Widget horizontalListTile(BuildContext context,
+      {String title, IconData icon, Function tapHandler}) {
+    double width = MediaQuery.of(context).size.width * 0.28;
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.all(Radius.circular(5)),
+      child: InkWell(
+        onTap: tapHandler,
+        child: Container(
+          width: width,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              border: Border.all(color: Colors.black12)),
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16.0),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Icon(icon, color: Theme.of(context).primaryColor, size: 32),
+                SizedBox(height: 8),
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  strutStyle: StrutStyle(forceStrutHeight: true),
+                  style: Theme.of(context).textTheme.subtitle2.copyWith(
+                      fontWeight: FontWeight.w600, color: Colors.grey),
+                ),
+              ]),
+        ),
+      ),
+    );
+  }
 }

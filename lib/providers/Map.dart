@@ -1,15 +1,19 @@
 // Dart & Other Packages
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
+import 'dart:typed_data';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 // FLutter MaterialComponenets
 import 'package:flutter/material.dart';
-// Screens
-import 'package:clax/screens/MakeARide/RateTrip.dart';
+// Utils
+import 'package:clax/utils/MapConversions.dart';
 // Services
 import 'package:clax/services/RealtimeDB.dart';
+// Components
+import 'package:clax/screens/MakeARide/RateTrip.dart';
 // Application Theme
 import 'package:clax/commonUI.dart';
 
@@ -18,12 +22,14 @@ class MapProvider extends ChangeNotifier {
     init();
   }
   // Scaffold Key
-  GlobalKey<ScaffoldState> _scaffoldKey;
+  GlobalKey<ScaffoldState> scaffoldKey;
   // Permissions
   GeolocationStatus _permission;
   bool _gpsEnabled = false;
   // Map Controller
   Completer<GoogleMapController> _controller;
+  // State Vars
+
   Map<String, dynamic> _userLocation;
   bool _focusDriver;
   // Markers ID
@@ -39,12 +45,12 @@ class MapProvider extends ChangeNotifier {
   Map<String, Marker> _markers;
   Set<Circle> _circles;
   Set<Polyline> _polylines;
-  String distance;
+  double distance;
   // Initializing Realtime Database Connection
   RealtimeDB _realtimeDB;
   // Trip has Ended?
   bool ended;
-
+  String timeString;
   Future init() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     _controller = Completer();
@@ -56,7 +62,7 @@ class MapProvider extends ChangeNotifier {
     _focusDriver = true;
     ended = false;
     zooming = 16;
-    distance = 'calculating...';
+    distance = null;
     // If previous distance was saved
     if (_prefs.getString("currentLocaiton") != null) {
       Map<String, dynamic> decoded = Map<String, dynamic>.from(
@@ -144,7 +150,7 @@ class MapProvider extends ChangeNotifier {
       });
       // Show error Snackbar
     } else
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
+      scaffoldKey.currentState.showSnackBar(SnackBar(
         content: Text("برجاء تشغيل خدمة تحديد الموقع"),
       ));
   }
@@ -161,15 +167,17 @@ class MapProvider extends ChangeNotifier {
     }
   }
 
-  void enableStreamingDriverLocation() {
+  void enableStreamingDriverLocation() async {
     int i;
     ended = false;
+    final Uint8List markerIcon =
+        await getBytesFromAsset('assets/images/buss.png', 100);
     // Reading Database changes of Location
     // if (_realtimeDB == null) _realtimeDB = RealtimeDB();
-    print('clax-lines/$_lineId/$_driverId');
+    // print('clax-lines/$_lineId/$_driverId');
     if (_realtimeDB == null) _realtimeDB = RealtimeDB();
     _realtimeDB.readAsync('clax-lines/$_lineId/$_driverId', (value) async {
-      print("Got Value: $value");
+      // print("Got Value: $value");
       try {
         // Parse Location from Database
         LatLng position =
@@ -178,6 +186,8 @@ class MapProvider extends ChangeNotifier {
         _markers[_driverId] = Marker(
           markerId: MarkerId(_driverId),
           position: position,
+          flat: true,
+          icon: BitmapDescriptor.fromBytes(markerIcon),
           infoWindow: InfoWindow(
             title: "Driver",
             snippet: "Lat: ${position.latitude}, Long: ${position.longitude}",
@@ -192,7 +202,22 @@ class MapProvider extends ChangeNotifier {
                 position.latitude,
                 position.longitude))
             .ceil();
-        i > 999 ? distance = '${i / 1000} km' : distance = '$i m';
+        distance = i.toDouble();
+
+        int time = (((distance / 1000) /
+                    (Random().nextDouble() * (80 - 60 + 1) + 60)) *
+                60)
+            .ceil();
+
+        if (time < 60) {
+          timeString = "$time دقيقة";
+        } else {
+          int hours = (time / 60).floor();
+          print(hours);
+          int minutes = (time - hours.toDouble() * 60).ceil();
+          print(minutes);
+          timeString = '$hours ساعه \n  $minutes دقيقه';
+        }
         if (i < 100) {
           i = 1000;
           ended = true;
@@ -204,12 +229,12 @@ class MapProvider extends ChangeNotifier {
         notifyListeners();
       } catch (error) {
         print("Error: $error");
-        if (_scaffoldKey.currentState != null)
-          _scaffoldKey.currentState.showSnackBar(SnackBar(
+        if (scaffoldKey.currentState != null)
+          scaffoldKey.currentState.showSnackBar(SnackBar(
             backgroundColor: Colors.red,
             content: Text(
               "حدث خطأ ما",
-              style: Theme.of(_scaffoldKey.currentContext)
+              style: Theme.of(scaffoldKey.currentContext)
                   .textTheme
                   .bodyText2
                   .copyWith(color: Colors.white),
@@ -228,12 +253,12 @@ class MapProvider extends ChangeNotifier {
   void navigateToDriver() async {
     // Animating Camera if app has focus on driver
     if (_focusDriver) {
+      final GoogleMapController controller = await _controller.future;
       // Updating Map's current view
       CameraPosition currentMarker = CameraPosition(
         target: _markers[_driverId].position,
-        zoom: zooming,
+        zoom: await controller.getZoomLevel(),
       );
-      final GoogleMapController controller = await _controller.future;
       // controller.moveCamera(CameraUpdate.newCameraPosition(currentMarker));
       // Slower
       controller.animateCamera(CameraUpdate.newCameraPosition(currentMarker));
@@ -242,11 +267,12 @@ class MapProvider extends ChangeNotifier {
   }
 
   void navigateToUser() async {
+    GoogleMapController controller = await _controller.future;
     CameraPosition currentMarker = CameraPosition(
       target: _userLocation['position'],
-      zoom: 16,
+      zoom: await controller.getZoomLevel(),
     );
-    GoogleMapController controller = await _controller.future;
+    print(_userLocation['position']);
     // controller.moveCamera(CameraUpdate.newCameraPosition(currentMarker));
     // Slower
     controller.animateCamera(CameraUpdate.newCameraPosition(currentMarker));
@@ -275,13 +301,13 @@ class MapProvider extends ChangeNotifier {
       Position position = await _geolocator.getCurrentPosition();
       // Retrieve Info about current location
       List<Placemark> placemark = await _geolocator.placemarkFromCoordinates(
-          position.latitude, position.longitude);
-
+          position.latitude, position.longitude,
+          localeIdentifier: "ar_AE");
       //// Update global variable
       // Location Name
-      _userLocation["name"] = placemark[0].administrativeArea +
-          "," +
-          placemark[0].subAdministrativeArea;
+      _userLocation["name"] = placemark[0].subAdministrativeArea +
+          " - " +
+          placemark[0].administrativeArea;
       // Location Coordinates
       _userLocation["position"] = LatLng(position.latitude, position.longitude);
       // Updating Cache
@@ -298,6 +324,7 @@ class MapProvider extends ChangeNotifier {
       ));
       notifyListeners();
     }
+    return _userLocation;
   }
 
   void driverArrived() async {
@@ -305,11 +332,11 @@ class MapProvider extends ChangeNotifier {
     Widget continueButton = FlatButton(
       child: Text("حسنا",
           style: TextStyle(
-              color: Theme.of(_scaffoldKey.currentContext).accentColor,
+              color: Theme.of(scaffoldKey.currentContext).accentColor,
               fontWeight: FontWeight.bold)),
       onPressed: () {
         // Dismiss the Alert Dialoge Box
-        Navigator.of(_scaffoldKey.currentContext)
+        Navigator.of(scaffoldKey.currentContext)
             .pushReplacementNamed(RateTrip.routeName);
       },
     );
@@ -328,14 +355,14 @@ class MapProvider extends ChangeNotifier {
           children: <Widget>[
             Text(
               "لقد وصل السائق",
-              style: Theme.of(_scaffoldKey.currentContext)
+              style: Theme.of(scaffoldKey.currentContext)
                   .textTheme
                   .bodyText1
                   .copyWith(fontWeight: FontWeight.values[5]),
             ),
             SizedBox(height: 2),
             Text("انتظر حتى انتهاء الرحلة ثم قم بتقيم السائق.",
-                style: Theme.of(_scaffoldKey.currentContext).textTheme.caption)
+                style: Theme.of(scaffoldKey.currentContext).textTheme.caption)
           ],
         ),
       ),
@@ -344,7 +371,7 @@ class MapProvider extends ChangeNotifier {
       titlePadding: EdgeInsets.all(0),
       contentPadding: EdgeInsets.all(0),
       content: Container(
-        color: Theme.of(_scaffoldKey.currentContext).primaryColor,
+        color: Theme.of(scaffoldKey.currentContext).primaryColor,
         child: continueButton,
       ),
     );
@@ -352,11 +379,11 @@ class MapProvider extends ChangeNotifier {
     // show the dialog
     await showDialog(
       useRootNavigator: true,
-      context: _scaffoldKey.currentContext,
+      context: scaffoldKey.currentContext,
       builder: (BuildContext context) {
         return alert;
       },
-    ).then((value) => Navigator.of(_scaffoldKey.currentContext)
+    ).then((value) => Navigator.of(scaffoldKey.currentContext)
         .pushReplacementNamed(RateTrip.routeName));
   }
 
@@ -375,5 +402,4 @@ class MapProvider extends ChangeNotifier {
   set initController(_) => _controller = Completer();
   set controller(controller) => _controller = controller;
   set focusDriver(boolean) => _focusDriver = boolean;
-  set setScaffoldKey(GlobalKey<ScaffoldState> sk) => _scaffoldKey = sk;
 }

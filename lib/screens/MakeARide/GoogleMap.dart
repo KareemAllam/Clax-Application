@@ -1,15 +1,21 @@
 // Dart & Other Pacakges
+import 'dart:math';
 import 'dart:ui';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 // Flutter Material Components
 import 'package:flutter/material.dart';
+// Models
+import 'package:clax/models/CurrentTrip.dart';
 // Providers
 import 'package:clax/providers/Map.dart';
+import 'package:clax/providers/CurrentTrip.dart';
 // Components
 import 'package:clax/screens/MakeARide/Components/DriverInfo.dart';
-// Map Styles
-import 'package:clax/mapstyles.dart';
+// Services
+import 'package:clax/services/GoogleApi.dart';
+// Map Utils
+import 'package:clax/utils/MapConversions.dart';
 
 class MapPage extends StatefulWidget {
   static const routeName = "map";
@@ -20,15 +26,40 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   MapProvider map;
   bool built = false;
+
+  Future createPolyLine(GoogleMapController controller) async {
+    CurrentTrip currentTripInfo =
+        Provider.of<CurrentTripProvider>(context, listen: false)
+            .currentTripInfo;
+
+    Map result =
+        await getLinePoints(currentTripInfo.start, currentTripInfo.end);
+    if (!result['status']) return;
+    List<Point<num>> _polyLine = result['polyline'];
+    List<LatLng> polylinePoints =
+        MapConversions.stringPointToLatLngs(_polyLine);
+    map.polylines.add(Polyline(
+      polylineId: PolylineId('dynamic'),
+      visible: true,
+      startCap: Cap.roundCap,
+      geodesic: true,
+      jointType: JointType.round,
+      endCap: Cap.roundCap,
+      points: polylinePoints,
+      width: 2,
+      color: Colors.purple,
+    ));
+    controller.getZoomLevel().then((zoomLevel) => controller.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(target: currentTripInfo.start, zoom: zoomLevel),
+          ),
+        ));
+  }
+
   @override
   void dispose() {
     map.disposeInit();
     super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   @override
@@ -52,6 +83,7 @@ class _MapPageState extends State<MapPage> {
       map.checkPermission();
       built = true;
     }
+    
     return Scaffold(
       appBar: AppBar(
         actions: <Widget>[
@@ -119,9 +151,8 @@ class _MapPageState extends State<MapPage> {
                   target: map.coordinates ?? LatLng(31.5812, 30.50037),
                   zoom: 12),
               onMapCreated: (GoogleMapController controller) {
-                controller.setMapStyle(uber);
-                if (!map.controller.isCompleted)
-                  map.controller.complete(controller);
+                createPolyLine(controller);
+                map.controller.complete(controller);
               },
             ),
             Align(
@@ -136,28 +167,32 @@ class _MapPageState extends State<MapPage> {
                         textDirection: TextDirection.ltr,
                         children: <Widget>[
                           Text(
+                            map.timeString,
+                            textAlign: TextAlign.center,
+                            strutStyle: StrutStyle(forceStrutHeight: true),
+                            style: Theme.of(context)
+                                .textTheme
+                                .subtitle2
+                                .copyWith(color: Colors.white),
+                          ),
+                          // Text(
+                          //   distance,
+                          //   textAlign: TextAlign.center,
+                          //   strutStyle: StrutStyle(forceStrutHeight: true),
+                          //   style:
+                          //       Theme.of(context).textTheme.subtitle2.copyWith(
+                          //             color: Colors.white,
+                          //           ),
+                          // ),
+                          Text(
                             map.name,
                             textAlign: TextAlign.center,
                             strutStyle: StrutStyle(forceStrutHeight: true),
                             style: Theme.of(context)
                                 .textTheme
                                 .subtitle2
-                                .copyWith(
-                                    color: Colors.white,
-                                    fontFamily: "Product Sans"),
+                                .copyWith(color: Colors.white),
                           ),
-                          Text(
-                            '${map.distance}',
-                            textAlign: TextAlign.center,
-                            textDirection: TextDirection.ltr,
-                            strutStyle: StrutStyle(forceStrutHeight: true),
-                            style: Theme.of(context)
-                                .textTheme
-                                .subtitle2
-                                .copyWith(
-                                    color: Colors.white,
-                                    fontFamily: "Product Sans"),
-                          )
                         ],
                       )
                     : Row(

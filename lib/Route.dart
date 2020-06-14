@@ -53,10 +53,10 @@ import 'package:clax/screens/Payments/Payment_TransferMoney.dart';
 
 //// Tracking Screens
 import 'package:clax/screens/MakeARide/Clax.dart';
-import 'package:clax/screens/MakeARide/RateTrip.dart';
 import 'package:clax/screens/MakeARide/GoogleMap.dart';
-import 'package:clax/screens/MakeARide/RideSeats.dart';
-import 'package:clax/screens/MakeARide/widgets/FlipIcon.dart';
+import 'package:clax/screens/MakeARide/MapPickLocation.dart';
+import 'package:clax/screens/MakeARide/RateTrip.dart';
+import 'package:clax/screens/MakeARide/NewRide.dart';
 
 class Router {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -64,9 +64,8 @@ class Router {
       case '/':
         return MaterialPageRoute(
             builder: (_) => LoadMainScreen(), settings: settings);
-      case Login.routeName:
-        return MaterialPageRoute(builder: (_) => Login(), settings: settings);
-      // Home
+
+      // Clax
       case Clax.routeName:
         return MaterialPageRoute(builder: (_) => Clax(), settings: settings);
       case RateTrip.routeName:
@@ -75,9 +74,15 @@ class Router {
       case StartARide.routeName:
         return MaterialPageRoute(
             builder: (_) => StartARide(), settings: settings);
-
       case MapPage.routeName:
         return MaterialPageRoute(builder: (_) => MapPage(), settings: settings);
+      case MapPickLocation.routeName:
+        return MaterialPageRoute(
+            builder: (_) => MapPickLocation(), settings: settings);
+
+      // Login & Registration
+      case Login.routeName:
+        return MaterialPageRoute(builder: (_) => Login(), settings: settings);
       case RegisterForm.routeName:
         return MaterialPageRoute(
             builder: (_) => RegisterForm(), settings: settings);
@@ -87,6 +92,8 @@ class Router {
       case ForgetPass.routeName:
         return MaterialPageRoute(
             builder: (_) => ForgetPass(), settings: settings);
+
+      // Settings
       case Account.routeName:
         return MaterialPageRoute(builder: (_) => Account(), settings: settings);
       case Bookings.routeName:
@@ -94,7 +101,6 @@ class Router {
             builder: (_) => Bookings(), settings: settings);
       case Family.routeName:
         return MaterialPageRoute(builder: (_) => Family(), settings: settings);
-
       case FreeRides.routeName:
         return MaterialPageRoute(
             builder: (_) => FreeRides(), settings: settings);
@@ -102,17 +108,8 @@ class Router {
         return MaterialPageRoute(builder: (_) => Guide(), settings: settings);
       case Members.routeName:
         return MaterialPageRoute(builder: (_) => Members(), settings: settings);
-      case FlipCard.routeName:
-        return MaterialPageRoute(
-            builder: (_) => FlipCard(), settings: settings);
       case More.routeName:
         return MaterialPageRoute(builder: (_) => More(), settings: settings);
-      case Payments.routeName:
-        return MaterialPageRoute(
-            builder: (_) => Payments(), settings: settings);
-      case Notifications.routeName:
-        return MaterialPageRoute(
-            builder: (_) => Notifications(), settings: settings);
       case Rides.routeName:
         return MaterialPageRoute(builder: (_) => Rides(), settings: settings);
       case Safety.routeName:
@@ -144,31 +141,20 @@ class Router {
       case AccountOverview.routeName:
         return MaterialPageRoute(
             builder: (_) => AccountOverview(), settings: settings);
-      case PromoCodes.routeName:
+      case Notifications.routeName:
         return MaterialPageRoute(
-            builder: (_) => PromoCodes(), settings: settings);
+            builder: (_) => Notifications(), settings: settings);
+
       // Payment
+      case Payments.routeName:
+        return MaterialPageRoute(
+            builder: (_) => Payments(), settings: settings);
       case PaymentScreen.routeName:
         return MaterialPageRoute(
             builder: (_) => PaymentScreen(), settings: settings);
-      case ComplainDetails.routeName:
-        return MaterialPageRoute(
-            builder: (_) => ComplainDetails(), settings: settings);
-      case ComplaintsHistory.routeName:
-        return MaterialPageRoute(
-            builder: (_) => ComplaintsHistory(), settings: settings);
       case PaymentAdd.routeName:
         return MaterialPageRoute(
             builder: (_) => PaymentAdd(), settings: settings);
-      case PaypalWeb.routeName:
-        return MaterialPageRoute(
-            builder: (_) => PaypalWeb(), settings: settings);
-      case Complains.routeName:
-        return MaterialPageRoute(
-            builder: (_) => Complains(), settings: settings);
-      case WriteAComplain.routeName:
-        return MaterialPageRoute(
-            builder: (_) => WriteAComplain(), settings: settings);
       case PaymentHistory.routeName:
         return MaterialPageRoute(
             builder: (_) => PaymentHistory(), settings: settings);
@@ -178,6 +164,25 @@ class Router {
       case PaypalWeb.routeName:
         return MaterialPageRoute(
             builder: (_) => PaypalWeb(), settings: settings);
+
+      // Home
+      case PromoCodes.routeName:
+        return MaterialPageRoute(
+            builder: (_) => PromoCodes(), settings: settings);
+
+      // Complaints
+      case ComplainDetails.routeName:
+        return MaterialPageRoute(
+            builder: (_) => ComplainDetails(), settings: settings);
+      case ComplaintsHistory.routeName:
+        return MaterialPageRoute(
+            builder: (_) => ComplaintsHistory(), settings: settings);
+      case Complains.routeName:
+        return MaterialPageRoute(
+            builder: (_) => Complains(), settings: settings);
+      case WriteAComplain.routeName:
+        return MaterialPageRoute(
+            builder: (_) => WriteAComplain(), settings: settings);
 
       default:
         return MaterialPageRoute(builder: (_) {

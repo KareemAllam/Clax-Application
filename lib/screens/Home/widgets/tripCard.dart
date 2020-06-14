@@ -63,7 +63,7 @@ class TripCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      " ${trip.station.name}",
+                      " ${trip.lineName}",
                       style: Theme.of(context)
                           .textTheme
                           .bodyText2
@@ -71,7 +71,7 @@ class TripCard extends StatelessWidget {
                     ),
                     Text(
                       special.DateFormat('EEE, M/d').add_jm().format(
-                            trip.start,
+                            trip.startDate,
                           ),
                       style: Theme.of(context)
                           .textTheme

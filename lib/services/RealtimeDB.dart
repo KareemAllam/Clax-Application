@@ -39,7 +39,7 @@ class RealtimeDB {
   void readAsync(String child, Function cb) {
     _databaseRefrences[child] =
         FirebaseDatabase.instance.reference().child(child);
-    print("Listening to child: $child");
+    // print("Listening to child: $child");
     events[child] = _databaseRefrences[child].onValue.listen((event) {
       // code on event change
       cb(event.snapshot.value);
@@ -49,7 +49,7 @@ class RealtimeDB {
   /// Cancel reading asynchronously from db
   /// with specified child.
   void cancelReadAsync(String child) {
-    print("canceled successfully...");
+    // print("canceled successfully...");
     try {
       events[child].cancel();
     } catch (_) {}

@@ -150,28 +150,26 @@ class PaymentProvider extends ChangeNotifier {
       notifyListeners();
       return ServerResponse(status: true, message: result.body);
     } else if (result.statusCode == 408)
-      return ServerResponse(status: true, message: "تعذر الوصول للخادم");
+      return ServerResponse(status: false, message: "تعذر الوصول للخادم");
     else
       return ServerResponse(
-          status: true, message: "لا يوجد لديك رصيد لعملية التحويل.");
+          status: false, message: "لا يوجد لديك رصيد لعملية التحويل.");
   }
 
   // Charge user via Paypal ==> Increase Blanace
-  Future<String> chargePaypal(String amount) async {
-    try {
-      Response result = await Api.post(
-          'passengers/payments/manage-financials/paypal/charge-paypal',
-          {"amount": amount});
-      if (result.statusCode == 200) {
-        _balance += int.parse(amount);
-        notifyListeners();
-        return result.body;
-      } else {
-        return "error";
-      }
-    } catch (_) {
-      return 'error';
-    }
+  Future<ServerResponse> chargePaypal(String amount) async {
+    Response result = await Api.post(
+        'passengers/payments/manage-financials/paypal/charge-paypal',
+        {"amount": amount});
+    if (result.statusCode == 200) {
+      _balance += int.parse(amount);
+      notifyListeners();
+      return ServerResponse(status: true, message: result.body);
+    } else if (result.statusCode == 408) {
+      return ServerResponse(status: false, message: "تعذر الوصول للخادم");
+    } else
+      return ServerResponse(
+          status: false, message: "لا يوجد لديك رصيد لعملية التحويل.");
   }
 
   // Add Payment Card

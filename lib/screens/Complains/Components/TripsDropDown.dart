@@ -72,7 +72,7 @@ class TripsDropDownMenuState extends State<TripsDropDownMenu> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Text(trip.station.name,
+                              Text(trip.lineName,
                                   strutStyle:
                                       StrutStyle(forceStrutHeight: true),
                                   style: Theme.of(context)
@@ -85,7 +85,7 @@ class TripsDropDownMenuState extends State<TripsDropDownMenu> {
                               Text(
                                   intl.DateFormat('EEE')
                                       .add_jm()
-                                      .format(trip.start),
+                                      .format(trip.startDate),
                                   strutStyle:
                                       StrutStyle(forceStrutHeight: true),
                                   style: Theme.of(context)

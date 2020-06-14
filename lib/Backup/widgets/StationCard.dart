@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:clax/models/Station.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class StationCard extends StatelessWidget {
   final dynamic position;
@@ -11,10 +10,7 @@ class StationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        onSelect(
-            station.name,
-            LatLng(station.coordinates[0], station.coordinates[1]),
-            Icons.subway);
+        onSelect(station);
       },
       child: Row(
         // crossAxisAlignment: CrossAxisAlignment.start,

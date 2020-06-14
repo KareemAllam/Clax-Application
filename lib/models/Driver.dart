@@ -6,7 +6,7 @@ class DriverModel {
   NameModel name;
   String phone;
   String img;
-  CarInfo carInfo;
+  Car carInfo;
 
   DriverModel({this.name, this.phone, this.img, this.carInfo});
 
@@ -15,7 +15,7 @@ class DriverModel {
     phone = json['phone'];
     img = json['img'];
     carInfo =
-        json['carInfo'] != null ? new CarInfo.fromJson(json['carInfo']) : null;
+        json['carInfo'] != null ? new Car.fromJson(json['carInfo']) : null;
   }
 
   Map<String, dynamic> toJson() {

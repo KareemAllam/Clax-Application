@@ -33,24 +33,20 @@ class PaymentPopup extends StatefulWidget {
 class _PaymentPopupState extends State<PaymentPopup> {
   TextEditingController amount = TextEditingController();
   bool loading = false;
-  bool error = false;
+  List error = [false, ""];
 
-  Future<bool> creditCardCharge(id) async {
+  Future creditCardCharge(id) async {
     setState(() {
       loading = true;
-      error = false;
+      error[0] = false;
     });
     if (amount.text.length == 0) {
       setState(() {
         loading = false;
-        error = true;
+        error = [true, "رجاءً تأكد من معلوماتك و حاول مره اخرى"];
       });
       return false;
     } else {
-      setState(() {
-        error = false;
-        loading = true;
-      });
       ServerResponse result =
           await Provider.of<PaymentProvider>(context, listen: false)
               .chargeCredit(id, amount.text);
@@ -59,52 +55,52 @@ class _PaymentPopupState extends State<PaymentPopup> {
         Provider.of<PaymentProvider>(context, listen: false).add(bill);
         setState(() {
           loading = false;
-          error = false;
+          error = [false];
         });
         return true;
       } else {
         setState(() {
           loading = false;
-          error = false;
+          error = [true, result.message];
         });
-        Scaffold.of(context)
-            .showSnackBar(SnackBar(content: Text(result.message)));
         return false;
       }
     }
   }
 
-  Future<String> paypalCharge() async {
+  Future paypalCharge() async {
     setState(() {
       loading = true;
-      error = false;
+      error = [false];
     });
     if (amount.text.length == 0) {
       setState(() {
         loading = false;
-        error = true;
+        error = [
+          true,
+        ];
       });
       return "error";
     } else {
       //Api request
       setState(() {
-        error = false;
+        error = [true, "رجاءً تأكد من معلوماتك و حاول مره اخرى"];
         loading = true;
       });
-      String result = await Provider.of<PaymentProvider>(context, listen: false)
-          .chargePaypal(amount.text);
-      if (result != 'error') {
+      ServerResponse result =
+          await Provider.of<PaymentProvider>(context, listen: false)
+              .chargePaypal(amount.text);
+      if (result.status) {
         setState(() {
           loading = false;
-          error = false;
+          error = [false];
         });
-        return result;
+        return true;
       } else {
         setState(() {
           loading = false;
-          error = false;
+          error = [true, result.message];
         });
-        return "error";
       }
     }
   }
@@ -120,25 +116,27 @@ class _PaymentPopupState extends State<PaymentPopup> {
         backgroundColor: Colors.transparent,
         contentPadding: EdgeInsets.all(0),
         titlePadding: EdgeInsets.all(0),
-        title: Container(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                )),
-            child: Text(
-              "حدد المبلغ المناسب:",
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyText2
-                  .copyWith(color: Colors.white),
-            )),
+        // title: Container(
+        //     padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        //     decoration: BoxDecoration(
+        //         // color: Theme.of(context).primaryColor,
+        //         color: Colors.white,
+        //         borderRadius: BorderRadius.only(
+        //           topLeft: Radius.circular(20),
+        //           topRight: Radius.circular(20),
+        //         )),
+        //     child: Text(
+        //       "حدد المبلغ المناسب:",
+        //       style: Theme.of(context)
+        //           .textTheme
+        //           .bodyText2
+        //           .copyWith(color: Colors.black87),
+        //     )),
         content: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
           Container(
               child: Column(children: <Widget>[
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Expanded(
                       child: TextField(
@@ -167,6 +165,7 @@ class _PaymentPopupState extends State<PaymentPopup> {
                     ),
                     Expanded(
                         child: Text("جنية مصري",
+                            textAlign: TextAlign.center,
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyText2
@@ -175,10 +174,14 @@ class _PaymentPopupState extends State<PaymentPopup> {
                 ),
               ]),
               padding: EdgeInsets.symmetric(
-                vertical: 10,
+                vertical: 20,
                 horizontal: 20,
               ),
               decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
                 color: Colors.white,
               )),
           GestureDetector(
@@ -188,7 +191,7 @@ class _PaymentPopupState extends State<PaymentPopup> {
                 if (result) {
                   Navigator.pop(context, true);
                 }
-                if (!result && error == false) {
+                if (!result && error[0] == false) {
                   Navigator.pop(context, false);
                 }
               } else {
@@ -203,7 +206,7 @@ class _PaymentPopupState extends State<PaymentPopup> {
             child: Container(
               width: double.infinity,
               alignment: Alignment.center,
-              height: 40,
+              height: 50,
               decoration: BoxDecoration(
                   color: Theme.of(context).primaryColor,
                   borderRadius: BorderRadius.only(
@@ -212,14 +215,13 @@ class _PaymentPopupState extends State<PaymentPopup> {
               child: loading
                   ? SpinKitThreeBounce(size: 15, color: Colors.white)
                   : Text("اضافة",
-                      style: Theme.of(context).textTheme.bodyText1.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.values[6])),
+                      style: Theme.of(context).textTheme.bodyText2.copyWith(
+                          color: Colors.white, fontWeight: FontWeight.bold)),
             ),
           ),
-          error
+          error[0]
               ? Text(
-                  "رجاءً تأكد من معلوماتك و حاول مره اخرى",
+                  error[1],
                   textAlign: TextAlign.start,
                   style: Theme.of(context)
                       .textTheme

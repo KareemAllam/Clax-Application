@@ -1,9 +1,13 @@
-import 'package:clax/models/CurrentDriver.dart';
-import 'package:clax/providers/CurrentTrip.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+// Dart & Other Packages
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+// Flutter's Material components
+import 'package:flutter/material.dart';
+// Models
+import 'package:clax/models/CurrentDriver.dart';
+// Providers
+import 'package:clax/providers/CurrentTrip.dart';
 
 class DriverInfo extends StatefulWidget {
   @override
@@ -15,15 +19,11 @@ class _DriverInfoState extends State<DriverInfo> {
 
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _driverInfo = (Provider.of<CurrentTripProvider>(context).currentDriverInfo);
+    _driverInfo = (Provider.of<CurrentTripProvider>(context, listen: false)
+        .currentDriverInfo);
   }
 
   ImageProvider<dynamic> image() {
-    // try {
-    //   return NetworkImage(_driverInfo['img']);
-    // } catch (_) {
-    //   return AssetImage('assets/images/404.png');
-    // }
     return AssetImage('assets/images/404.png');
   }
 
@@ -49,10 +49,8 @@ class _DriverInfoState extends State<DriverInfo> {
               Text(
                 subtitle,
                 strutStyle: StrutStyle(forceStrutHeight: true),
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyText2
-                    .copyWith(color: Colors.black87),
+                style: Theme.of(context).textTheme.bodyText2.copyWith(
+                    color: Colors.black87, fontWeight: FontWeight.bold),
               )
             ],
           )

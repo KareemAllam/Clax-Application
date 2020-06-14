@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:clax/models/Line.dart';
+import 'package:clax/models/Station.dart';
 
 List<LineModel> getStaticData() {
   String stations =
@@ -10,4 +11,40 @@ List<LineModel> getStaticData() {
   (json.decode(stations) as List)
       .forEach((station) => decodestations.add(LineModel.fromJson(station)));
   return decodestations;
+}
+
+List<LineModel> kiroMap() {
+  LineModel line1 = LineModel(
+    id: "5e7164c94b168835e419a6d7",
+    cost: 3.5,
+    from: "طنطا",
+    to: "سمنود",
+    stations: <StationModel>[
+      StationModel(id: "1", name: "طنطا", coordinates: [30.8092, 30.996660]),
+      StationModel(
+          id: "2", name: "محلة روح", coordinates: [30.9164, 31.121010]),
+      StationModel(
+          id: "3", name: "المحله الكبرى", coordinates: [30.96968, 31.1690]),
+      StationModel(
+          id: "4", name: "الراهبين", coordinates: [30.9772897, 31.2154705]),
+      StationModel(id: "5", name: "سمنود", coordinates: [30.96154, 31.240960]),
+    ],
+  );
+  LineModel line2 = LineModel(
+    id: "5e7164c94b168835e419a6d7",
+    cost: 3.5,
+    from: "سمنود",
+    to: "طلخا",
+    stations: <StationModel>[
+      StationModel(id: "1", name: "سمنود", coordinates: [30.96154, 31.240960]),
+      StationModel(
+          id: "2", name: "ميت عساس", coordinates: [31.00273, 31.284515]),
+      StationModel(
+          id: "3", name: "كفر حسان", coordinates: [31.01667, 31.30000]),
+      StationModel(
+          id: "4", name: "ميت الكرماء", coordinates: [30.6666, 31.13333]),
+      StationModel(id: "5", name: "طلخا", coordinates: [31.052251, 31.3731608]),
+    ],
+  );
+  return [line1, line2];
 }
