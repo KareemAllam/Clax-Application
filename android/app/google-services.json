@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "236411204360",
+    "firebase_url": "https://sanguine-theory-273017.firebaseio.com",
+    "project_id": "sanguine-theory-273017",
+    "storage_bucket": "sanguine-theory-273017.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:236411204360:android:f253c9300e3d68e4dc72bd",
+        "android_client_info": {
+          "package_name": "com.example.googlemap"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "236411204360-7astlri7cl5ef62o6jg90nned62oo5ku.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBeqODuls3YZKSvNuHq2xUTLByCFgORrLI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "236411204360-7astlri7cl5ef62o6jg90nned62oo5ku.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:236411204360:android:767c1d726f656349dc72bd",
+        "android_client_info": {
+          "package_name": "me.clax.egyp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "236411204360-7astlri7cl5ef62o6jg90nned62oo5ku.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBeqODuls3YZKSvNuHq2xUTLByCFgORrLI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "236411204360-7astlri7cl5ef62o6jg90nned62oo5ku.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:236411204360:android:9f475e6c1c209cd0dc72bd",
+        "android_client_info": {
+          "package_name": "me.clax.egyp.driver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "236411204360-7astlri7cl5ef62o6jg90nned62oo5ku.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBeqODuls3YZKSvNuHq2xUTLByCFgORrLI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "236411204360-7astlri7cl5ef62o6jg90nned62oo5ku.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
