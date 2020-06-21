@@ -23,11 +23,11 @@ class _FreeRidesState extends State<FreeRides> {
   bool valid = false;
 
   void sendCode(BuildContext context) async {
-    Map<String, dynamic> body = {
+    Map<String, String> body = {
       'code': promocode.text,
     };
 
-    await Api.post('offers', json.encode(body)).then(
+    await Api.post('offers', body).then(
       (response) {
         Map<String, dynamic> responseBody = json.decode(response.body);
         String code;

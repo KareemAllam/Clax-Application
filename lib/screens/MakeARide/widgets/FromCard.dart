@@ -15,7 +15,7 @@ class FromCard extends StatelessWidget {
       },
       child: Container(
         margin: EdgeInsets.only(top: 5, left: 7, right: 7),
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 14),
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),

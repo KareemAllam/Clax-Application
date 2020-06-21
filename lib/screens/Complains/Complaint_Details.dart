@@ -98,10 +98,10 @@ class _ComplainDetailsState extends State<ComplainDetails> {
                     Row(children: <Widget>[
                       ConstrainedBox(
                           constraints: BoxConstraints(maxWidth: 30),
-                          child: Icon(Icons.location_on,
+                          child: Icon(Icons.error_outline,
                               color: Theme.of(context).primaryColor)),
                       SizedBox(width: 10),
-                      Text('${trip.lineName}',
+                      Text('${complain.subject}',
                           strutStyle: StrutStyle(forceStrutHeight: true),
                           style: Theme.of(context).textTheme.subtitle2.copyWith(
                               color: Color(0xff212121),
@@ -140,11 +140,12 @@ class _ComplainDetailsState extends State<ComplainDetails> {
                               color: Theme.of(context).primaryColor),
                         ),
                         SizedBox(width: 10),
-                        Text(trip.price.toString() ?? 2,
-                            style: Theme.of(context)
-                                .textTheme
-                                .subtitle2
-                                .copyWith(fontFamily: "Product Sans")),
+                        if (trip != null)
+                          Text(trip.price.toString() ?? 2,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .subtitle2
+                                  .copyWith(fontFamily: "Product Sans")),
                         Text(" جنية مصرى",
                             strutStyle: StrutStyle(forceStrutHeight: true),
                             style: Theme.of(context).textTheme.subtitle2)
@@ -176,14 +177,16 @@ class _ComplainDetailsState extends State<ComplainDetails> {
                       //   ),
                       // ),
                       child: CircleAvatar(
-                        maxRadius: 45.0,
-                        backgroundColor: Colors.transparent,
-                        child: FadeInImage(
+                          maxRadius: 45.0,
+                          backgroundColor: Colors.transparent,
+                          child: FadeInImage(
                             placeholder: AssetImage('assets/images/404.png'),
-                            image: trip.driver.img != null
-                                ? NetworkImage(trip.driver.img)
-                                : AssetImage('assets/images/404.png')),
-                      ),
+                            image: trip == null
+                                ? AssetImage('assets/images/404.png')
+                                : trip.driver != null
+                                    ? Image.memory(trip.driver.profilePic)
+                                    : AssetImage('assets/images/404.png'),
+                          )),
                     )
                     // child: Column(
                     //     crossAxisAlignment: CrossAxisAlignment.end,

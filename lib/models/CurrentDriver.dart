@@ -1,3 +1,6 @@
+// Dart
+import 'dart:typed_data';
+// Models
 import 'package:clax/models/Car.dart';
 import 'package:clax/models/Name.dart';
 
@@ -10,16 +13,17 @@ import 'package:clax/models/Name.dart';
 class CurrentDriver {
   String driverId;
   String phone;
-  String img;
+  Uint8List profilePic;
   NameModel name;
   Car car;
 
-  CurrentDriver({this.driverId, this.car, this.img, this.name, this.phone});
+  CurrentDriver(
+      {this.driverId, this.car, this.profilePic, this.name, this.phone});
 
   CurrentDriver.fromJson(Map<String, dynamic> json) {
     driverId = json['driverId'];
     phone = json['phone'];
-    img = json['img'];
+    profilePic = Uint8List.fromList(List<int>.from(json['profilePic']));
     name = NameModel.fromJson(json['name']);
     car = Car.fromJson(json['car']);
   }
@@ -28,7 +32,7 @@ class CurrentDriver {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['driverId'] = this.driverId;
     data['phone'] = this.phone;
-    data['img'] = this.img;
+    data['profilePic'] = this.profilePic;
     data['name'] = this.name.toJson();
     data['car'] = this.car.toJson();
     return data;

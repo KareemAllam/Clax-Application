@@ -21,16 +21,15 @@ class _LoadingButtonState extends State<LoadingButton> {
   Widget build(BuildContext context) {
     return !sending
         ? Container(
-            padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.2,
-                vertical: 40),
+            alignment: Alignment.center,
+            margin: EdgeInsets.only(top: 32),
             child: RaisedButton(
-                elevation: 1,
+                elevation: 0,
+                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 50),
                 highlightElevation: 1,
                 shape: StadiumBorder(),
                 onPressed: () async {
                   FocusScope.of(context).requestFocus(new FocusNode());
-
                   setState(() {
                     sending = true;
                   });

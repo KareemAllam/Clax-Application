@@ -13,10 +13,9 @@ import 'package:clax/services/Backend.dart';
 class ComplainsProvider extends ChangeNotifier {
   List<ComplainModel> _complains = [];
   ComplainsProvider() {
-    initialize();
+    init();
   }
-
-  void initialize() async {
+  void init() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     // Get Cached Data
     if (_prefs.getString("complains") != null) {
@@ -30,7 +29,7 @@ class ComplainsProvider extends ChangeNotifier {
   // Fetch Data from Server
   Future<ServerResponse> serverData() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
-    Response response = await Api.get('user/mycomplaint');
+    Response response = await Api.get('passengers/complaints/all');
     if (response.statusCode == 200) {
       _complains = List<ComplainModel>.from((json
           .decode(response.body)
@@ -45,7 +44,8 @@ class ComplainsProvider extends ChangeNotifier {
 
   Future<ServerResponse> add(body) async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
-    Response result = await Api.post("user/complaint", body);
+    Response result =
+        await Api.post("passengers/complaints/add", body, stringDynamic: true);
     if (result.statusCode == 200) {
       ComplainModel complain = ComplainModel.fromJson(json.decode(result.body));
       _complains.add(complain);

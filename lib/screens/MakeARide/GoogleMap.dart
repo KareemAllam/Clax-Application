@@ -49,6 +49,7 @@ class _MapPageState extends State<MapPage> {
       width: 2,
       color: Colors.purple,
     ));
+    setState(() {});
     controller.getZoomLevel().then((zoomLevel) => controller.animateCamera(
           CameraUpdate.newCameraPosition(
             CameraPosition(target: currentTripInfo.start, zoom: zoomLevel),
@@ -83,7 +84,7 @@ class _MapPageState extends State<MapPage> {
       map.checkPermission();
       built = true;
     }
-    
+
     return Scaffold(
       appBar: AppBar(
         actions: <Widget>[
@@ -158,61 +159,42 @@ class _MapPageState extends State<MapPage> {
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
-                color: Theme.of(context).primaryColor,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                child: map.gpsEnabled
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        textDirection: TextDirection.ltr,
-                        children: <Widget>[
-                          Text(
-                            map.timeString,
-                            textAlign: TextAlign.center,
-                            strutStyle: StrutStyle(forceStrutHeight: true),
-                            style: Theme.of(context)
-                                .textTheme
-                                .subtitle2
-                                .copyWith(color: Colors.white),
-                          ),
-                          // Text(
-                          //   distance,
-                          //   textAlign: TextAlign.center,
-                          //   strutStyle: StrutStyle(forceStrutHeight: true),
-                          //   style:
-                          //       Theme.of(context).textTheme.subtitle2.copyWith(
-                          //             color: Colors.white,
-                          //           ),
-                          // ),
-                          Text(
-                            map.name,
-                            textAlign: TextAlign.center,
-                            strutStyle: StrutStyle(forceStrutHeight: true),
-                            style: Theme.of(context)
-                                .textTheme
-                                .subtitle2
-                                .copyWith(color: Colors.white),
-                          ),
-                        ],
-                      )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Icon(Icons.location_on,
-                              color: Colors.white, size: 20),
-                          SizedBox(width: 10),
-                          Text(
-                            "فعل نظام الملاحه الخاص بك",
-                            textAlign: TextAlign.center,
-                            strutStyle: StrutStyle(forceStrutHeight: true),
-                            style: Theme.of(context)
-                                .textTheme
-                                .subtitle2
-                                .copyWith(color: Colors.white),
-                          )
-                        ],
+                  color: Theme.of(context).primaryColor,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    textDirection: TextDirection.ltr,
+                    children: <Widget>[
+                      Text(
+                        map.timeString ?? "loading",
+                        textAlign: TextAlign.center,
+                        strutStyle: StrutStyle(forceStrutHeight: true),
+                        style: Theme.of(context)
+                            .textTheme
+                            .subtitle2
+                            .copyWith(color: Colors.white),
                       ),
-              ),
+                      Text(
+                        map.distanceString ?? "loading",
+                        textAlign: TextAlign.center,
+                        strutStyle: StrutStyle(forceStrutHeight: true),
+                        style: Theme.of(context)
+                            .textTheme
+                            .subtitle2
+                            .copyWith(color: Colors.white),
+                      ),
+                      Text(
+                        map.name,
+                        textAlign: TextAlign.center,
+                        strutStyle: StrutStyle(forceStrutHeight: true),
+                        style: Theme.of(context)
+                            .textTheme
+                            .subtitle2
+                            .copyWith(color: Colors.white),
+                      ),
+                    ],
+                  )),
             )
           ],
         ),

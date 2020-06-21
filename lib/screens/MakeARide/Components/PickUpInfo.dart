@@ -9,7 +9,7 @@ class PickupInfo extends StatelessWidget {
     return Stack(
       children: <Widget>[
         Container(
-          padding: EdgeInsets.only(left: 16.0, right: 16.0, bottom: 8, top: 0),
+          padding: EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16, top: 0),
           decoration: BoxDecoration(
               color: Theme.of(context).primaryColor,
               border: Border(

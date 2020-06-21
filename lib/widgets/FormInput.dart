@@ -19,8 +19,7 @@ class FormInput extends StatelessWidget {
             style: Theme.of(context).textTheme.subtitle2,
           )),
       Container(
-        padding: EdgeInsets.symmetric(
-            vertical: height * 0.0054, horizontal: width * 0.05),
+        padding: EdgeInsets.symmetric(horizontal: 16),
         height: height * 0.3,
         child: TextField(
           enabled: true,
@@ -35,7 +34,7 @@ class FormInput extends StatelessWidget {
               .bodyText1
               .copyWith(color: Color(0xff212121)),
           decoration: InputDecoration(
-            contentPadding: EdgeInsets.all(0),
+            // contentPadding: EdgeInsets.all(0),
             hintText: placeholder,
             hintStyle: placeholder.contains("فضلك")
                 ? Theme.of(context).textTheme.bodyText2.copyWith(
@@ -46,9 +45,8 @@ class FormInput extends StatelessWidget {
                     .bodyText2
                     .copyWith(color: Colors.grey),
             counter: SizedBox(),
-            icon: Icon(
+            prefixIcon: Icon(
               Icons.power_input,
-              color: Theme.of(context).primaryColor,
             ),
             border: InputBorder.none,
           ),

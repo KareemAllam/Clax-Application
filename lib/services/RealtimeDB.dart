@@ -13,7 +13,6 @@ class RealtimeDB {
   // Database changes listener
   Map<String, StreamSubscription<Event>> events;
   // Static Data Vars
-  int _counter = 0;
   String text = 'testing...';
 
   void pushNewChild(String child) {
@@ -25,14 +24,11 @@ class RealtimeDB {
   }
 
   /// Reading a snapshot from firebase once.
-  void readOnce(String child) async {
+  Future<Map> readOnce(String child) async {
     _databaseRefrences[child] =
         FirebaseDatabase.instance.reference().child(child);
-    DataSnapshot snapshot = await _databaseRefrences[child].orderByKey().once();
-    var result = snapshot.value.values as Iterable;
-    for (var item in result) {
-      print(item);
-    }
+    DataSnapshot snapshot = await _databaseRefrences[child].once();
+    return Map<String, dynamic>.from(snapshot.value);
   }
 
   /// Reading a snapshot from firebase on value changed.
@@ -57,10 +53,10 @@ class RealtimeDB {
   }
 
   /// Updating the value of a specified child.
-  void updateChild(String child, dynamic value) {
+  void updateChild(String child, Map value) {
     _databaseRefrences[child] =
         FirebaseDatabase.instance.reference().child(child);
-    _databaseRefrences[child].update({"value": ++_counter});
+    _databaseRefrences[child].update(Map<String, dynamic>.from(value));
   }
 
   void setMainNode(String child, Position position, int seats) {

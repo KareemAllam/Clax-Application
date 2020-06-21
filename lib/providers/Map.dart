@@ -1,17 +1,24 @@
 // Dart & Other Packages
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
 import 'dart:typed_data';
+import 'package:clax/screens/MakeARide/Clax.dart';
+import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 // FLutter MaterialComponenets
 import 'package:flutter/material.dart';
+// Models
+import 'package:clax/models/Bill.dart';
 // Utils
 import 'package:clax/utils/MapConversions.dart';
 // Services
+import 'package:clax/services/GoogleApi.dart';
 import 'package:clax/services/RealtimeDB.dart';
+// Providers
+import 'package:clax/providers/CurrentTrip.dart';
+import 'package:clax/providers/Payment.dart';
 // Components
 import 'package:clax/screens/MakeARide/RateTrip.dart';
 // Application Theme
@@ -45,12 +52,13 @@ class MapProvider extends ChangeNotifier {
   Map<String, Marker> _markers;
   Set<Circle> _circles;
   Set<Polyline> _polylines;
-  double distance;
   // Initializing Realtime Database Connection
   RealtimeDB _realtimeDB;
   // Trip has Ended?
   bool ended;
+  double distance;
   String timeString;
+  String distanceString;
   Future init() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     _controller = Completer();
@@ -89,9 +97,18 @@ class MapProvider extends ChangeNotifier {
     // _realtimeDB = RealtimeDB();
   }
 
-  void setDriverId(String driverId, String lineId) {
+  void setDriverId(
+      String driverId, String lineId, LatLng pickupLocation) async {
     _driverId = driverId;
     _lineId = lineId;
+    List<Placemark> placemarks = await _geolocator.placemarkFromCoordinates(
+        pickupLocation.latitude, pickupLocation.longitude,
+        localeIdentifier: "ar_AR");
+    _userLocation["name"] = placemarks[0].subAdministrativeArea +
+        " - " +
+        placemarks[0].administrativeArea;
+    _userLocation['position'] = pickupLocation;
+
     notifyListeners();
     enableStreamingDriverLocation();
   }
@@ -174,10 +191,9 @@ class MapProvider extends ChangeNotifier {
         await getBytesFromAsset('assets/images/buss.png', 100);
     // Reading Database changes of Location
     // if (_realtimeDB == null) _realtimeDB = RealtimeDB();
-    // print('clax-lines/$_lineId/$_driverId');
+    print('clax-lines/$_lineId/$_driverId');
     if (_realtimeDB == null) _realtimeDB = RealtimeDB();
     _realtimeDB.readAsync('clax-lines/$_lineId/$_driverId', (value) async {
-      // print("Got Value: $value");
       try {
         // Parse Location from Database
         LatLng position =
@@ -193,33 +209,18 @@ class MapProvider extends ChangeNotifier {
             snippet: "Lat: ${position.latitude}, Long: ${position.longitude}",
           ),
         );
+
+        // Retreive Distance Info
+        Map distanceInfo =
+            await getDuration(position, _userLocation["position"]);
+        // Update Time
+        timeString = distanceInfo["duration"]['text'];
         // Update Distance
-        if (_userLocation == null || _userLocation["position"] == null)
-          await currentLocation();
-        i = (await _geolocator.distanceBetween(
-                _userLocation["position"].latitude ?? 30.3944923,
-                _userLocation["position"].longitude ?? 30.127593,
-                position.latitude,
-                position.longitude))
-            .ceil();
-        distance = i.toDouble();
-
-        int time = (((distance / 1000) /
-                    (Random().nextDouble() * (80 - 60 + 1) + 60)) *
-                60)
-            .ceil();
-
-        if (time < 60) {
-          timeString = "$time دقيقة";
-        } else {
-          int hours = (time / 60).floor();
-          print(hours);
-          int minutes = (time - hours.toDouble() * 60).ceil();
-          print(minutes);
-          timeString = '$hours ساعه \n  $minutes دقيقه';
-        }
-        if (i < 100) {
-          i = 1000;
+        distance = distanceInfo['distance']['value'].toDouble();
+        distanceString = distanceInfo['distance']['text'];
+        i = distance.floor();
+        if (i < 1000) {
+          i = 10000;
           ended = true;
           disableStreamingDriverLocation();
           driverArrived();
@@ -268,6 +269,9 @@ class MapProvider extends ChangeNotifier {
 
   void navigateToUser() async {
     GoogleMapController controller = await _controller.future;
+    markers[_userId] = Marker(
+        markerId: MarkerId(_userId), position: _userLocation['position']);
+    notifyListeners();
     CameraPosition currentMarker = CameraPosition(
       target: _userLocation['position'],
       zoom: await controller.getZoomLevel(),
@@ -328,6 +332,95 @@ class MapProvider extends ChangeNotifier {
   }
 
   void driverArrived() async {
+    String requestId = Provider.of<CurrentTripProvider>(
+            scaffoldKey.currentContext,
+            listen: false)
+        .currentTripInfo
+        .requestId;
+    // Setting up the button
+    Widget continueButton = FlatButton(
+      child: Text("ركبت",
+          style: TextStyle(
+              color: Theme.of(scaffoldKey.currentContext).accentColor,
+              fontWeight: FontWeight.bold)),
+      onPressed: () {
+        _realtimeDB.updateChild(
+            'clax-requests/$_lineId/$requestId', {'status': "done"});
+        rateDriver();
+      },
+    );
+    Widget cancelButton = FlatButton(
+      child: Text("لم اجد السائق",
+          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+      onPressed: () {
+        print("punishment handling");
+        // Dismiss the Alert Dialoge Box
+        Navigator.of(scaffoldKey.currentContext).pop();
+
+        // Clear Trip State
+        Provider.of<CurrentTripProvider>(scaffoldKey.currentContext,
+                listen: false)
+            .clearTripInfo();
+
+        // Return to Main Screen
+        Navigator.of(scaffoldKey.currentContext).popUntil((route) {
+          if (route.settings.name == Clax.routeName) return true;
+          return false;
+        });
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      backgroundColor: Colors.transparent,
+      title: Container(
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(5), topRight: Radius.circular(5))),
+        padding: EdgeInsets.only(top: 20, right: 15, left: 15, bottom: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              "لقد وصل السائق",
+              style: Theme.of(scaffoldKey.currentContext)
+                  .textTheme
+                  .bodyText1
+                  .copyWith(fontWeight: FontWeight.values[5]),
+            ),
+            SizedBox(height: 2),
+            Text("انتظر حتى تركب المكروباص ثم اضغط ركبت.",
+                style: Theme.of(scaffoldKey.currentContext).textTheme.caption)
+          ],
+        ),
+      ),
+      buttonPadding: EdgeInsets.all(0),
+      actionsPadding: EdgeInsets.all(0),
+      titlePadding: EdgeInsets.all(0),
+      contentPadding: EdgeInsets.all(0),
+      content: Container(
+        color: Theme.of(scaffoldKey.currentContext).primaryColor,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            continueButton,
+            cancelButton,
+          ],
+        ),
+      ),
+    );
+
+    // show the dialog
+    showDialog(
+        barrierDismissible: false,
+        context: scaffoldKey.currentContext,
+        builder: (BuildContext context) {
+          return alert;
+        });
+  }
+
+  void rateDriver() async {
     // Setting up the button
     Widget continueButton = FlatButton(
       child: Text("حسنا",
@@ -385,6 +478,36 @@ class MapProvider extends ChangeNotifier {
       },
     ).then((value) => Navigator.of(scaffoldKey.currentContext)
         .pushReplacementNamed(RateTrip.routeName));
+  }
+
+  void cancelOngoingTrip() {
+    // Update Reqeust
+    String requestId = Provider.of<CurrentTripProvider>(
+            scaffoldKey.currentContext,
+            listen: false)
+        .currentTripInfo
+        .requestId;
+    _realtimeDB.updateChild(
+        'clax-requests/$_lineId/$requestId', {'status': "passenger_cancelled"});
+    // Reduce Balance
+    double finalPrice = Provider.of<CurrentTripProvider>(
+            scaffoldKey.currentContext,
+            listen: false)
+        .currentTripInfo
+        .finalCost;
+    Provider.of<PaymentProvider>(scaffoldKey.currentContext, listen: false)
+        .setBalance = -finalPrice;
+    // Add Bill
+    Provider.of<PaymentProvider>(scaffoldKey.currentContext, listen: false).add(
+        BillModel(
+            amount: finalPrice,
+            date: DateTime.now(),
+            type: "Punishment",
+            description: "عقوبة الغاء الرحلة"));
+    // Stop Ongoing State
+    disableStreamingDriverLocation();
+    Provider.of<CurrentTripProvider>(scaffoldKey.currentContext, listen: false)
+        .cancelTripRequest();
   }
 
   // Getters

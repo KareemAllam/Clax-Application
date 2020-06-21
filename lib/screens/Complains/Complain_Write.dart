@@ -1,4 +1,5 @@
 // Dart & Other Packages
+import 'dart:convert';
 import 'package:provider/provider.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
@@ -9,8 +10,8 @@ import 'package:clax/providers/Trips.dart';
 import 'package:clax/models/Trip.dart';
 import 'package:clax/models/Error.dart';
 // Components
-import 'package:clax/screens/Complains/Components/ComplainTDropDown.dart';
 import 'package:clax/screens/Complains/Components/TripsDropDown.dart';
+// import 'package:clax/screens/Complains/Components/ComplainTDropDown.dart';
 // Widgets
 import 'package:clax/widgets/FormGeneral.dart';
 import 'package:clax/widgets/FormInput.dart';
@@ -29,20 +30,18 @@ class WriteAComplain extends StatefulWidget {
 
 class _WriteAComplainState extends State<WriteAComplain> {
   Trip selectedTrip;
-  String complainType;
   bool enabled = true;
 
+  TextEditingController title = TextEditingController();
   TextEditingController description = TextEditingController();
+
+  bool tripRelated = false;
+  String titlePlaceholder = "ما هو موضوع الشكوى؟";
   String tripPlaceholder = "حدد رحلة من رحلاتك السابقة";
-  String typePlaceHolder = "حدد نوع الشكوى المناسب";
   String descriptionPlaceHolder = "حد اقصى 250 كملة";
 
   void changeStateTrip(Trip value) {
     selectedTrip = value;
-  }
-
-  void changeStateComplainType(String value) {
-    complainType = value;
   }
 
   Future<ServerResponse> submitForm() async {
@@ -53,25 +52,19 @@ class _WriteAComplainState extends State<WriteAComplain> {
 
     // Form Validation
     int error = 0;
-    if (complainType == null) {
-      setState(() {
-        error = 1;
-        typePlaceHolder = 'من فضلك، اختر نوع شكوى مناسب';
-      });
+    if (title.text.length == 0) {
+      error = 1;
+      titlePlaceholder = 'من فضلك، اختر عنوان مناسب للشكوى';
     } else
-      typePlaceHolder = "حدد نوع الشكوى المناسب";
-    if (selectedTrip == null) {
-      setState(() {
-        error = 1;
-        tripPlaceholder = "من فضلك، اختر رحلة";
-      });
+      titlePlaceholder = "ما هو موضوع الشكوى؟";
+    if (tripRelated && selectedTrip == null) {
+      error = 1;
+      tripPlaceholder = "من فضلك، اختر رحلة";
     } else
       tripPlaceholder = "حدد رحلة من رحلاتك السابقة";
     if (description.text.length == 0) {
-      setState(() {
-        error = 1;
-        descriptionPlaceHolder = "من فضلك، اوصف المشكلة";
-      });
+      error = 1;
+      descriptionPlaceHolder = "من فضلك، اوصف المشكلة";
     } else
       descriptionPlaceHolder = "حد اقصى 250 كملة";
 
@@ -84,17 +77,19 @@ class _WriteAComplainState extends State<WriteAComplain> {
     }
 
     Map<String, dynamic> body = {
-      '_trip': selectedTrip.id,
+      "subject": title.text,
       'text': description.text,
-      "from_passenger": "true"
+      "from_passenger": true
     };
-    ServerResponse result =
-        await Provider.of<ComplainsProvider>(context, listen: false).add(body);
-    return result;
-  }
 
-  void initState() {
-    super.initState();
+    if (tripRelated) {
+      body['_trip'] = selectedTrip.id;
+    }
+
+    ServerResponse result =
+        await Provider.of<ComplainsProvider>(context, listen: false)
+            .add(json.encode(body));
+    return result;
   }
 
   @override
@@ -135,19 +130,89 @@ class _WriteAComplainState extends State<WriteAComplain> {
             FocusScope.of(context).requestFocus(new FocusNode());
           },
           child: ListView(children: [
-            SizedBox(height: height * 0.02),
-            FormGeneral(
-              title: "اختار رحلة:",
-              placeholder: tripPlaceholder,
-              widget: TripsDropDownMenu(changeStateTrip),
+            SizedBox(height: 16),
+            Container(
+                padding: EdgeInsets.only(right: 16, bottom: 8),
+                width: double.infinity,
+                child: Text(
+                  "عنوان الشكوى",
+                  style: Theme.of(context).textTheme.subtitle2,
+                )),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: TextField(
+                enabled: true,
+                maxLength: 250,
+                textInputAction: TextInputAction.newline,
+                keyboardType: TextInputType.multiline,
+                maxLines: null,
+                controller: title,
+                cursorColor: Theme.of(context).primaryColor,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyText1
+                    .copyWith(color: Color(0xff212121)),
+                decoration: InputDecoration(
+                  counterText: "",
+                  // contentPadding: EdgeInsets.all(0),
+                  hintText: titlePlaceholder,
+                  hintStyle: titlePlaceholder.contains("من")
+                      ? Theme.of(context).textTheme.bodyText2.copyWith(
+                            color: Theme.of(context).primaryColor,
+                          )
+                      : Theme.of(context)
+                          .textTheme
+                          .bodyText2
+                          .copyWith(color: Colors.grey),
+                  prefixIcon: Icon(
+                    Icons.format_quote,
+                  ),
+                  border: InputBorder.none,
+                ),
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(context).backgroundColor,
+                border: Border.all(
+                    color: Theme.of(context).secondaryHeaderColor, width: 0.5),
+              ),
             ),
-            SizedBox(height: height * 0.02),
-            FormGeneral(
-              title: "نوع الشكوى:",
-              placeholder: typePlaceHolder,
-              widget: ComplainsTypeDropdown(changeStateComplainType),
-              // widget: Text(""),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  if (!tripRelated)
+                    Padding(
+                      padding: EdgeInsets.only(right: 16, top: 4),
+                      child: GestureDetector(
+                        onTap: () => setState(() {
+                          tripRelated = true;
+                        }),
+                        child: Text(
+                          "الشكوى بخصوص رحلة ما؟",
+                          style: Theme.of(context)
+                              .textTheme
+                              .caption
+                              .copyWith(color: Theme.of(context).primaryColor),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
+            if (tripRelated)
+              Column(
+                children: <Widget>[
+                  SizedBox(height: height * 0.02),
+                  FormGeneral(
+                    title: "اختار رحلة:",
+                    widget: TripsDropDownMenu(
+                        changeStateTrip,
+                        () => setState(() => tripRelated = false),
+                        tripPlaceholder),
+                  ),
+                ],
+              ),
             SizedBox(height: height * 0.02),
             FormInput(
                 title: "اوصف الشكوى",

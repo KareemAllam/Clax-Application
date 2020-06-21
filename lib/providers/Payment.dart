@@ -15,7 +15,8 @@ import 'package:clax/utils/nameAdjustment.dart';
 
 class PaymentProvider extends ChangeNotifier {
   double _balance = 0.0;
-  double discount = 0.0;
+  double discountPercent = 0.0;
+  double discountAmount = 0;
   List<CreditCardModel> _cards = [];
   List<BillModel> _bills = [];
 
@@ -207,10 +208,16 @@ class PaymentProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<BillModel> get bills => _bills;
-  double get balance => _balance;
-  set setDiscount(double value) {
-    discount = value;
+  // Discount
+  void setDiscount(double value, String type) {
+    if (type == "percent")
+      discountPercent = value;
+    else
+      discountAmount += value;
     notifyListeners();
   }
+
+  // Getters
+  List<BillModel> get bills => _bills;
+  double get balance => _balance;
 }

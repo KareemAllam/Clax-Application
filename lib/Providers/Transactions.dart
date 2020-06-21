@@ -12,11 +12,11 @@ import 'package:clax/services/Backend.dart';
 class TransactionsProvider extends ChangeNotifier {
   List<TransactionModel> _transactions = [];
   TransactionsProvider() {
-    initialize();
+    init();
   }
 
   // Import Local Data
-  Future initialize() async {
+  Future init() async {
     // Cheeck if Cache is empty
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     if (_prefs.getString("transactions") != null) {

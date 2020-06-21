@@ -21,7 +21,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBYVM5TSY42NSuEgIq2Ee87hjdkfY40BPU"
+          "current_key": "AIzaSyBeqODuls3YZKSvNuHq2xUTLByCFgORrLI"
         }
       ],
       "services": {
@@ -50,7 +50,36 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBYVM5TSY42NSuEgIq2Ee87hjdkfY40BPU"
+          "current_key": "AIzaSyBkN4KS6PmgIVOwS4p_ceT5SlYqyQ4AsmA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "236411204360-7astlri7cl5ef62o6jg90nned62oo5ku.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:236411204360:android:9f475e6c1c209cd0dc72bd",
+        "android_client_info": {
+          "package_name": "me.clax.egyp.driver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "236411204360-7astlri7cl5ef62o6jg90nned62oo5ku.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBeqODuls3YZKSvNuHq2xUTLByCFgORrLI"
         }
       ],
       "services": {

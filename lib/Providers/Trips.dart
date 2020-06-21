@@ -12,19 +12,18 @@ import 'package:clax/services/Backend.dart';
 class TripsProvider extends ChangeNotifier {
   // Last Trips
   List<Trip> trips = [];
-  List<Trip> favs = [];
 
   // Provider Constructor
   TripsProvider() {
-    initialize();
+    init();
   }
 
   // Async Constructor
-  Future initialize() async {
+  Future init() async {
     // Fetch Data from Cache
     await cacheData();
     // Fetch Data from Server
-    // await serverData();
+    await serverData();
   }
 
   Future cacheData() async {
@@ -42,18 +41,15 @@ class TripsProvider extends ChangeNotifier {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     Response response = await Api.get('passengers/past-trips/');
     if (response.statusCode == 200) {
-      List<Trip> pastTrips = [];
       List _ = json.decode(response.body);
-      if (_ == []) _ = [];
       if (_.length > 0) {
-        _.map((trip) {
-          Trip _trip = Trip.fromJson(trip);
-          pastTrips.add(_trip);
-        }).toList();
+        // Assigning Server Data to Cache
+        List<Trip> pastTrips = [];
+        _.forEach((trip) => pastTrips.add(Trip.fromJson(trip)));
         trips = pastTrips;
         _prefs.setString('pastTrips', json.encode(trips));
-        notifyListeners();
       }
+      notifyListeners();
       return true;
     }
     return false;
@@ -64,6 +60,11 @@ class TripsProvider extends ChangeNotifier {
     if (trips == null) trips = [];
     trips.add(trip);
     _prefs.setString('pastTrips', json.encode(trips));
+    notifyListeners();
+  }
+
+  void favTrip(index) {
+    trips[index].favorite = !trips[index].favorite;
     notifyListeners();
   }
 }

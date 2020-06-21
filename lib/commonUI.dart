@@ -6,6 +6,7 @@ ThemeData appTheme = ThemeData(
   dividerColor: Colors.black12,
   primaryColor: Colors.deepPurple,
   // primaryColor: Colors.deepPurpleAccent[400],
+  // primaryColor: Color(0xfffc143b),
   // primaryColor: Color(0xff6f36ff),
   // primaryColor: Colors.black,
   primaryColorLight: Colors.deepPurple[300],

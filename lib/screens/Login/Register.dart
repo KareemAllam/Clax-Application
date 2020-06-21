@@ -1,7 +1,7 @@
 // Dart & Other Packages
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 // Flutter's Material Components
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +10,8 @@ import 'package:flutter/services.dart';
 import 'package:clax/services/Backend.dart';
 // Providers
 import 'package:clax/providers/Auth.dart';
+// Static Data
+import 'package:clax/governments.dart';
 
 class RegisterForm extends StatefulWidget {
   static const routeName = '/register';
@@ -45,7 +47,8 @@ class _RegisterFormState extends State<RegisterForm> {
   bool _termsChecked = false;
   bool _loading = false;
   Widget _eulaCondition = SizedBox(height: 0);
-
+  List<String> goverments = staticGoverments;
+  String selectedGovernment;
   String password;
   TextEditingController _firstName = TextEditingController();
   FocusNode _firstNameNode = FocusNode();
@@ -60,7 +63,7 @@ class _RegisterFormState extends State<RegisterForm> {
   TextEditingController _confirmPassword = TextEditingController();
   FocusNode _confirmPasswordNode = FocusNode();
 
-  Future<dynamic> register(firebaseToken) async {
+  Future<dynamic> register(String firebaseToken) async {
     // Check For Validation Conditions
     _formKey.currentState.validate();
     bool result = _formKey.currentState.validate();
@@ -95,7 +98,8 @@ class _RegisterFormState extends State<RegisterForm> {
         'phone': _phone.text,
         'mail': _email.text,
         'pass': _password.text,
-        'fireBaseId': firebaseToken
+        'fireBaseId': firebaseToken,
+        'govern': selectedGovernment
       };
       // Disable Register Button
       setState(() {
@@ -630,6 +634,43 @@ class _RegisterFormState extends State<RegisterForm> {
                     labelText: 'تأكيد كلمة المرور',
                   ),
                 ),
+                SizedBox(height: 10),
+
+                Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(
+                        color: Colors.black26,
+                      )),
+                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+                  child: DropdownButton(
+                    underline: SizedBox(),
+                    hint: Row(
+                      children: <Widget>[
+                        Icon(Icons.location_city, color: Colors.grey),
+                        SizedBox(width: 8),
+                        Text("اختار محافظتك",
+                            style: TextStyle(color: Colors.grey))
+                      ],
+                    ),
+                    value: selectedGovernment,
+                    items: goverments
+                        .map((element) => DropdownMenuItem(
+                            value: element,
+                            child: Row(
+                              children: <Widget>[
+                                Icon(Icons.location_city, color: Colors.grey),
+                                SizedBox(width: 8),
+                                Text(element)
+                              ],
+                            )))
+                        .toList(),
+                    onChanged: (_) => setState(() => selectedGovernment = _),
+                    isExpanded: true,
+                  ),
+                ),
+
                 Row(mainAxisSize: MainAxisSize.min, children: [
                   Checkbox(
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -670,6 +711,8 @@ class _RegisterFormState extends State<RegisterForm> {
                             padding: EdgeInsets.only(top: 15),
                           )
                         : RaisedButton(
+                            elevation: 0,
+                            highlightElevation: 0,
                             onPressed: () async {
                               var result = await register(firebaseToken);
                               if (result == 2)

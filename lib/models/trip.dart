@@ -11,6 +11,7 @@ class Trip {
   DateTime startDate;
   double price;
   int rate;
+  bool favorite;
   Trip(
       {this.id,
       this.startDate,
@@ -18,18 +19,20 @@ class Trip {
       this.driver,
       this.price,
       this.lineName,
-      this.rate});
+      this.rate,
+      this.favorite});
 
   Trip.fromJson(Map<String, dynamic> json) {
-    id = json['_d'];
+    id = json['_id'];
     startDate = DateTime.parse(json['start']) ?? DateTime.now();
     lineId = json['lineId'] ?? null;
-    lineName = json['lineName'] ?? null;
+    lineName = json['_line'] ?? null;
     driver = json['driver'] != null
         ? new DriverModel.fromJson(json['driver'])
         : null;
-    price = double.parse(json['price'].toString());
+    price = json['price'].toDouble();
     rate = json['rate'] ?? 0;
+    favorite = json['favorite'] ?? false;
   }
 
   Map<String, dynamic> toJson() {
@@ -42,7 +45,7 @@ class Trip {
       data['driver'] = this.driver.toJson();
     }
     data['price'] = this.price;
-    data['rate'] = this.rate ?? "0";
+    data['rate'] = this.rate ?? 0;
     return data;
   }
 }

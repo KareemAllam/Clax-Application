@@ -1,9 +1,13 @@
-import 'package:clax/models/CurrentDriver.dart';
-import 'package:clax/providers/CurrentTrip.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+// Dart & Other Pacakges
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+// Flutter's Material Components
+import 'package:flutter/material.dart';
+// Models
+import 'package:clax/models/CurrentDriver.dart';
+// Providers
+import 'package:clax/providers/CurrentTrip.dart';
 
 class DriverInfo extends StatefulWidget {
   @override
@@ -16,15 +20,6 @@ class _DriverInfoState extends State<DriverInfo> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _driverInfo = (Provider.of<CurrentTripProvider>(context).currentDriverInfo);
-  }
-
-  ImageProvider<dynamic> image() {
-    // try {
-    //   return NetworkImage(_driverInfo['img']);
-    // } catch (_) {
-    //   return AssetImage('assets/images/404.png');
-    // }
-    return AssetImage('assets/images/404.png');
   }
 
   Widget pieceOfInfo(String title, String subtitle, IconData icon) => Row(
@@ -58,6 +53,34 @@ class _DriverInfoState extends State<DriverInfo> {
           )
         ],
       );
+  Widget colorInfo(String title, String subtitle, IconData icon) => Row(
+        children: <Widget>[
+          Icon(
+            icon,
+            color: Theme.of(context).primaryColor,
+          ),
+          SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                title,
+                style: Theme.of(context)
+                    .textTheme
+                    .caption
+                    .copyWith(color: Colors.grey),
+                strutStyle: StrutStyle(forceStrutHeight: true),
+              ),
+              SizedBox(height: 5),
+              Container(
+                color: Color(int.parse(subtitle)),
+                height: 15,
+                width: 60,
+              )
+            ],
+          )
+        ],
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -86,23 +109,21 @@ class _DriverInfoState extends State<DriverInfo> {
                     color: Theme.of(context).primaryColor, size: 50))
             : Padding(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                 child: Row(children: <Widget>[
-                  Expanded(
-                    child: Image(
-                      image: image(),
-                    ),
-                  ),
+                  Expanded(child: Image.memory(_driverInfo.profilePic)),
                   // SizedBox(width: 20),
                   SizedBox(width: 20),
                   Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.max,
                     children: <Widget>[
                       pieceOfInfo(
                           "الأسم",
                           '${_driverInfo.name.first} ${_driverInfo.name.last}',
                           Icons.person),
-                      SizedBox(height: 10),
+                      SizedBox(height: 16),
                       GestureDetector(
                         onTap: () => launch("tel://${_driverInfo.phone}"),
                         child: pieceOfInfo(
@@ -117,8 +138,8 @@ class _DriverInfoState extends State<DriverInfo> {
                     children: <Widget>[
                       pieceOfInfo("رقم الميكروباص", _driverInfo.car.plateNumber,
                           Icons.directions_bus),
-                      SizedBox(height: 10),
-                      pieceOfInfo("لون المكروباص", _driverInfo.car.color,
+                      SizedBox(height: 16),
+                      colorInfo("لون المكروباص", _driverInfo.car.color,
                           Icons.format_paint)
                     ],
                   )

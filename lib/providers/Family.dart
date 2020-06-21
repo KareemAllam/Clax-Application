@@ -20,6 +20,9 @@ class FamilyProvider extends ChangeNotifier {
   List<FamilyMember> familyRequestsReceived;
 
   FamilyProvider() {
+    init();
+  }
+  init() {
     familyMembers = [];
     familyRequestsReceived = [];
     familyRequestsSent = [];
@@ -66,6 +69,7 @@ class FamilyProvider extends ChangeNotifier {
         familyRequestsSent = _;
       }
     }
+
     notifyListeners();
   }
 
@@ -84,6 +88,7 @@ class FamilyProvider extends ChangeNotifier {
       List _familyMembers = responseParsed['familyMembers'];
       List _receivedRequests = responseParsed['receivedRequests'];
       List _sentRequests = responseParsed['sentRequests'];
+
       // If members isn't empty array
       if (_familyMembers.length > 0) {
         List<FamilyMember> _members = [];
@@ -94,6 +99,7 @@ class FamilyProvider extends ChangeNotifier {
         // Assign response to App Data
         familyMembers = _members;
       }
+
       // If members isn't empty array
       if (_receivedRequests.length > 0) {
         List<FamilyMember> _members = [];
@@ -102,8 +108,9 @@ class FamilyProvider extends ChangeNotifier {
           _members.add(member);
         });
         // Assign response to App Data
-        familyRequestsSent = _members;
+        familyRequestsReceived = _members;
       }
+
       // If members isn't empty array
       if (_sentRequests.length > 0) {
         List<FamilyMember> _members = [];
@@ -112,8 +119,11 @@ class FamilyProvider extends ChangeNotifier {
           _members.add(member);
         });
         // Assign response to App Data
-        familyRequestsReceived = _members;
+        familyRequestsSent = _members;
       }
+      print(familyMembers);
+      print(familyRequestsReceived);
+      print(familyRequestsSent);
       notifyListeners();
       return ServerResponse(status: true);
     }

@@ -45,3 +45,22 @@ Future<Map> getLinePoints(
 // Future routeInformation()async{
 //   distanceMatrixApi.distanceWithLocation(origin, destination)
 // }
+
+Future<Map> getDuration(
+    GoogleMaps.LatLng origin, GoogleMaps.LatLng destination) async {
+  Location originLocation = MapConversions.latlngToLocation(origin);
+  Location destinationLocation = MapConversions.latlngToLocation(destination);
+  DistanceResponse response = await distanceMatrixApi.distanceWithLocation(
+      [originLocation], [destinationLocation],
+      languageCode: "ar");
+  return {
+    "distance": {
+      "text": response.results[0].elements[0].distance.text,
+      "value": response.results[0].elements[0].distance.value
+    },
+    'duration': {
+      "value": response.results[0].elements[0].duration.value,
+      "text": response.results[0].elements[0].duration.text
+    }
+  };
+}

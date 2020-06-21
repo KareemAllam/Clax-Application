@@ -17,12 +17,13 @@ class CurrentTrip {
   // Trip Info
   int seats;
   double finalCost;
+  bool onlinePayment;
   // Request Info
   DateTime startDate;
   String requestId;
 
   CurrentTrip(this.lindId, this.lineName, this.start, this.end,
-      this.pickupCoords, this.seats, this.finalCost,
+      this.pickupCoords, this.seats, this.finalCost, this.onlinePayment,
       {this.requestId, this.startDate});
 
   CurrentTrip.fromJson(Map<String, dynamic> json) {
@@ -41,6 +42,7 @@ class CurrentTrip {
     // Not Required
     if (json['startDate'] != null)
       startDate = DateTime.parse(json['startDate']);
+    onlinePayment = json['onlinePayment'];
   }
 
   Map<String, dynamic> toJson() {
@@ -49,13 +51,14 @@ class CurrentTrip {
     data['lineId'] = this.lindId;
     data['lineName'] = this.lineName;
     // Coordinates
-    data['start'] = this.start.toJson();
     data['end'] = this.end.toJson();
+    data['start'] = this.start.toJson();
     data['pickupCoords'] = this.pickupCoords.toJson();
     // Trip Info
-    data['requestId'] = this.requestId;
     data['seats'] = this.seats.toString();
     data['finalCost'] = this.finalCost.toString();
+    data['requestId'] = this.requestId;
+    data['onlinePayment'] = onlinePayment;
     // Not Required
     if (this.startDate != null) data['startDate'] = this.startDate.toString();
     return data;

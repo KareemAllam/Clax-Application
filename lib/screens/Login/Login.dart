@@ -1,4 +1,11 @@
 // Dart & Other Packages
+import 'package:clax/providers/Complains.dart';
+import 'package:clax/providers/CurrentTrip.dart';
+import 'package:clax/providers/Family.dart';
+import 'package:clax/providers/Payment.dart';
+import 'package:clax/providers/Profile.dart';
+import 'package:clax/providers/Transactions.dart';
+import 'package:clax/providers/Trips.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -61,7 +68,19 @@ class LoginState extends State<Login> {
         //  Update Cache with id
         Provider.of<AuthProvider>(context, listen: false)
             .logIn(response.headers['x-login-token']);
-        Navigator.of(context).pushReplacementNamed(Clax.routeName);
+        if (Provider.of<ProfilesProvider>(context, listen: false)
+                .profile
+                .name ==
+            null) {
+          Provider.of<ProfilesProvider>(context, listen: false).init();
+          Provider.of<CurrentTripProvider>(context, listen: false).init();
+          Provider.of<PaymentProvider>(context, listen: false).init();
+          Provider.of<FamilyProvider>(context, listen: false).init();
+          Provider.of<TransactionsProvider>(context, listen: false).init();
+          Provider.of<TripsProvider>(context, listen: false).init();
+          Provider.of<ComplainsProvider>(context, listen: false).init();
+          Navigator.of(context).pushReplacementNamed(Clax.routeName);
+        }
         setState(() {
           _loading = false;
         });
@@ -302,8 +321,10 @@ class LoginState extends State<Login> {
                                       ),
                                     ),
                                     GestureDetector(
-                                      onTap: () => Navigator.of(context)
-                                          .pushNamed(ForgetPass.routeName),
+                                      onTap: () {
+                                        Navigator.of(context)
+                                            .pushNamed(ForgetPass.routeName);
+                                      },
                                       child: Text('لا تستطيع الوصول لحسابك؟',
                                           style: TextStyle(
                                             color: theme.primaryColor,

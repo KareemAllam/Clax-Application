@@ -15,12 +15,17 @@ class SeatsAndConfirm extends StatefulWidget {
 class _SeatsAndConfirmState extends State<SeatsAndConfirm> {
   int _seatsCount = 1;
   double balance;
+  double discountPercent;
+  double discountAmount;
   double finalPrice;
+  bool onlinePayment = true;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     balance = Provider.of<PaymentProvider>(context).balance;
+    discountAmount = Provider.of<PaymentProvider>(context).discountAmount;
+    discountPercent = Provider.of<PaymentProvider>(context).discountPercent;
   }
 
   void areYouSure() {
@@ -40,7 +45,7 @@ class _SeatsAndConfirmState extends State<SeatsAndConfirm> {
       onPressed: () async {
         // Start Searching for Driver
         // Pass Data to Parent Widget
-        widget.startSearchingForDriver(_seatsCount, finalPrice);
+        widget.startSearchingForDriver(_seatsCount, finalPrice, onlinePayment);
         // Dismiss the Alert Dialoge Box
         Navigator.of(context).pop();
       },
@@ -97,7 +102,12 @@ class _SeatsAndConfirmState extends State<SeatsAndConfirm> {
 
   @override
   Widget build(BuildContext context) {
-    finalPrice = ((_seatsCount) * widget.pricePerSeat).toDouble();
+    double tripPrice = ((_seatsCount) * widget.pricePerSeat).toDouble();
+    double discount = 0;
+    if (discountAmount != 0) discount = (tripPrice - discountAmount);
+    if (discountPercent != 0) discount *= discountPercent;
+    if (discount != 0) discount = double.parse(discount.toStringAsFixed(2));
+    finalPrice = tripPrice - discount;
     bool canPay =
         (balance - ((_seatsCount + 1) * widget.pricePerSeat).toDouble()) >= 0 &&
             _seatsCount <= 2;
@@ -116,9 +126,16 @@ class _SeatsAndConfirmState extends State<SeatsAndConfirm> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text(
-                  "عدد الكراسي:",
-                  style: Theme.of(context).textTheme.subtitle2,
+                Row(
+                  children: <Widget>[
+                    Icon(Icons.event_seat,
+                        color: Theme.of(context).primaryColor),
+                    SizedBox(width: 24),
+                    Text(
+                      "عدد الكراسي",
+                      style: Theme.of(context).textTheme.subtitle2,
+                    ),
+                  ],
                 ),
                 Row(children: <Widget>[
                   IconButton(
@@ -127,7 +144,9 @@ class _SeatsAndConfirmState extends State<SeatsAndConfirm> {
                       padding: EdgeInsets.all(0),
                       icon: Icon(
                         Icons.add_box,
-                        color: canPay ? Colors.green : Colors.grey,
+                        color: canPay
+                            ? Theme.of(context).accentColor
+                            : Colors.grey[350],
                       ),
                       onPressed: () {
                         if (_seatsCount != 3 && canPay)
@@ -146,7 +165,7 @@ class _SeatsAndConfirmState extends State<SeatsAndConfirm> {
                       padding: EdgeInsets.all(0),
                       icon: Icon(
                         Icons.indeterminate_check_box,
-                        color: _seatsCount > 1 ? Colors.red : Colors.grey,
+                        color: _seatsCount > 1 ? Colors.red : Colors.grey[350],
                       ),
                       onPressed: () {
                         if (_seatsCount != 1)
@@ -158,22 +177,97 @@ class _SeatsAndConfirmState extends State<SeatsAndConfirm> {
               ],
             ),
           ),
+          SizedBox(height: 8),
+          Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+              ),
+              padding: EdgeInsets.only(left: 8),
+              child: Column(
+                children: <Widget>[
+                  RadioListTile<bool>(
+                    activeColor: Theme.of(context).primaryColor,
+                    secondary: Icon(Icons.credit_card,
+                        color: onlinePayment
+                            ? Theme.of(context).primaryColor
+                            : Colors.grey[350]),
+                    title: Text(
+                      "ادفع اونلاين",
+                      style: Theme.of(context).textTheme.subtitle2,
+                    ),
+                    value: true,
+                    groupValue: onlinePayment,
+                    onChanged: (bool value) {
+                      setState(() {
+                        onlinePayment = value;
+                      });
+                    },
+                  ),
+                  Divider(height: 1),
+                  RadioListTile<bool>(
+                    activeColor: Theme.of(context).primaryColor,
+                    secondary: Icon(Icons.monetization_on,
+                        color: !onlinePayment
+                            ? Theme.of(context).primaryColor
+                            : Colors.grey[350]),
+                    title: Text(
+                      'ادفع كاش',
+                      style: Theme.of(context).textTheme.subtitle2,
+                    ),
+                    value: false,
+                    groupValue: onlinePayment,
+                    onChanged: (bool value) {
+                      setState(() {
+                        onlinePayment = value;
+                      });
+                    },
+                  ),
+                ],
+              )),
           Spacer(),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             color: Colors.white,
             child: Column(
               children: <Widget>[
+                if (discount != 0)
+                  Row(
+                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        "سعر الرحلة:",
+                        style: textTheme.subtitle2.copyWith(color: Colors.grey),
+                      ),
+                      Spacer(),
+                      Text(
+                        '$tripPrice جنية',
+                        style: textTheme.subtitle2.copyWith(
+                            color: Colors.black54, fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  ),
+                if (discount != 0)
+                  Row(
+                    children: <Widget>[
+                      Text("مقدار الخصم:",
+                          style:
+                              textTheme.subtitle2.copyWith(color: Colors.grey)),
+                      Spacer(),
+                      Text(
+                        '$discount جنية',
+                        style: textTheme.subtitle2.copyWith(
+                            color: Colors.black54, fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  ),
                 Row(
-                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text(
-                      "هتدفع اجمالي:",
-                      style: textTheme.subtitle2.copyWith(color: Colors.grey),
-                    ),
+                    Text("اجمالي الرحلة:",
+                        style:
+                            textTheme.subtitle2.copyWith(color: Colors.grey)),
                     Spacer(),
                     Text(
-                      '- ${(_seatsCount * widget.pricePerSeat).toDouble()} جنية',
+                      '$finalPrice جنية',
                       style: textTheme.subtitle2.copyWith(
                           color: Colors.red, fontWeight: FontWeight.bold),
                     )
@@ -205,7 +299,7 @@ class _SeatsAndConfirmState extends State<SeatsAndConfirm> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Icon(Icons.search, color: Theme.of(context).accentColor),
-                    SizedBox(width: 5),
+                    SizedBox(width: 8),
                     Text(
                       "ابحث عن سائق",
                       style: textTheme.subtitle2.copyWith(color: Colors.white),

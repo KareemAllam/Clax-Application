@@ -15,7 +15,7 @@ List<LineModel> getStaticData() {
 
 List<LineModel> kiroMap() {
   LineModel line1 = LineModel(
-    id: "5e7164c94b168835e419a6d7",
+    id: "5e716d485797b82358227805",
     cost: 3.5,
     from: "طنطا",
     to: "سمنود",

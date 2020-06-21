@@ -61,20 +61,21 @@ class _RateTripState extends State<RateTrip> {
     Trip _trip = Trip(
         driver: DriverModel(
             carInfo: driverInfo.car,
-            img: driverInfo.img,
+            profilePic: driverInfo.profilePic,
             name: driverInfo.name,
             phone: driverInfo.phone),
         id: Random(2).toString(),
         lineId: tripInfo.lindId,
         price: tripInfo.finalCost,
         startDate: tripInfo.startDate,
-        rate: userSubmitted ? driverRate * 10 : 30);
+        rate: userSubmitted ? driverRate * 1 : 3);
 
     await Provider.of<TripsProvider>(context, listen: false).addTrip(_trip);
 
     // Adjusting Payment Balance
-    Provider.of<PaymentProvider>(context, listen: false).setBalance =
-        -tripInfo.finalCost;
+    if (tripInfo.onlinePayment)
+      Provider.of<PaymentProvider>(context, listen: false).setBalance =
+          -tripInfo.finalCost;
 
     // Clear Trip State
     await Provider.of<CurrentTripProvider>(context, listen: false)

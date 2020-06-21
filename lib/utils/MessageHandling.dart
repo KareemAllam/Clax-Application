@@ -25,7 +25,7 @@ class NotificationHandler {
         offer(message['data']['discount']);
         break;
       default:
-        defaultAction(message);
+        // defaultAction(message);
         break;
       // Default FCM Action
     }
@@ -33,16 +33,49 @@ class NotificationHandler {
 
   void defaultAction(message) {
     // Parse Notification Data
-    print(message);
+    // print(message);
     String title = message["notification"]['title'];
     String body = message["notification"]['body'];
     String data = '';
     Map<String, dynamic> _ = Map<String, dynamic>.from(message['data']);
-    List<Widget> attrbs = [];
-    _.forEach((key, value) => attrbs.add(Text(
-          '$key: $value',
-          style: Theme.of(context).textTheme.caption,
-        )));
+    List<String> keys = [];
+    List<dynamic> vals = [];
+    Widget table;
+
+    _.forEach((key, value) {
+      keys.add(key);
+      vals.add(value);
+    });
+    table = Row(children: <Widget>[
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: keys
+            .map(
+              (e) => Text(
+                e,
+                style: Theme.of(context)
+                    .textTheme
+                    .caption
+                    .copyWith(color: Colors.grey),
+              ),
+            )
+            .toList(),
+      ),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: vals
+            .map(
+              (e) => Text(
+                e,
+                style: Theme.of(context)
+                    .textTheme
+                    .caption
+                    .copyWith(color: Colors.grey),
+              ),
+            )
+            .toList(),
+      )
+    ]);
     // set up the AlertDialog
     showDialog(
         context: context,
@@ -71,7 +104,7 @@ class NotificationHandler {
                         Text(
                           data,
                         ),
-                        Column(children: attrbs)
+                        table
                       ],
                     )
                   ],
@@ -103,7 +136,12 @@ class NotificationHandler {
   // }
 
   void offer(dynamic discount) {
-    double offerDiscount = double.parse(discount.toString());
-    Provider.of<PaymentProvider>(context).setDiscount = offerDiscount;
+    double offerDiscount = double.parse(discount['value'].toString());
+    String type;
+    if (discount['type'] == ['percent'])
+      type = 'percent';
+    else
+      type = 'amount';
+    Provider.of<PaymentProvider>(context).setDiscount(offerDiscount, type);
   }
 }
