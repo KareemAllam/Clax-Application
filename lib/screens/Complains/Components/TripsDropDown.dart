@@ -87,7 +87,7 @@ class TripsDropDownMenuState extends State<TripsDropDownMenu> {
                               Text(
                                   intl.DateFormat('EEE')
                                       .add_jm()
-                                      .format(trip.startDate),
+                                      .format(trip.date),
                                   strutStyle:
                                       StrutStyle(forceStrutHeight: true),
                                   style: Theme.of(context)
@@ -126,7 +126,7 @@ class TripsDropDownMenuState extends State<TripsDropDownMenu> {
                                     Text(
                                         intl.DateFormat('EEE')
                                             .add_jm()
-                                            .format(trip.startDate),
+                                            .format(trip.date),
                                         strutStyle:
                                             StrutStyle(forceStrutHeight: true),
                                         style: Theme.of(context)

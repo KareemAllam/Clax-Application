@@ -89,6 +89,7 @@ class _WriteAComplainState extends State<WriteAComplain> {
     ServerResponse result =
         await Provider.of<ComplainsProvider>(context, listen: false)
             .add(json.encode(body));
+
     return result;
   }
 
@@ -220,7 +221,10 @@ class _WriteAComplainState extends State<WriteAComplain> {
                 description: description),
             LoadingButton(
               label: "قدم شكوى",
-              handleTap: submitForm,
+              handleTap: () async {
+                ServerResponse result = await submitForm();
+                if (result.status) Navigator.of(context).pop();
+              },
             ),
           ]),
         ));

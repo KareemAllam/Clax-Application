@@ -29,9 +29,16 @@ class MemberCard extends StatelessWidget {
             ServerResponse result =
                 await Provider.of<FamilyProvider>(context, listen: false)
                     .removeMember(member.id);
-            if (result.status == false)
-              Scaffold.of(context)
-                  .showSnackBar(SnackBar(content: Text(result.message)));
+            Scaffold.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: result.status ? Colors.green : Colors.red,
+                content: Text(result.message,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyText2
+                        .copyWith(color: Colors.white)),
+              ),
+            );
             Navigator.pop(context);
           });
 

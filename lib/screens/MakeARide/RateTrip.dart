@@ -1,13 +1,11 @@
 // Dart & Other Pacakges
 import 'dart:math';
-import 'package:clax/models/CurrentDriver.dart';
 import 'package:provider/provider.dart';
 // Flutter Material Components
 import 'package:flutter/material.dart';
 // Models
 import 'package:clax/models/Trip.dart';
 import 'package:clax/models/Bill.dart';
-import 'package:clax/models/Driver.dart';
 import 'package:clax/models/CurrentTrip.dart';
 // Providers
 import 'package:clax/providers/Trips.dart';
@@ -45,10 +43,6 @@ class _RateTripState extends State<RateTrip> {
         Provider.of<CurrentTripProvider>(context, listen: false)
             .currentTripInfo;
 
-    CurrentDriver driverInfo =
-        Provider.of<CurrentTripProvider>(context, listen: false)
-            .currentDriverInfo;
-
     // Adjusting Payment History
     BillModel bill = BillModel(
         amount: tripInfo.finalCost,
@@ -59,15 +53,10 @@ class _RateTripState extends State<RateTrip> {
 
     // Adjusting Trips History
     Trip _trip = Trip(
-        driver: DriverModel(
-            carInfo: driverInfo.car,
-            profilePic: driverInfo.profilePic,
-            name: driverInfo.name,
-            phone: driverInfo.phone),
         id: Random(2).toString(),
-        lineId: tripInfo.lindId,
-        price: tripInfo.finalCost,
-        startDate: tripInfo.startDate,
+        lineName: tripInfo.lindId,
+        cost: tripInfo.finalCost,
+        date: tripInfo.startDate,
         rate: userSubmitted ? driverRate * 1 : 3);
 
     await Provider.of<TripsProvider>(context, listen: false).addTrip(_trip);

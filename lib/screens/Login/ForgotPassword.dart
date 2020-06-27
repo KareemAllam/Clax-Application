@@ -143,19 +143,28 @@ class _ForgetPassState extends State<ForgetPass> {
                             },
                             decoration: InputDecoration(
                               filled: true,
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Theme.of(context).primaryColor,
+                                      width: 1.2),
+                                  borderRadius: BorderRadius.circular(30)),
                               floatingLabelBehavior:
                                   FloatingLabelBehavior.never,
                               contentPadding: EdgeInsets.symmetric(
                                   horizontal: 15, vertical: 0),
-                              border: OutlineInputBorder(
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.black26),
+                                  borderRadius: BorderRadius.circular(30)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Theme.of(context).primaryColor,
+                                      width: 1.2),
                                   borderRadius: BorderRadius.circular(30)),
                               fillColor: Colors.white,
                               prefixIcon: Icon(
                                 Icons.person_outline,
                               ),
-                              labelStyle: Theme.of(context)
-                                  .textTheme
-                                  .bodyText1
+                              labelStyle: theme.textTheme.bodyText1
                                   .copyWith(color: Colors.grey),
                               labelText: 'رقم الهاتف / البريد الالكتروني',
                             ),

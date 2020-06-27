@@ -121,13 +121,11 @@ class FamilyProvider extends ChangeNotifier {
         // Assign response to App Data
         familyRequestsSent = _members;
       }
-      print(familyMembers);
-      print(familyRequestsReceived);
-      print(familyRequestsSent);
       notifyListeners();
       return ServerResponse(status: true);
     }
-    return ServerResponse(status: false, message: "تعذر الوصول للخادم");
+    return ServerResponse(
+        status: false, message: "تأكد من اتصالك بالانترنت و حاول مرة اخرى");
   }
 
   /// Add a member request.
@@ -226,22 +224,28 @@ class FamilyProvider extends ChangeNotifier {
 
   /// Remove a member from your family.
   Future<ServerResponse> removeMember(String id) async {
-    Response result =
-        await Api.put('passengers/family/delete', reqBody: {'_id': id});
+    String memberName =
+        (familyMembers.where((element) => element.id == id).toList())[0]
+            .name
+            .toString();
+    Map<String, dynamic> body = {'_id': id};
+    Response result = await Api.put('passengers/family/delete', reqBody: body);
     if (result.statusCode == 200) {
       familyMembers =
           familyMembers.where((element) => element.id != id).toList();
       notifyListeners();
-      return ServerResponse(status: true);
+      return ServerResponse(
+          status: true, message: "تم ازالة $memberName من اسرتك");
     } else if (result.statusCode == 408)
-      return ServerResponse(status: false, message: "تعذر الوصول للخادم");
+      return ServerResponse(
+          status: false, message: "تأكد من اتصالك بالانترنت و حاول مرة اخرى");
     else {
       // remove it from sent requests
       familyMembers =
           familyMembers.where((element) => element.id != id).toList();
       notifyListeners();
       return ServerResponse(
-          status: false, message: "هذا الشخص لما يعد في اسرتك");
+          status: false, message: "$memberName لما يعد في اسرتك");
     }
   }
 }

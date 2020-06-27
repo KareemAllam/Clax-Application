@@ -2,8 +2,6 @@
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
-// Models
-import 'package:clax/models/Error.dart';
 
 class LoadingButton extends StatefulWidget {
   final String label;
@@ -33,21 +31,10 @@ class _LoadingButtonState extends State<LoadingButton> {
                   setState(() {
                     sending = true;
                   });
-                  ServerResponse result = await widget.handleTap();
-                  if (result.status)
-                    Navigator.pop(context);
-                  else {
-                    setState(() {
-                      sending = false;
-                    });
-                    if (result.message != "")
-                      Scaffold.of(context).showSnackBar(SnackBar(
-                          content: Text(result.message,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .caption
-                                  .copyWith(color: Colors.white))));
-                  }
+                  await widget.handleTap();
+                  setState(() {
+                    sending = false;
+                  });
                 },
                 color: Theme.of(context).primaryColor,
                 child: Text(

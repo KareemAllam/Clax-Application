@@ -1,12 +1,13 @@
 // Dart & Other Pacakges
 import 'dart:convert';
-import 'package:clax/models/Error.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // Flutter Foundation
 import 'package:flutter/foundation.dart';
 // Models
 import 'package:clax/models/Bill.dart';
+import 'package:clax/models/Error.dart';
+import 'package:clax/models/Offer.dart';
 import 'package:clax/models/CreditCard.dart';
 // Services
 import 'package:clax/services/Backend.dart';
@@ -19,7 +20,7 @@ class PaymentProvider extends ChangeNotifier {
   double discountAmount = 0;
   List<CreditCardModel> _cards = [];
   List<BillModel> _bills = [];
-
+  List<Offer> offers = [];
   PaymentProvider() {
     init();
   }
@@ -44,6 +45,20 @@ class PaymentProvider extends ChangeNotifier {
               .decode(prefs.getString('bills'))
               .map((bill) => BillModel.fromJson(bill))).toList() ??
           [];
+    }
+
+    if (prefs.getString('offers') != null) {
+      offers = List<Offer>.from(json.decode(prefs.getString('offers')).map(
+            (offer) => Offer.fromJson(offer),
+          ));
+      bool offerRemoved = false;
+      offers.forEach((offer) {
+        if (offer.end.isBefore(DateTime.now())) {
+          offers.remove(offer);
+          offerRemoved = true;
+        }
+      });
+      if (offerRemoved) prefs.setString("offers", json.encode(offers));
     }
 
     notifyListeners();
@@ -208,7 +223,48 @@ class PaymentProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Discount
+  // add a Promo Code
+  Future<ServerResponse> addOffer(String code) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Response response =
+        await Api.post('passengers/settings/claim-offer', {'code': code});
+    if (response.statusCode == 200) {
+      Offer _offer = Offer.fromJson(
+        json.decode(response.body),
+      );
+      offers.add(_offer);
+      if (_offer.offerType == "Discount")
+        discountPercent *= _offer.value;
+      else
+        discountAmount += _offer.value;
+      prefs.setString('offers', json.encode(offers));
+      notifyListeners();
+      return ServerResponse(status: true);
+    } else if (response.statusCode == 408)
+      return ServerResponse(
+          status: false, message: "تأكد من اتصالك بالانترنت و حاول مره اخرى");
+    else
+      return ServerResponse(status: false, message: "انت مشترك بالعرض بالفعل");
+  }
+
+  // Get Current Offers
+  Future<ServerResponse> fetchOffers() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Response response = await Api.get('passengers/settings/get-offers');
+    if (response.statusCode == 200) {
+      offers = List<Offer>.from(json.decode(response.body).map(
+            (offer) => Offer.fromJson(offer),
+          ));
+      prefs.setString('offers', json.encode(offers));
+
+      notifyListeners();
+      return ServerResponse(status: true);
+    } else
+      return ServerResponse(
+          status: false, message: "تأكد من اتصالك بالانترنت و حاول مره اخرى");
+  }
+
+  // Manual Discount Setting
   void setDiscount(double value, String type) {
     if (type == "percent")
       discountPercent = value;

@@ -74,10 +74,10 @@ class _CurrentFamilyMembersState extends State<CurrentFamilyMembers> {
         }
       },
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Row(children: <Widget>[
           Icon(Icons.add_circle, color: Colors.green),
-          SizedBox(width: 20),
+          SizedBox(width: 16),
           Text("اضف فرد جديدة لعائلتك",
               style: Theme.of(context)
                   .textTheme

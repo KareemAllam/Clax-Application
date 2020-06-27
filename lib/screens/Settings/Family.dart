@@ -1,4 +1,5 @@
 // Flutter's Material Components
+import 'package:clax/models/Error.dart';
 import 'package:clax/providers/Family.dart';
 import 'package:flutter/material.dart';
 // Components
@@ -22,23 +23,39 @@ class _MembersState extends State<Members> {
       child: Scaffold(
           appBar: AppBar(
             actions: <Widget>[
-              IconButton(
-                  icon: loading
-                      ? SpinKitCircle(color: Colors.white, size: 25)
-                      : Icon(Icons.refresh),
-                  onPressed: loading
-                      ? () {}
-                      : () async {
-                          setState(() {
-                            loading = true;
-                          });
-                          await Provider.of<FamilyProvider>(context,
-                                  listen: false)
-                              .serverData();
-                          setState(() {
-                            loading = false;
-                          });
-                        })
+              Builder(
+                builder: (context) => IconButton(
+                    icon: loading
+                        ? SpinKitCircle(color: Colors.white, size: 25)
+                        : Icon(Icons.refresh),
+                    onPressed: loading
+                        ? () {}
+                        : () async {
+                            setState(() {
+                              loading = true;
+                            });
+                            ServerResponse result =
+                                await Provider.of<FamilyProvider>(context,
+                                        listen: false)
+                                    .serverData();
+                            if (!result.status)
+                              Scaffold.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: Colors.red,
+                                  content: Text(
+                                    result.message,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText2
+                                        .copyWith(color: Colors.white),
+                                  ),
+                                ),
+                              );
+                            setState(() {
+                              loading = false;
+                            });
+                          }),
+              )
             ],
             title: Text(
               "العائلة",

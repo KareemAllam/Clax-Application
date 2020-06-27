@@ -4,7 +4,6 @@ import 'package:intl/intl.dart' as intl;
 import 'package:flutter/material.dart';
 // Models
 import 'package:clax/models/Complain.dart';
-import 'package:clax/models/Trip.dart';
 
 class ComplainDetails extends StatefulWidget {
   static const routeName = '/complaints/complaintsHistory/complaintDetails';
@@ -19,7 +18,6 @@ class _ComplainDetailsState extends State<ComplainDetails> {
     Map<String, dynamic> args =
         Map<String, dynamic>.from(ModalRoute.of(context).settings.arguments);
     ComplainModel complain = args['complain'];
-    Trip trip = args['trip'];
     Widget widget;
     if (complain.status != "pending")
       widget = Container(
@@ -83,9 +81,6 @@ class _ComplainDetailsState extends State<ComplainDetails> {
                 boxShadow: [
                   BoxShadow(spreadRadius: 0.1, color: Colors.black54)
                 ],
-                // borderRadius: BorderRadius.only(
-                //     bottomLeft: Radius.circular(20),
-                //     bottomRight: Radius.circular(20))
               ),
               padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
               child:
@@ -100,7 +95,7 @@ class _ComplainDetailsState extends State<ComplainDetails> {
                           constraints: BoxConstraints(maxWidth: 30),
                           child: Icon(Icons.error_outline,
                               color: Theme.of(context).primaryColor)),
-                      SizedBox(width: 10),
+                      SizedBox(width: 16),
                       Text('${complain.subject}',
                           strutStyle: StrutStyle(forceStrutHeight: true),
                           style: Theme.of(context).textTheme.subtitle2.copyWith(
@@ -116,7 +111,7 @@ class _ComplainDetailsState extends State<ComplainDetails> {
                           child: Icon(Icons.calendar_today,
                               color: Theme.of(context).primaryColor),
                         ),
-                        SizedBox(width: 10),
+                        SizedBox(width: 16),
                         Text(
                             intl.DateFormat('EEE M/d h:mm a')
                                 .format(complain.date),
@@ -133,78 +128,31 @@ class _ComplainDetailsState extends State<ComplainDetails> {
                       height: 10,
                     ),
                     Row(children: <Widget>[
-                      Row(children: <Widget>[
-                        ConstrainedBox(
-                          constraints: BoxConstraints(maxWidth: 30),
-                          child: Icon(Icons.confirmation_number,
-                              color: Theme.of(context).primaryColor),
-                        ),
-                        SizedBox(width: 10),
-                        if (trip != null)
-                          Text(trip.price.toString() ?? 2,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .subtitle2
-                                  .copyWith(fontFamily: "Product Sans")),
-                        Text(" جنية مصرى",
-                            strutStyle: StrutStyle(forceStrutHeight: true),
-                            style: Theme.of(context).textTheme.subtitle2)
-                      ]),
-                      Spacer(),
-                      Row(children: <Widget>[
-                        Icon(Icons.report_problem,
-                            color: Theme.of(context).primaryColor),
-                        SizedBox(width: 5),
-                        Text(
-                          complain.code.toString().substring(0, 5),
-                          strutStyle: StrutStyle(forceStrutHeight: true),
-                          style: Theme.of(context).textTheme.subtitle2.copyWith(
-                              fontFamily: "Product Sans", color: Colors.grey),
-                        )
-                      ]),
-                      Spacer(),
+                      Icon(Icons.report_problem,
+                          color: Theme.of(context).primaryColor),
+                      SizedBox(width: 16),
+                      Text(
+                        complain.code.toString().substring(0, 5),
+                        strutStyle: StrutStyle(forceStrutHeight: true),
+                        style: Theme.of(context).textTheme.subtitle2.copyWith(
+                            fontFamily: "Product Sans", color: Colors.grey),
+                      )
                     ]),
                   ]),
                 ),
                 Expanded(
                     flex: 2,
                     child: Container(
-                      // decoration: BoxDecoration(
-                      //   border: Border(
-                      //     right: BorderSide(
-                      //       color: Colors.black26,
-                      //     ),
-                      //   ),
-                      // ),
                       child: CircleAvatar(
-                          maxRadius: 45.0,
-                          backgroundColor: Colors.transparent,
-                          child: FadeInImage(
-                            placeholder: AssetImage('assets/images/404.png'),
-                            image: trip == null
-                                ? AssetImage('assets/images/404.png')
-                                : trip.driver != null
-                                    ? Image.memory(trip.driver.profilePic)
-                                    : AssetImage('assets/images/404.png'),
-                          )),
-                    )
-                    // child: Column(
-                    //     crossAxisAlignment: CrossAxisAlignment.end,
-                    //     mainAxisSize: MainAxisSize.min,
-                    //     mainAxisAlignment: MainAxisAlignment.start,
-                    //     children: [
-                    //       CircleAvatar(
-                    //         maxRadius: 45.0,
-                    //         backgroundColor: Colors.transparent,
-                    //         child: FadeInImage(
-                    //             placeholder: AssetImage('assets/images/logo.png'),
-                    //             image: NetworkImage(complain.image)),
-                    //       ),
-                    // Text(complain.trip.driver.name == ""
-                    //     ? "غير معلوم"
-                    //     : complain.trip.driver.name)
-                    // ]),
-                    ),
+                        maxRadius: 45.0,
+                        backgroundColor: Colors.transparent,
+                        child: complain.profilePic != null
+                            ? Image.memory(complain.profilePic)
+                            : Image.asset(
+                                'assets/images/404.png',
+                              ),
+                      ),
+                    )),
               ]),
             ),
           ),
@@ -219,8 +167,8 @@ class _ComplainDetailsState extends State<ComplainDetails> {
                       topRight: Radius.circular(20),
                       bottomRight: Radius.circular(20))),
               // height: height * 0.5,
-              margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              margin: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               width: double.infinity,
               child: Text(
                 complain.text,

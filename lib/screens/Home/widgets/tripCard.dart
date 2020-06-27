@@ -1,8 +1,10 @@
-import 'package:clax/models/Trip.dart';
-import 'package:clax/providers/Trips.dart';
-import 'package:flutter/material.dart';
+// Dart & Other Packages
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart' as special;
-import 'package:provider/provider.dart';
+// Models
+import 'package:clax/models/Trip.dart';
+// Flutter's Material Components
+import 'package:flutter/material.dart';
 
 class TripCard extends StatelessWidget {
   static const routeName = '/trip_card';
@@ -37,73 +39,75 @@ class TripCard extends StatelessWidget {
     return Column(children: [
       Container(
         color: Colors.white,
-        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Container(
-              width: 20,
-              height: MediaQuery.of(context).size.height * 0.08,
-              child: GestureDetector(
-                  onTap: () {
-                    Provider.of<TripsProvider>(context, listen: false)
-                        .favTrip(index);
-                  },
-                  child: trip.favorite
-                      ? Icon(
-                          Icons.star,
-                          size: 25,
-                          color: Theme.of(context).accentColor,
-                        )
-                      : Icon(Icons.star_border)),
-            ),
-            SizedBox(width: 15),
-            Expanded(
-              flex: 7,
-              child: Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      " ${trip.lineName}",
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyText2
-                          .copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      special.DateFormat('EEE, M/d').add_jm().format(
-                            trip.startDate,
-                          ),
-                      style: Theme.of(context)
-                          .textTheme
-                          .caption
-                          .copyWith(color: Colors.grey),
-                      textDirection: TextDirection.ltr,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Expanded(
+            Flexible(
               flex: 2,
-              child: Container(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Text(
-                      '${trip.price} جنيه',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyText2
-                          .copyWith(color: Colors.grey),
+              child: Row(
+                children: <Widget>[
+                  Container(
+                    width: 24.0,
+                    child: Icon(
+                      FontAwesomeIcons.route,
+                      size: 20.0,
+                      color: Theme.of(context).primaryColor,
                     ),
-                  ],
-                ),
+                  ),
+                  SizedBox(width: 15),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        " ${trip.lineName}",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText2
+                            .copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        special.DateFormat('EEE, M/d').add_jm().format(
+                              trip.date,
+                            ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .caption
+                            .copyWith(color: Colors.grey),
+                        textDirection: TextDirection.ltr,
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            SizedBox(width: 20),
+            Flexible(
+              child: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                Icon(Icons.event_seat, color: Colors.grey[350], size: 20),
+                SizedBox(width: 8),
+                Text('${trip.seats}', style: TextStyle(color: Colors.grey)),
+              ]),
+            ),
+            Flexible(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(Icons.confirmation_number,
+                      color: Colors.grey[350], size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    '${trip.cost}',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyText2
+                        .copyWith(color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
             Icon(
               rateIcon(),
               color: Colors.redAccent,

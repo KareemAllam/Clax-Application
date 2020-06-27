@@ -90,26 +90,18 @@ class _ComplaintsHistoryState extends State<ComplaintsHistory> {
               physics: AlwaysScrollableScrollPhysics(
                   parent: BouncingScrollPhysics()),
               itemBuilder: (context, index) {
-                Trip trip = complains[index].tripId != ""
-                    ? trips
-                        .where(
-                            (element) => element.id == complains[index].tripId)
-                        .toList()[0]
-                    : null;
                 return FlatButton(
                   color: Colors.white,
                   textTheme: ButtonTextTheme.primary,
                   padding: EdgeInsets.all(0),
                   onPressed: () {
-                    Navigator.of(context).pushNamed(ComplainDetails.routeName,
-                        arguments: {
-                          'complain': complains[index],
-                          "trip": trip
-                        });
+                    Navigator.of(context)
+                        .pushNamed(ComplainDetails.routeName, arguments: {
+                      'complain': complains[index],
+                    });
                   },
                   child: ComplainHistoryCard(
                     complain: complains[index],
-                    trip: trip,
                   ),
                 );
               },

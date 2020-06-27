@@ -47,12 +47,12 @@ class _FavTripCardState extends State<FavTripCard> {
                         Text(
                           intl.DateFormat.EEEE()
                               .add_jm()
-                              .format(widget.trip.startDate),
+                              .format(widget.trip.date),
                           textDirection: TextDirection.ltr,
                           style: TextStyle(fontFamily: 'Product Sans'),
                         ),
                         Text(
-                          '\$${widget.trip.price}',
+                          '\$${widget.trip.cost}',
                           style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,

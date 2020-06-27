@@ -6,7 +6,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 // Utils
-import 'package:clax/utils/MessageHandling.dart';
+import 'package:clax/services/CloudMessaging.dart';
 // Providers
 import 'package:clax/providers/Map.dart';
 import 'package:clax/providers/CurrentTrip.dart';

@@ -12,4 +12,8 @@ class NameModel {
     data['last'] = this.last;
     return data;
   }
+
+  String toString() {
+    return first + " " + last;
+  }
 }

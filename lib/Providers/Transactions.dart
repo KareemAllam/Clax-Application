@@ -1,5 +1,6 @@
 // Dart & Other Pacakges
 import 'dart:convert';
+import 'package:clax/models/Error.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // Flutter Foundation
@@ -77,17 +78,22 @@ class TransactionsProvider extends ChangeNotifier {
   }
 
   /// Make a Transfer Request
-  Future<String> makeARequest(body) async {
-    try {
-      Response response =
-          await Api.post('passengers/payments/loaning/request-loan', body);
-      if (response.statusCode == 408)
-        return "تعذر الوصول للإنترنت. تأكد من اتصالك بالإنترنت و حاول مره اخرى.";
-      else
-        return response.body;
-    } catch (_) {
-      return "تعذر الوصول للإنترنت. تأكد من اتصالك بالإنترنت و حاول مره اخرى.";
-    }
+  Future<ServerResponse> makeARequest(body) async {
+    Response response =
+        await Api.post('passengers/payments/loaning/request-loan', body);
+    if (response.statusCode == 408)
+      return ServerResponse(
+          status: false,
+          message:
+              "تعذر الوصول للإنترنت. تأكد من اتصالك بالإنترنت و حاول مره اخرى.");
+    else if (response.statusCode == 400)
+      return ServerResponse(
+          status: false, message: "عذرا، هذا المستخدم غير موجود لدينا");
+    else if (response.statusCode == 204)
+      return ServerResponse(
+          status: false, message: "عذرا، هذا المستخدم ليس لديه رصيد كافي");
+    else
+      return ServerResponse(status: true);
   }
 
   /// Accept a Transfer Request

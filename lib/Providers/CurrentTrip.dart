@@ -147,13 +147,16 @@ class CurrentTripProvider extends ChangeNotifier {
       if (value['status'] == "refused") {
         cancelTripRequest();
         // TODO: Show notificaion
+        showDialog(
+            context: scaffoldKey.currentContext,
+            builder: (context) => AlertDialog());
       }
 
       if (value['status'] == "pending_passenger") {
         // Driver Information
         Map body = {
-          // TODO: Enable Retreiving Driver
-          'driverId': value['_driver'],
+          'tourId': value['_tour'],
+          // TODO: Online Payment
           // 'onlinePayment': currentTripInfo.onlinePayment
         };
         Response result = await Api.post(

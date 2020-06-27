@@ -1,12 +1,13 @@
-import 'package:flutter/material.dart';
-import 'package:clax/models/Complain.dart';
-import 'package:clax/models/Trip.dart';
+// Dart & Other Packages
 import 'package:intl/intl.dart' as intl;
+// Flutter's Material Components
+import 'package:flutter/material.dart';
+// Models
+import 'package:clax/models/Complain.dart';
 
 class ComplainHistoryCard extends StatelessWidget {
   final ComplainModel complain;
-  final Trip trip;
-  ComplainHistoryCard({this.complain, this.trip});
+  ComplainHistoryCard({this.complain});
   @override
   Widget build(BuildContext context) {
     Widget child;

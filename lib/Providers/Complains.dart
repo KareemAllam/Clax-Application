@@ -38,7 +38,8 @@ class ComplainsProvider extends ChangeNotifier {
       notifyListeners();
       return ServerResponse(status: true);
     } else {
-      return ServerResponse(status: false, message: "تعذر الوصول للخادم");
+      return ServerResponse(
+          status: false, message: "تأكد من اتصالك بالانترنت و حاول مره اخرى.");
     }
   }
 
@@ -47,8 +48,6 @@ class ComplainsProvider extends ChangeNotifier {
     Response result =
         await Api.post("passengers/complaints/add", body, stringDynamic: true);
     if (result.statusCode == 200) {
-      ComplainModel complain = ComplainModel.fromJson(json.decode(result.body));
-      _complains.add(complain);
       _prefs.setString("complains", json.encode(_complains));
       notifyListeners();
       return ServerResponse(status: true);

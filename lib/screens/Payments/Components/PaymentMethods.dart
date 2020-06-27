@@ -186,6 +186,7 @@ class _PaymentPopupState extends State<PaymentPopup> {
               )),
           GestureDetector(
             onTap: () async {
+              FocusScope.of(context).unfocus();
               if (widget.type == 'card') {
                 bool result = await creditCardCharge(widget.card.id);
                 if (result) {
