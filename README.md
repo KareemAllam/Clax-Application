@@ -2,7 +2,9 @@
 
 a Public focusing mainly on the problem of public transportation as a service.
 
-![Clax Cover](https://i.imgur.com/DZSnCUa.png)
+<p align="center">
+  <img src="https://i.imgur.com/DZSnCUa.png" />
+</p>
 
 ## Getting Started
 
