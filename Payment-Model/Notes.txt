@@ -1,0 +1,3 @@
+Blue: #5469d4
+Orange: #f5925e
+Grey: #e3e8ee
