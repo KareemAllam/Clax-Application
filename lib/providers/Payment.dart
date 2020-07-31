@@ -12,7 +12,7 @@ import 'package:clax/models/CreditCard.dart';
 // Services
 import 'package:clax/services/Backend.dart';
 // Utils
-import 'package:clax/utils/nameAdjustment.dart';
+import 'package:clax/utils/Adjustments.dart';
 
 class PaymentProvider extends ChangeNotifier {
   double _balance = 0.0;

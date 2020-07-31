@@ -143,40 +143,42 @@ class _MapPickLocationState extends State<MapPickLocation> {
                   .bodyText1
                   .copyWith(color: Colors.white)),
           actions: [
-            IconButton(
-                icon: locating
-                    ? SpinKitCircle(color: Colors.white, size: 24)
-                    : Icon(Icons.gps_fixed),
-                onPressed: locating
-                    ? () {}
-                    : () async {
-                        setState(() {
-                          locating = true;
-                        });
+            Builder(
+              builder: (context) => IconButton(
+                  icon: locating
+                      ? SpinKitCircle(color: Colors.white, size: 24)
+                      : Icon(Icons.gps_fixed),
+                  onPressed: locating
+                      ? () {}
+                      : () async {
+                          setState(() {
+                            locating = true;
+                          });
 
-                        Position currentPosition = await Geolocator()
-                            .getCurrentPosition(
-                                desiredAccuracy: LocationAccuracy.medium);
+                          Position currentPosition = await Geolocator()
+                              .getCurrentPosition(
+                                  desiredAccuracy: LocationAccuracy.medium);
 
-                        _markers.add(Marker(
-                            markerId: MarkerId("currnetLocation"),
-                            position: LatLng(currentPosition.latitude,
-                                currentPosition.longitude)));
+                          _markers.add(Marker(
+                              markerId: MarkerId("currnetLocation"),
+                              position: LatLng(currentPosition.latitude,
+                                  currentPosition.longitude)));
 
-                        setState(() {
-                          locating = false;
-                        });
+                          setState(() {
+                            locating = false;
+                          });
 
-                        controller.animateCamera(
-                          CameraUpdate.newCameraPosition(
-                            CameraPosition(
-                              zoom: await controller.getZoomLevel(),
-                              target: LatLng(currentPosition.latitude,
-                                  currentPosition.longitude),
+                          controller.animateCamera(
+                            CameraUpdate.newCameraPosition(
+                              CameraPosition(
+                                zoom: await controller.getZoomLevel(),
+                                target: LatLng(currentPosition.latitude,
+                                    currentPosition.longitude),
+                              ),
                             ),
-                          ),
-                        );
-                      })
+                          );
+                        }),
+            )
           ]),
       body: Builder(
           builder: (context2) => GoogleMap(

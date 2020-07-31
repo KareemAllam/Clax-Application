@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -31,8 +32,7 @@ class DriverArrivedInfo extends StatelessWidget {
           time.cancel();
         });
 
-    Uint8List img = Uint8List.fromList(
-        List<int>.from(driverInfo['profilePic']['data']['data']));
+    Uint8List img = base64Decode(driverInfo['profilePic']['data']);
 
     return AlertDialog(
       backgroundColor: Colors.transparent,
@@ -78,46 +78,40 @@ class DriverArrivedInfo extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 child: Row(children: <Widget>[
                   Flexible(
-                    flex: 4,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Row(children: <Widget>[
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text(
-                                "اسم السائق:",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyText2
-                                    .copyWith(color: Colors.grey),
-                              ),
-                              Text(
-                                "موعد الوصول:",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyText2
-                                    .copyWith(color: Colors.grey),
-                              )
-                            ],
-                          ),
-                          SizedBox(width: 4),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text(
-                                '${driverInfo['name']['first']} ${driverInfo['name']['last']}',
-                                style: Theme.of(context).textTheme.bodyText2,
-                              ),
-                              Text(driverInfo['duration'],
-                                  style: Theme.of(context).textTheme.bodyText2)
-                            ],
-                          )
-                        ])
-                      ],
-                    ),
-                  ),
+                      flex: 4,
+                      child: Row(children: <Widget>[
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              "اسم السائق:",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyText2
+                                  .copyWith(color: Colors.grey),
+                            ),
+                            Text(
+                              "موعد الوصول:",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyText2
+                                  .copyWith(color: Colors.grey),
+                            )
+                          ],
+                        ),
+                        SizedBox(width: 4),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              '${driverInfo['name']['first']} ${driverInfo['name']['last']}',
+                              style: Theme.of(context).textTheme.bodyText2,
+                            ),
+                            Text(driverInfo['duration'],
+                                style: Theme.of(context).textTheme.bodyText2)
+                          ],
+                        )
+                      ])),
                   Flexible(flex: 1, child: Image.memory(img))
                 ]),
               )

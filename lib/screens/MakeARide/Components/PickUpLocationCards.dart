@@ -45,15 +45,6 @@ class _PickUpLocationState extends State<PickUpLocation> {
     ];
   }
 
-  Widget detectWithGps() {
-    return Column(children: <Widget>[
-      Text("asd"),
-      IconButton(
-          icon: Icon(Icons.close),
-          onPressed: () => setState(() => methSelected = 0))
-    ]);
-  }
-
   // Pick a method Widget
   Widget pickupMethods() {
     return Column(
@@ -86,7 +77,7 @@ class _PickUpLocationState extends State<PickUpLocation> {
               }),
               Cards.horizontalListTile(context,
                   icon: Icons.pin_drop,
-                  title: "مكانك الحالي",
+                  title: "اختار مكانك الحالى",
                   tapHandler: () => setState(() => methSelected = 2)),
               Cards.horizontalListTile(context,
                   icon: Icons.subway,

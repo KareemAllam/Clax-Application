@@ -1,4 +1,7 @@
 // Dart & Other Packages
+import 'package:clax/providers/Payment.dart';
+import 'package:clax/providers/Profile.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
@@ -68,8 +71,8 @@ class _MainDrawerState extends State<MainDrawer> {
   Widget build(BuildContext context) {
     Widget buildListTile(String title, IconData icon, Function tapHandler) =>
         Container(
-          decoration: BoxDecoration(
-              border: Border(top: BorderSide(color: Colors.black12))),
+          // decoration: BoxDecoration(
+          //     border: Border(top: BorderSide(color: Colors.black12))),
           child: ListTile(
             leading:
                 Icon(icon, size: 26, color: Theme.of(context).primaryColor),
@@ -83,72 +86,117 @@ class _MainDrawerState extends State<MainDrawer> {
             onTap: tapHandler,
           ),
         );
-
+    String _name =
+        Provider.of<ProfilesProvider>(context).profile.name.toString();
+    double balance = Provider.of<PaymentProvider>(context).balance;
     return SafeArea(
       child: Drawer(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Image.asset(
-              'assets/images/taxi.png',
-              width: double.infinity,
-              fit: BoxFit.fitWidth,
+          child: ListView(
+        children: <Widget>[
+          // Image.asset(
+          //   'assets/images/taxi.png',
+          //   fit: BoxFit.fitWidth,
+          // ),
+          Container(
+            padding:
+                const EdgeInsets.only(left: 16, top: 32, right: 16, bottom: 16),
+            decoration: BoxDecoration(
+              image: const DecorationImage(
+                image: const AssetImage(
+                  'assets/images/texture.png',
+                ),
+                fit: BoxFit.cover,
+              ),
             ),
-            ...menu.map((index) => buildListTile(
-                  index['title'],
-                  index['icon'],
-                  () {
-                    // Get Current Route Name
-                    String currentRoute = ModalRoute.of(context).settings.name;
-                    // () => Clax
-                    if (index['route'] == Clax.routeName) {
-                      // Clax => Clax
-                      if (currentRoute == Clax.routeName) {
-                        // Dismiss Drawer
-                        Navigator.of(context).pop();
-                        return;
-                      } else {
-                        // Dismiss Drawer
-                        Navigator.of(context).pop();
-                        // Item => Clax
-                        Navigator.of(context).pop();
-                        // Navigator.of(context)
-                        //     .pop(index['route']);
-                        return;
-                      }
-                    }
-                    // Item => Item
-                    else if (currentRoute == index['route']) {
-                      // Dismiss Drawer
-                      Navigator.of(context).pop();
-                      return;
-                    }
-                    // Navigating to Different Screen
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Image.asset(
+                    'assets/images/logo.png',
+                    height: 64,
+                  ),
+                  SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(_name,
+                              strutStyle: StrutStyle(forceStrutHeight: true),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6
+                                  .copyWith(color: Colors.white)),
+                          SizedBox(height: 12),
+                          Text('$balance جنيه',
+                              strutStyle: StrutStyle(forceStrutHeight: true),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyText1
+                                  .copyWith(color: Colors.white60)),
+                        ],
+                      ),
+                      Transform.rotate(
+                        angle: 22 / 7,
+                        child: IconButton(
+                            icon: Icon(Icons.exit_to_app),
+                            padding: EdgeInsets.all(0),
+                            alignment: Alignment.centerRight,
+                            onPressed: logout,
+                            color: Colors.white),
+                      )
+                    ],
+                  ),
+                ]),
+          ),
+          ...menu.map((index) => buildListTile(
+                index['title'],
+                index['icon'],
+                () {
+                  // Get Current Route Name
+                  String currentRoute = ModalRoute.of(context).settings.name;
+                  // () => Clax
+                  if (index['route'] == Clax.routeName) {
+                    // Clax => Clax
                     if (currentRoute == Clax.routeName) {
                       // Dismiss Drawer
                       Navigator.of(context).pop();
-                      // Navigate to Screen
-                      Navigator.of(context).pushNamed(index['route']);
-                    }
-                    // "Item => Item2"
-                    else {
+                      return;
+                    } else {
                       // Dismiss Drawer
                       Navigator.of(context).pop();
-                      // Navigate to Screen
-                      Navigator.of(context)
-                          .pushReplacementNamed(index['route']);
+                      // Item => Clax
+                      Navigator.of(context).pop();
+                      // Navigator.of(context)
+                      //     .pop(index['route']);
+                      return;
                     }
-                  },
-                )),
-            Spacer(),
-            buildListTile(
-              "تسجيل الخروج",
-              Icons.exit_to_app,
-              logout,
-            )
-          ],
-        ),
-      ),
+                  }
+                  // Item => Item
+                  else if (currentRoute == index['route']) {
+                    // Dismiss Drawer
+                    Navigator.of(context).pop();
+                    return;
+                  }
+                  // Navigating to Different Screen
+                  if (currentRoute == Clax.routeName) {
+                    // Dismiss Drawer
+                    Navigator.of(context).pop();
+                    // Navigate to Screen
+                    Navigator.of(context).pushNamed(index['route']);
+                  }
+                  // "Item => Item2"
+                  else {
+                    // Dismiss Drawer
+                    Navigator.of(context).pop();
+                    // Navigate to Screen
+                    Navigator.of(context).pushReplacementNamed(index['route']);
+                  }
+                },
+              )),
+        ],
+      )),
     );
   }
 }

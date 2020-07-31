@@ -1,26 +1,25 @@
 // Dart & Other Pacakges
 import 'dart:convert';
-import 'dart:typed_data';
-import 'package:clax/models/Error.dart';
-import 'package:clax/screens/MakeARide/Components/DriverArrivedInfo.dart';
-import 'package:clax/services/GoogleApi.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 // Flutter Material Componenets
 import 'package:flutter/material.dart';
 // Models
 import 'package:clax/models/Car.dart';
 import 'package:clax/models/Name.dart';
+import 'package:clax/models/Error.dart';
 import 'package:clax/models/CurrentTrip.dart';
 import 'package:clax/models/CurrentDriver.dart';
 // Providers
 import 'package:clax/providers/Map.dart';
 // // Screens
+import 'package:clax/screens/MakeARide/Components/DriverArrivedInfo.dart';
 // import 'package:clax/screens/MakeARide/GoogleMap.dart';
 // Services
 import 'package:clax/services/Backend.dart';
+import 'package:clax/services/GoogleApi.dart';
 import 'package:clax/services/RealtimeDB.dart';
 // Widgets
 // import 'package:clax/widgets/Notification.dart';
@@ -78,6 +77,7 @@ class CurrentTripProvider extends ChangeNotifier {
     String lineId = currentTripInfo.lindId;
     String requestId = currentTripInfo.requestId;
     // Listing to changes on RequestId
+    db.updateChild('clax-requests/$lineId/$requestId', {"status": "cancel"});
     db.cancelReadAsync('clax-requests/$lineId/$requestId');
     currentTripInfo = null;
     _prefs.remove("tripInfo");
@@ -111,8 +111,7 @@ class CurrentTripProvider extends ChangeNotifier {
     if (response.statusCode == 200) {
       // Retrieving request Id
       currentTripInfo = trip;
-      // currentTripInfo.requestId = json.decode(response.body);
-      currentTripInfo.requestId = "5eec5d7700afce3bc08f4082";
+      currentTripInfo.requestId = json.decode(response.body);
       // Saving current trip info in cache
       _prefs.setString("tripInfo", json.encode(currentTripInfo.toJson()));
       notifyListeners();
@@ -132,15 +131,16 @@ class CurrentTripProvider extends ChangeNotifier {
 
   Future startListeningToRequest() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
+
     var _currentTripInfo = currentTripInfo;
     // if (currentTripInfo == null)
     //   currentTripInfo =
     //       CurrentTrip.fromJson(json.decode(_prefs.getString("tripInfo")));
     String lineId = _currentTripInfo.lindId;
     String requestId = _currentTripInfo.requestId;
-    // Listing to changes on RequestId
-    // print('clax-requests/$lineId/$requestId');
 
+    // Listing to changes on RequestId
+    print('clax-requests/$lineId/$requestId');
     db.readAsync('clax-requests/$lineId/$requestId', (value) async {
       // print(value);
       // No Driver has accepted the request
@@ -164,10 +164,8 @@ class CurrentTripProvider extends ChangeNotifier {
           body,
         );
         Map<String, dynamic> driverInfo = json.decode(result.body);
-
         // Calculate Time
-        Map driver =
-            await db.readOnce('clax-lines/$lineId/${value['_driver']}');
+        Map driver = await db.readOnce('clax-lines/$lineId/${value['_tour']}');
         LatLng driverLocaiton =
             LatLng(driver['loc']["lat"], driver['loc']["lng"]);
         Map distanceInfo =
@@ -186,8 +184,9 @@ class CurrentTripProvider extends ChangeNotifier {
           db.updateChild('clax-requests/$lineId/$requestId',
               {'status': "passenger_cancelled"});
         }
+
         // User Accepted the Driver
-        else if (answer) {
+        else {
           // Update Request State
           db.updateChild('clax-requests/$lineId/$requestId', {
             'cost': _currentTripInfo.finalCost,
@@ -201,15 +200,12 @@ class CurrentTripProvider extends ChangeNotifier {
 
           // Update CurrentDriver with driver information
           currentDriverInfo = CurrentDriver(
-              driverId: value['_driver'],
-              name: NameModel(
-                  first: driverInfo['name']['first'],
-                  last: driverInfo['name']['last']),
+              tourId: value['_tour'],
+              name: NameModel.fromJson(driverInfo['name']),
               car: Car(
                   color: driverInfo['_currentCar']['color'],
                   plateNumber: driverInfo['_currentCar']['plateNumber']),
-              profilePic: Uint8List.fromList(
-                  List<int>.from(driverInfo['profilePic']['data']["data"])),
+              profilePic: base64Decode(driverInfo['profilePic']['data']),
               phone: driverInfo['phone']);
           _prefs.setString('driverInfo', json.encode(currentDriverInfo));
 
@@ -224,8 +220,7 @@ class CurrentTripProvider extends ChangeNotifier {
   }
 
   Future startTracking() async {
-    // String driverId = currentDriverInfo.driverId;
-    String driverId = "5ee2490b9b6b5f4018c75f82";
+    String driverId = currentDriverInfo.tourId;
 
     if (currentTripInfo == null) {
       SharedPreferences _prefs = await SharedPreferences.getInstance();

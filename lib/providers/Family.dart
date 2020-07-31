@@ -12,7 +12,7 @@ import 'package:clax/models/Name.dart';
 // Services
 import 'package:clax/services/Backend.dart';
 // Utils
-import 'package:clax/utils/phonenumber.dart';
+import 'package:clax/utils/Adjustments.dart';
 
 class FamilyProvider extends ChangeNotifier {
   List<FamilyMember> familyMembers;
@@ -130,7 +130,7 @@ class FamilyProvider extends ChangeNotifier {
 
   /// Add a member request.
   Future<ServerResponse> makeRequest(Contact contact) async {
-    String number = getNumberViewString(contact.phoneNumber.number);
+    String number = phoneNumber(contact.phoneNumber.number, userView: true);
     Response result =
         await Api.put('passengers/family/add', reqBody: {"phone": number});
     if (result.statusCode == 200) {

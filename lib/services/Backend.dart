@@ -7,8 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class Api {
   static Map<String, String> configHeaders;
-  static const String BaseUrl = 'http://192.168.1.2:3000/api/';
-  // static const String BaseUrl = 'https://www.clax-egyp.me/api/';
+  // static const String BaseUrl = 'http://192.168.1.2:3000/api/';
+  static const String BaseUrl = 'https://www.clax-egyp.me/api/';
 
   static Future<http.Response> get(url) async {
     // Retreive Token from Cache

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:clax/screens/MakeARide/Clax.dart';
+import 'package:clax/widgets/CustomCircleIndicator.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -337,6 +338,74 @@ class MapProvider extends ChangeNotifier {
             listen: false)
         .currentTripInfo
         .requestId;
+
+    Timer time = Timer(Duration(seconds: 60), () {
+      // Stop Trip State
+      // Change request State
+      _realtimeDB.updateChild('clax-requests/$_lineId/$requestId',
+          {'status': "passenger_cancelled"});
+      Navigator.of(scaffoldKey.currentContext).pop();
+      // Clear Trip State
+      Provider.of<CurrentTripProvider>(scaffoldKey.currentContext,
+              listen: false)
+          .clearTripInfo();
+
+      // Return to Main Screen
+      Navigator.of(scaffoldKey.currentContext).popUntil((route) {
+        if (route.settings.name == Clax.routeName) return true;
+        return false;
+      });
+
+      // Reduce Balance
+      double finalPrice = Provider.of<CurrentTripProvider>(
+              scaffoldKey.currentContext,
+              listen: false)
+          .currentTripInfo
+          .finalCost;
+      Provider.of<PaymentProvider>(scaffoldKey.currentContext, listen: false)
+          .setBalance = -finalPrice;
+      // Add Bill
+      Provider.of<PaymentProvider>(scaffoldKey.currentContext, listen: false)
+          .add(BillModel(
+              amount: finalPrice,
+              date: DateTime.now(),
+              type: "Punishment",
+              description: "عقوبة الغاء الرحلة"));
+      // Stop Ongoing State
+      disableStreamingDriverLocation();
+      Provider.of<CurrentTripProvider>(scaffoldKey.currentContext,
+              listen: false)
+          .cancelTripRequest();
+      showDialog(
+        context: scaffoldKey.currentContext,
+        builder: (context) => AlertDialog(
+          elevation: 1,
+          backgroundColor: Colors.transparent,
+          title: GestureDetector(
+            onTap: Navigator.of(scaffoldKey.currentContext).pop,
+            child: Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(16)),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text("لم تقم بالرد على السائق ف الوقت المناسب",
+                        style: Theme.of(scaffoldKey.currentContext)
+                            .textTheme
+                            .bodyText1),
+                    Text("تم خصم سعر الرحلة من حسابك.",
+                        style: Theme.of(scaffoldKey.currentContext)
+                            .textTheme
+                            .bodyText2
+                            .copyWith(color: Colors.grey)),
+                  ]),
+            ),
+          ),
+        ),
+      );
+    });
+
     // Setting up the button
     Widget continueButton = FlatButton(
       child: Text("ركبت",
@@ -344,19 +413,32 @@ class MapProvider extends ChangeNotifier {
               color: Theme.of(scaffoldKey.currentContext).accentColor,
               fontWeight: FontWeight.bold)),
       onPressed: () {
+        // Stop the timer
+        time.cancel();
+        // Change request State
         _realtimeDB.updateChild(
             'clax-requests/$_lineId/$requestId', {'status': "done"});
         rateDriver();
       },
     );
+
     Widget cancelButton = FlatButton(
       child: Text("لم اجد السائق",
           style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
       onPressed: () {
-        print("punishment handling");
+        // Stop the timer
+        time.cancel();
+        // Change request State
+        LatLng userLocation = _userLocation['position'];
+        _realtimeDB.updateChild('clax-requests/$_lineId/$requestId', {
+          'status': "driver_cancelled",
+          "passengerLoc": {
+            "lat": userLocation.latitude,
+            "lng": userLocation.longitude
+          }
+        });
         // Dismiss the Alert Dialoge Box
         Navigator.of(scaffoldKey.currentContext).pop();
-
         // Clear Trip State
         Provider.of<CurrentTripProvider>(scaffoldKey.currentContext,
                 listen: false)
@@ -367,6 +449,36 @@ class MapProvider extends ChangeNotifier {
           if (route.settings.name == Clax.routeName) return true;
           return false;
         });
+        showDialog(
+          context: scaffoldKey.currentContext,
+          builder: (context) => AlertDialog(
+            elevation: 1,
+            backgroundColor: Colors.transparent,
+            title: GestureDetector(
+              onTap: Navigator.of(scaffoldKey.currentContext).pop,
+              child: Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16)),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text("نعتذر عن تصرف السائق",
+                          style: Theme.of(scaffoldKey.currentContext)
+                              .textTheme
+                              .bodyText1),
+                      Text(
+                          "سيتم اضافه تعويض لحسابك في اسرع وقت بعد مراجعه المشكلة",
+                          style: Theme.of(scaffoldKey.currentContext)
+                              .textTheme
+                              .bodyText2
+                              .copyWith(color: Colors.grey)),
+                    ]),
+              ),
+            ),
+          ),
+        );
       },
     );
 
@@ -390,8 +502,14 @@ class MapProvider extends ChangeNotifier {
                   .copyWith(fontWeight: FontWeight.values[5]),
             ),
             SizedBox(height: 2),
-            Text("انتظر حتى تركب المكروباص ثم اضغط ركبت.",
-                style: Theme.of(scaffoldKey.currentContext).textTheme.caption)
+            Row(
+              children: <Widget>[
+                Text("انتظر حتى تركب المكروباص ثم اضغط ركبت.",
+                    style:
+                        Theme.of(scaffoldKey.currentContext).textTheme.caption),
+                CustomCircleIndicator(60)
+              ],
+            ),
           ],
         ),
       ),

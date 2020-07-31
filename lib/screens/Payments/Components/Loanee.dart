@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 // Models
 import 'package:clax/models/Name.dart';
 // Utils
-import 'package:clax/utils/nameAdjustment.dart';
+import 'package:clax/utils/Adjustments.dart';
 // Providers
 import 'package:clax/providers/Transactions.dart';
 import 'package:clax/providers/Profile.dart';
@@ -64,7 +64,7 @@ class _LoaneeState extends State<Loanee> {
     NameModel name =
         Provider.of<ProfilesProvider>(context, listen: false).profile.name;
     Map<String, String> body = {
-      "phone": getNumber(_contact.phoneNumber.number),
+      "phone": phoneNumber(_contact.phoneNumber.number),
       "name": '${name.first} ${name.last}',
       "amount": _amountController.text
     };
@@ -143,7 +143,7 @@ class _LoaneeState extends State<Loanee> {
                                       children: <Widget>[
                                         Expanded(
                                             child: Text(
-                                          getName(_contact.fullName),
+                                          phoneNumber(_contact.fullName),
                                           style: TextStyle(
                                               fontFamily: "Cairo",
                                               color: Colors.black87,
@@ -151,8 +151,9 @@ class _LoaneeState extends State<Loanee> {
                                         )),
                                         Expanded(
                                             child: Text(
-                                          getNumberViewString(
-                                              _contact.phoneNumber.number),
+                                          phoneNumber(
+                                              _contact.phoneNumber.number,
+                                              userView: true),
                                           textDirection: TextDirection.ltr,
                                           textAlign: TextAlign.end,
                                           style: Theme.of(context)

@@ -1,5 +1,6 @@
 // Dart & Other Pacakges
 import 'dart:math';
+import 'package:clax/services/RealtimeDB.dart';
 import 'package:provider/provider.dart';
 // Flutter Material Components
 import 'package:flutter/material.dart';
@@ -54,11 +55,14 @@ class _RateTripState extends State<RateTrip> {
     // Adjusting Trips History
     Trip _trip = Trip(
         id: Random(2).toString(),
-        lineName: tripInfo.lindId,
+        lineName: tripInfo.lineName,
         cost: tripInfo.finalCost,
         date: tripInfo.startDate,
         rate: userSubmitted ? driverRate * 1 : 3);
-
+    if (userSubmitted)
+      RealtimeDB().updateChild(
+          'clax-requests/${tripInfo.lindId}/${tripInfo.requestId}',
+          {"feedback": _description.text, "rate": driverRate});
     await Provider.of<TripsProvider>(context, listen: false).addTrip(_trip);
 
     // Adjusting Payment Balance

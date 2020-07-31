@@ -29,11 +29,11 @@ class TripsProvider extends ChangeNotifier {
   Future cacheData() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     // Get Cached Past Trips
-    trips = _prefs.getString("pastTrips") != null
-        ? json
-            .decode(_prefs.getString("pastTrips"))
-            .forEach((trip) => trips.add(Trip.fromJson(trip)))
-        : [];
+    if (_prefs.getString("pastTrips") != null)
+      json
+          .decode(_prefs.getString("pastTrips"))
+          .forEach((trip) => trips.add(Trip.fromJson(trip)));
+
     notifyListeners();
   }
 

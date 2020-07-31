@@ -27,8 +27,8 @@ class _RidesState extends State<Rides> {
   // Assign Trips Changes to `trips`
   @override
   void didChangeDependencies() {
-    super.didChangeDependencies();
     trips = Provider.of<TripsProvider>(context).trips;
+    super.didChangeDependencies();
   }
 
   // retreive Trips from server

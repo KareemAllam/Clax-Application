@@ -9,8 +9,7 @@ class BottomSheetTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        // borderRadius: BorderRadius.only(
-        //     topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+
         color: Theme.of(context).primaryColor,
       ),
       alignment: Alignment.centerRight,
