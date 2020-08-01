@@ -1,6 +1,8 @@
 // Dart & Other Packages
 import 'package:clax/providers/Payment.dart';
 import 'package:clax/providers/Profile.dart';
+import 'package:clax/screens/Authentication.dart';
+import 'package:clax/screens/LandingPage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 // Flutter's Material Components
@@ -13,9 +15,9 @@ import 'package:clax/providers/Auth.dart';
 // import 'package:clax/providers/CurrentTrip.dart';
 // import 'package:clax/providers/Transactions.dart';
 // Screens
-import 'package:clax/screens/MakeARide/Clax.dart';
-import 'package:clax/screens/Home/Rahalatk.dart';
-import 'package:clax/screens/Home/FreeRides.dart';
+import 'package:clax/screens/ClaxRoot.dart';
+import 'package:clax/screens/Rides/Rahalatk.dart';
+import 'package:clax/screens/Rides/FreeRides.dart';
 import 'package:clax/screens/Help/Help.dart';
 import 'package:clax/screens/Settings/Settings.dart';
 import 'package:clax/screens/Complains/Complains_Screen.dart';
@@ -29,7 +31,11 @@ class MainDrawer extends StatefulWidget {
 
 class _MainDrawerState extends State<MainDrawer> {
   List<Map<String, dynamic>> menu = [
-    {"title": 'كلاكس', "icon": Icons.local_taxi, "route": Clax.routeName},
+    {
+      "title": 'كلاكس',
+      "icon": Icons.local_taxi,
+      "route": LandingPage.routeName
+    },
     {"title": 'رحلاتك', "icon": Icons.calendar_today, "route": Rides.routeName},
     {
       "title": 'الرحلات المجانية',
@@ -57,13 +63,20 @@ class _MainDrawerState extends State<MainDrawer> {
       //     .initialize();
       // await Provider.of<CurrentTripProvider>(context, listen: false).init();
 
-      // Pop Current Screens
-      Navigator.popUntil(context, (route) {
-        if (route.settings.name == Clax.routeName) return true;
-        return false;
-      });
-      // Push Login Screen
-      Navigator.of(context).pushReplacementNamed(Login.routeName);
+      BuildContext _context =
+          Provider.of<AuthProvider>(context, listen: false).outerContext;
+      Navigator.of(_context).pop();
+      Navigator.of(_context).pushReplacementNamed(Authentication.routeName);
+
+      // // Pop Current Screens
+      // Navigator.popUntil(context, (route) {
+      //   print(route.settings.name);
+      //   if (route.settings.name == "/") return true;
+      //   return false;
+      // });
+
+      // // Push Login Screen
+      // Navigator.of(context).pushNamed(Login.routeName);
     }
   }
 
@@ -157,9 +170,9 @@ class _MainDrawerState extends State<MainDrawer> {
                   // Get Current Route Name
                   String currentRoute = ModalRoute.of(context).settings.name;
                   // () => Clax
-                  if (index['route'] == Clax.routeName) {
+                  if (index['route'] == LandingPage.routeName) {
                     // Clax => Clax
-                    if (currentRoute == Clax.routeName) {
+                    if (currentRoute == LandingPage.routeName) {
                       // Dismiss Drawer
                       Navigator.of(context).pop();
                       return;
@@ -180,7 +193,7 @@ class _MainDrawerState extends State<MainDrawer> {
                     return;
                   }
                   // Navigating to Different Screen
-                  if (currentRoute == Clax.routeName) {
+                  if (currentRoute == LandingPage.routeName) {
                     // Dismiss Drawer
                     Navigator.of(context).pop();
                     // Navigate to Screen

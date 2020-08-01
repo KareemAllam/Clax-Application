@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 // import 'package:clax/screens/Login_Screens/Login.dart';
 
 class ResetPass extends StatefulWidget {
+  static const routeName = 'resetPass';
   @override
   _ResetPassState createState() => _ResetPassState();
 }

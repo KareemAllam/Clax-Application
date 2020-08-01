@@ -1,11 +1,5 @@
 // Dart & Other Packages
-import 'package:clax/providers/Complains.dart';
-import 'package:clax/providers/CurrentTrip.dart';
-import 'package:clax/providers/Family.dart';
-import 'package:clax/providers/Payment.dart';
-import 'package:clax/providers/Profile.dart';
-import 'package:clax/providers/Transactions.dart';
-import 'package:clax/providers/Trips.dart';
+import 'package:clax/screens/ClaxRoot.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -17,7 +11,6 @@ import 'package:clax/services/Backend.dart';
 // Providers
 import 'package:clax/providers/Auth.dart';
 // Screens
-import 'package:clax/screens/MakeARide/Clax.dart';
 import 'package:clax/screens/Login/ForgotPassword.dart';
 // Widgets
 // import 'package:clax/widgets/ExtendedAppBar.dart';
@@ -50,7 +43,7 @@ class LoginState extends State<Login> {
     super.dispose();
   }
 
-  Future<dynamic> submitform(firebaseToken) async {
+  Future<String> submitform(firebaseToken) async {
     setState(() {
       _loading = true;
     });
@@ -61,38 +54,21 @@ class LoginState extends State<Login> {
         "pass": _passwordController.text,
         "fireBaseId": firebaseToken
       };
-
       Response response = await Api.post('signing/passengers/login', body);
-
+      setState(() {
+        _loading = false;
+      });
       if (response.statusCode == 200) {
         //  Update Cache with id
         Provider.of<AuthProvider>(context, listen: false)
             .logIn(response.headers['x-login-token']);
-        if (Provider.of<ProfilesProvider>(context, listen: false)
-                .profile
-                .name ==
-            null) {
-          Provider.of<ProfilesProvider>(context, listen: false).init();
-          Provider.of<CurrentTripProvider>(context, listen: false).init();
-          Provider.of<PaymentProvider>(context, listen: false).init();
-          Provider.of<FamilyProvider>(context, listen: false).init();
-          Provider.of<TransactionsProvider>(context, listen: false).init();
-          Provider.of<TripsProvider>(context, listen: false).init();
-          Provider.of<ComplainsProvider>(context, listen: false).init();
-          Navigator.of(context).pushReplacementNamed(Clax.routeName);
-        }
-        setState(() {
-          _loading = false;
-        });
-        return true;
-      }
 
+        Navigator.of(context).pushReplacementNamed(ClaxRoot.routeName);
+        return "_";
+      }
       // If Server Erros Occured
       else {
-        setState(() {
-          _loading = false;
-        });
-        return false;
+        return "تأكد من اتصالك بالإنترنت و حاول مره اخرى.";
       }
     }
     // If there is no Internet Connection
@@ -100,7 +76,7 @@ class LoginState extends State<Login> {
       setState(() {
         _loading = false;
       });
-      return 0;
+      return "تاكد من معلوماتك و حاول مرة اخرى.";
     }
   }
 
@@ -170,7 +146,7 @@ class LoginState extends State<Login> {
                                   return 'هذا الرقم غير صحيح. تأكد من الرقم و حاول مره اخرى.';
                                 }
                                 // User Entered wrong information
-                                else if (!email.hasMatch(value)) {
+                                else if (!email.hasMatch(value.toLowerCase())) {
                                   return "تأكد من ادخال بياناتك بشكل صحيح";
                                 }
                                 // User Entered a valid mail
@@ -196,6 +172,14 @@ class LoginState extends State<Login> {
                                     FloatingLabelBehavior.never,
                                 contentPadding: EdgeInsets.symmetric(
                                     horizontal: 15, vertical: 0),
+                                focusedErrorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.red, width: 1.2),
+                                    borderRadius: BorderRadius.circular(30)),
+                                errorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.red, width: 1.2),
+                                    borderRadius: BorderRadius.circular(30)),
                                 enabledBorder: OutlineInputBorder(
                                     borderSide:
                                         BorderSide(color: Colors.black26),
@@ -237,8 +221,16 @@ class LoginState extends State<Login> {
                                 errorMaxLines: 1,
                                 floatingLabelBehavior:
                                     FloatingLabelBehavior.never,
+                                focusedErrorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.red, width: 1.2),
+                                    borderRadius: BorderRadius.circular(30)),
                                 contentPadding: EdgeInsets.symmetric(
                                     horizontal: 15, vertical: 0),
+                                errorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.red, width: 1.2),
+                                    borderRadius: BorderRadius.circular(30)),
                                 focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                         color: Theme.of(context).primaryColor,
@@ -280,20 +272,19 @@ class LoginState extends State<Login> {
                                         color: theme.primaryColor,
                                         highlightElevation: 0.1,
                                         onPressed: () async {
-                                          var result =
+                                          String msg =
                                               await submitform(firebaseToken);
-                                          if (result == false)
-                                            Scaffold.of(context).showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                  "تأكد من اتصالك بالإنترنت و حاول مره اخرى.",
-                                                  style: theme
-                                                      .textTheme.bodyText2
-                                                      .copyWith(
-                                                          color: Colors.white),
-                                                ),
+
+                                          Scaffold.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                msg,
+                                                style: theme.textTheme.bodyText2
+                                                    .copyWith(
+                                                        color: Colors.white),
                                               ),
-                                            );
+                                            ),
+                                          );
                                         },
                                       ),
                                     ),

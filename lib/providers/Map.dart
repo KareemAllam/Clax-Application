@@ -2,7 +2,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:clax/screens/MakeARide/Clax.dart';
+import 'package:clax/screens/LandingPage.dart';
 import 'package:clax/widgets/CustomCircleIndicator.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
@@ -352,7 +352,7 @@ class MapProvider extends ChangeNotifier {
 
       // Return to Main Screen
       Navigator.of(scaffoldKey.currentContext).popUntil((route) {
-        if (route.settings.name == Clax.routeName) return true;
+        if (route.settings.name == LandingPage.routeName) return true;
         return false;
       });
 
@@ -446,7 +446,7 @@ class MapProvider extends ChangeNotifier {
 
         // Return to Main Screen
         Navigator.of(scaffoldKey.currentContext).popUntil((route) {
-          if (route.settings.name == Clax.routeName) return true;
+          if (route.settings.name == LandingPage.routeName) return true;
           return false;
         });
         showDialog(

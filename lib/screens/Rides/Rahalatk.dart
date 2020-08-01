@@ -9,7 +9,7 @@ import 'package:clax/models/Trip.dart';
 import 'package:clax/providers/Trips.dart';
 // Widgets
 import 'package:clax/widgets/null.dart';
-import 'package:clax/screens/Home/widgets/tripCard.dart';
+import 'package:clax/screens/Rides/widgets/tripCard.dart';
 // Drawer
 import 'package:clax/screens/Drawer.dart';
 

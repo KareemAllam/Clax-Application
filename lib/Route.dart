@@ -1,4 +1,5 @@
 // Flutter's Material Components
+import 'package:clax/screens/LandingPage.dart';
 import 'package:flutter/material.dart';
 // Dart & Other Packages
 import 'package:provider/provider.dart';
@@ -6,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:clax/providers/Profile.dart';
 // Screens
 //// Authentication
-import 'package:clax/screens/Login/LoadMainScreen.dart';
+import 'package:clax/screens/Authentication.dart';
 import 'package:clax/screens/Login/Login.dart';
 import 'package:clax/screens/Login/Register.dart';
 import 'package:clax/screens/Login/Verification.dart';
@@ -35,8 +36,8 @@ import 'package:clax/screens/Help/PromoCodes.dart';
 import 'package:clax/screens/Help/Payments.dart';
 
 //// Home Screens
-import 'package:clax/screens/Home/FreeRides.dart';
-import 'package:clax/screens/Home/Rahalatk.dart';
+import 'package:clax/screens/Rides/FreeRides.dart';
+import 'package:clax/screens/Rides/Rahalatk.dart';
 
 //// Complains
 import 'package:clax/screens/Complains/Complaint_Details.dart';
@@ -52,7 +53,6 @@ import 'package:clax/screens/Payments/Payment_History.dart';
 import 'package:clax/screens/Payments/Payment_TransferMoney.dart';
 
 //// Tracking Screens
-import 'package:clax/screens/MakeARide/Clax.dart';
 import 'package:clax/screens/MakeARide/GoogleMap.dart';
 import 'package:clax/screens/MakeARide/MapPickLocation.dart';
 import 'package:clax/screens/MakeARide/RateTrip.dart';
@@ -63,11 +63,12 @@ class Router {
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(
-            builder: (_) => LoadMainScreen(), settings: settings);
+            builder: (_) => LandingPage(), settings: settings);
 
       // Clax
-      case Clax.routeName:
-        return MaterialPageRoute(builder: (_) => Clax(), settings: settings);
+      case LandingPage.routeName:
+        return MaterialPageRoute(
+            builder: (_) => LandingPage(), settings: settings);
       case RateTrip.routeName:
         return MaterialPageRoute(
             builder: (_) => RateTrip(), settings: settings);
@@ -80,18 +81,9 @@ class Router {
         return MaterialPageRoute(
             builder: (_) => MapPickLocation(), settings: settings);
 
-      // Login & Registration
-      case Login.routeName:
-        return MaterialPageRoute(builder: (_) => Login(), settings: settings);
-      case RegisterForm.routeName:
-        return MaterialPageRoute(
-            builder: (_) => RegisterForm(), settings: settings);
       case Verification.routeName:
         return MaterialPageRoute(
             builder: (_) => Verification(), settings: settings);
-      case ForgetPass.routeName:
-        return MaterialPageRoute(
-            builder: (_) => ForgetPass(), settings: settings);
 
       // Settings
       case Account.routeName:
@@ -185,13 +177,7 @@ class Router {
             builder: (_) => WriteAComplain(), settings: settings);
 
       default:
-        return MaterialPageRoute(builder: (_) {
-          return Scaffold(
-            body: Center(
-              child: Text('No route defined for ${settings.name}'),
-            ),
-          );
-        });
+        throw Exception('Invalid route: ${settings.name}');
     }
   }
 }

@@ -1,5 +1,5 @@
 // Dart & Other Packages
-import 'package:clax/screens/Home/widgets/offerCard.dart';
+import 'package:clax/screens/Rides/widgets/offerCard.dart';
 import 'package:clax/widgets/null.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';

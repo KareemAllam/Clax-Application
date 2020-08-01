@@ -12,7 +12,7 @@ import 'package:clax/models/CurrentTrip.dart';
 import 'package:clax/providers/Trips.dart';
 import 'package:clax/providers/Payment.dart';
 // Screens
-import 'package:clax/screens/MakeARide/Clax.dart';
+import 'package:clax/screens/LandingPage.dart';
 // Providers
 import 'package:clax/providers/CurrentTrip.dart';
 
@@ -77,7 +77,7 @@ class _RateTripState extends State<RateTrip> {
     // Return to Main Screen
     if (userSubmitted) {
       Navigator.of(context).popUntil((route) {
-        if (route.settings.name == Clax.routeName) return true;
+        if (route.settings.name == LandingPage.routeName) return true;
         return false;
       });
     }
