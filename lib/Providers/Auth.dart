@@ -1,8 +1,8 @@
 // Dart & Other Pacakges
-import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 // Flutter Foundation
+import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart';
 
 class AuthProvider extends ChangeNotifier {

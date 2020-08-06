@@ -7,12 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:clax/providers/Profile.dart';
 // Screens
 //// Authentication
-import 'package:clax/screens/Authentication.dart';
-import 'package:clax/screens/Login/Login.dart';
-import 'package:clax/screens/Login/Register.dart';
 import 'package:clax/screens/Login/Verification.dart';
-import 'package:clax/screens/Login/ForgotPassword.dart';
-
 //// Settings
 import 'package:clax/screens/Settings/AccountOverview.dart';
 import 'package:clax/screens/Settings/FamilyPreviews.dart';
@@ -22,7 +17,6 @@ import 'package:clax/screens/Settings/EditAccount.dart';
 import 'package:clax/screens/Settings/Safety.dart';
 import 'package:clax/screens/Settings/TrustedContacts.dart';
 import 'package:clax/screens/Settings/Family.dart';
-
 //// Help
 import 'package:clax/screens/Help/Bookings.dart';
 import 'package:clax/screens/Help/Guide.dart';
@@ -34,24 +28,20 @@ import 'package:clax/screens/Help/PaymentOptions.dart';
 import 'package:clax/screens/Help/UpfrontPricing.dart';
 import 'package:clax/screens/Help/PromoCodes.dart';
 import 'package:clax/screens/Help/Payments.dart';
-
 //// Home Screens
 import 'package:clax/screens/Rides/FreeRides.dart';
 import 'package:clax/screens/Rides/Rahalatk.dart';
-
 //// Complains
 import 'package:clax/screens/Complains/Complaint_Details.dart';
 import 'package:clax/screens/Complains/Complains_Screen.dart';
 import 'package:clax/screens/Complains/Complain_Write.dart';
 import 'package:clax/screens/Complains/Complains_Historty.dart';
-
 //// Payments Screens
 import 'package:clax/screens/Payments/Payment_HomeScreen.dart';
 import 'package:clax/screens/Payments/Payment_Add.dart';
 import 'package:clax/screens/Payments/Payment_PaypalWeb.dart';
 import 'package:clax/screens/Payments/Payment_History.dart';
 import 'package:clax/screens/Payments/Payment_TransferMoney.dart';
-
 //// Tracking Screens
 import 'package:clax/screens/MakeARide/GoogleMap.dart';
 import 'package:clax/screens/MakeARide/MapPickLocation.dart';
@@ -64,7 +54,6 @@ class Router {
       case '/':
         return MaterialPageRoute(
             builder: (_) => LandingPage(), settings: settings);
-
       // Clax
       case LandingPage.routeName:
         return MaterialPageRoute(
@@ -80,11 +69,10 @@ class Router {
       case MapPickLocation.routeName:
         return MaterialPageRoute(
             builder: (_) => MapPickLocation(), settings: settings);
-
+      // Authentication
       case Verification.routeName:
         return MaterialPageRoute(
             builder: (_) => Verification(), settings: settings);
-
       // Settings
       case Account.routeName:
         return MaterialPageRoute(builder: (_) => Account(), settings: settings);
@@ -136,7 +124,6 @@ class Router {
       case Notifications.routeName:
         return MaterialPageRoute(
             builder: (_) => Notifications(), settings: settings);
-
       // Payment
       case Payments.routeName:
         return MaterialPageRoute(
@@ -156,12 +143,10 @@ class Router {
       case PaypalWeb.routeName:
         return MaterialPageRoute(
             builder: (_) => PaypalWeb(), settings: settings);
-
       // Home
       case PromoCodes.routeName:
         return MaterialPageRoute(
             builder: (_) => PromoCodes(), settings: settings);
-
       // Complaints
       case ComplainDetails.routeName:
         return MaterialPageRoute(
@@ -175,7 +160,6 @@ class Router {
       case WriteAComplain.routeName:
         return MaterialPageRoute(
             builder: (_) => WriteAComplain(), settings: settings);
-
       default:
         throw Exception('Invalid route: ${settings.name}');
     }

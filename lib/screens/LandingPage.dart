@@ -14,7 +14,7 @@ import 'package:clax/screens/MakeARide/NewRide.dart';
 import 'package:clax/screens/MakeARide/RideSearching.dart';
 
 class LandingPage extends StatefulWidget {
-  static const routeName = '/LandingPage';
+  static const routeName = '/';
   @override
   _LandingPageState createState() => _LandingPageState();
 }
@@ -33,6 +33,7 @@ class _LandingPageState extends State<LandingPage> {
     Provider.of<MapProvider>(context, listen: false).scaffoldKey = _scaffoldKey;
     Provider.of<CurrentTripProvider>(context, listen: false).scaffoldKey =
         _scaffoldKey;
+
     tripInfo = Provider.of<CurrentTripProvider>(context).currentTripInfo;
     driverInfo = Provider.of<CurrentTripProvider>(context).currentDriverInfo;
   }
@@ -41,9 +42,13 @@ class _LandingPageState extends State<LandingPage> {
   Widget build(BuildContext context) {
     searching = tripInfo != null;
     onATrip = driverInfo != null;
-    return Container(
-      key: _scaffoldKey,
-      child: !searching ? StartARide() : onATrip ? OnATrip() : RideSearching(),
+    return WillPopScope(
+      onWillPop: () => Future.value(false),
+      child: Container(
+        key: _scaffoldKey,
+        child:
+            !searching ? StartARide() : onATrip ? OnATrip() : RideSearching(),
+      ),
     );
   }
 }

@@ -1,5 +1,4 @@
 // Dart & Other Packages
-import 'package:clax/screens/ClaxRoot.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -11,9 +10,8 @@ import 'package:clax/services/Backend.dart';
 // Providers
 import 'package:clax/providers/Auth.dart';
 // Screens
+import 'package:clax/screens/ClaxRoot.dart';
 import 'package:clax/screens/Login/ForgotPassword.dart';
-// Widgets
-// import 'package:clax/widgets/ExtendedAppBar.dart';
 
 class Login extends StatefulWidget {
   static const routeName = '/login';
@@ -86,247 +84,254 @@ class LoginState extends State<Login> {
     final String firebaseToken = Provider.of<AuthProvider>(context).fbToken;
 
     return Scaffold(
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).requestFocus(new FocusNode()),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-                padding: EdgeInsets.all(10),
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      height: height * 0.4,
-                      alignment: Alignment.centerRight,
-                      child: RichText(
-                          textAlign: TextAlign.start,
-                          text: TextSpan(children: [
-                            TextSpan(
-                              text: "مرحبا بك",
-                              style: theme.textTheme.headline3.copyWith(
-                                  height: 1.4,
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.w800),
-                            ),
-                            TextSpan(
-                              text: "\nفي كلاكس",
-                              style: theme.textTheme.headline3.copyWith(
-                                  height: 1.4,
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.w800),
-                            ),
-                            TextSpan(
-                              text: ".",
-                              style: theme.textTheme.headline3.copyWith(
-                                  height: 1.4,
-                                  color: theme.primaryColor,
-                                  fontWeight: FontWeight.w800),
-                            ),
-                          ])),
-                    ),
-                    Form(
-                        key: _formKey,
-                        child: Column(
-                          children: <Widget>[
-                            TextFormField(
-                              autocorrect: true,
-                              validator: (value) {
-                                value = value.trim();
-                                // Empte Textfield
-                                if (value.isEmpty) {
-                                  return 'ادخل رقم الهاتف / البريد الالكتروني الخاص بك';
-                                }
-                                // User Entered a Phone Number
-                                else if (phone.hasMatch(value)) {
-                                  // Wrong number of numbers.
-                                  if (value.length != 11)
-                                    return 'تأكد من ادخال رقمك بشكل صحيح.';
-                                  // Everything is good
-                                  if (phoneEgypt.hasMatch(value)) return null;
-                                  // Wrong Phone Number Format
-                                  return 'هذا الرقم غير صحيح. تأكد من الرقم و حاول مره اخرى.';
-                                }
-                                // User Entered wrong information
-                                else if (!email.hasMatch(value.toLowerCase())) {
-                                  return "تأكد من ادخال بياناتك بشكل صحيح";
-                                }
-                                // User Entered a valid mail
-                                else {
+      body: WillPopScope(
+        onWillPop: () => Future.value(false),
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).requestFocus(new FocusNode()),
+          child: SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        height: height * 0.4,
+                        alignment: Alignment.centerRight,
+                        child: RichText(
+                            textAlign: TextAlign.start,
+                            text: TextSpan(children: [
+                              TextSpan(
+                                text: "مرحبا بك",
+                                style: theme.textTheme.headline3.copyWith(
+                                    height: 1.4,
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w800),
+                              ),
+                              TextSpan(
+                                text: "\nفي كلاكس",
+                                style: theme.textTheme.headline3.copyWith(
+                                    height: 1.4,
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w800),
+                              ),
+                              TextSpan(
+                                text: ".",
+                                style: theme.textTheme.headline3.copyWith(
+                                    height: 1.4,
+                                    color: theme.primaryColor,
+                                    fontWeight: FontWeight.w800),
+                              ),
+                            ])),
+                      ),
+                      Form(
+                          key: _formKey,
+                          child: Column(
+                            children: <Widget>[
+                              TextFormField(
+                                autocorrect: true,
+                                validator: (value) {
+                                  value = value.trim();
+                                  // Empte Textfield
+                                  if (value.isEmpty) {
+                                    return 'ادخل رقم الهاتف / البريد الالكتروني الخاص بك';
+                                  }
+                                  // User Entered a Phone Number
+                                  else if (phone.hasMatch(value)) {
+                                    // Wrong number of numbers.
+                                    if (value.length != 11)
+                                      return 'تأكد من ادخال رقمك بشكل صحيح.';
+                                    // Everything is good
+                                    if (phoneEgypt.hasMatch(value)) return null;
+                                    // Wrong Phone Number Format
+                                    return 'هذا الرقم غير صحيح. تأكد من الرقم و حاول مره اخرى.';
+                                  }
+                                  // User Entered wrong information
+                                  else if (!email
+                                      .hasMatch(value.toLowerCase())) {
+                                    return "تأكد من ادخال بياناتك بشكل صحيح";
+                                  }
+                                  // User Entered a valid mail
+                                  else {
+                                    return null;
+                                  }
+                                },
+                                style: theme.textTheme.bodyText1.copyWith(
+                                    fontFamily: "Product Sans",
+                                    fontWeight: FontWeight.w600),
+                                textInputAction: TextInputAction.next,
+                                focusNode: _usernameNode,
+                                cursorColor: theme.primaryColor,
+                                controller: _usernameController,
+                                onFieldSubmitted: (_) {
+                                  _usernameNode.unfocus();
+                                  FocusScope.of(context)
+                                      .requestFocus(_passwordNode);
+                                },
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  floatingLabelBehavior:
+                                      FloatingLabelBehavior.never,
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 0),
+                                  focusedErrorBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.red, width: 1.2),
+                                      borderRadius: BorderRadius.circular(30)),
+                                  errorBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.red, width: 1.2),
+                                      borderRadius: BorderRadius.circular(30)),
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.black26),
+                                      borderRadius: BorderRadius.circular(30)),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context).primaryColor,
+                                          width: 1.2),
+                                      borderRadius: BorderRadius.circular(30)),
+                                  fillColor: Colors.white,
+                                  prefixIcon: Icon(
+                                    Icons.person_outline,
+                                  ),
+                                  labelStyle: theme.textTheme.bodyText1
+                                      .copyWith(color: Colors.grey),
+                                  labelText: 'رقم الهاتف / البريد الالكتروني',
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              TextFormField(
+                                textInputAction: TextInputAction.done,
+                                autocorrect: true,
+                                focusNode: _passwordNode,
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'ادخل كلمة المرور';
+                                  }
+                                  if (value.length > 18 || value.length < 8)
+                                    return "تاكد من ادخالك كلمة المرور بشكل صحيح";
                                   return null;
-                                }
-                              },
-                              style: theme.textTheme.bodyText1.copyWith(
-                                  fontFamily: "Product Sans",
-                                  fontWeight: FontWeight.w600),
-                              textInputAction: TextInputAction.next,
-                              focusNode: _usernameNode,
-                              cursorColor: theme.primaryColor,
-                              controller: _usernameController,
-                              onFieldSubmitted: (_) {
-                                _usernameNode.unfocus();
-                                FocusScope.of(context)
-                                    .requestFocus(_passwordNode);
-                              },
-                              decoration: InputDecoration(
-                                filled: true,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.never,
-                                contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 15, vertical: 0),
-                                focusedErrorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Colors.red, width: 1.2),
-                                    borderRadius: BorderRadius.circular(30)),
-                                errorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Colors.red, width: 1.2),
-                                    borderRadius: BorderRadius.circular(30)),
-                                enabledBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.black26),
-                                    borderRadius: BorderRadius.circular(30)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Theme.of(context).primaryColor,
-                                        width: 1.2),
-                                    borderRadius: BorderRadius.circular(30)),
-                                fillColor: Colors.white,
-                                prefixIcon: Icon(
-                                  Icons.person_outline,
+                                },
+                                obscureText: true,
+                                controller: _passwordController,
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(18)
+                                ],
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  errorMaxLines: 1,
+                                  floatingLabelBehavior:
+                                      FloatingLabelBehavior.never,
+                                  focusedErrorBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.red, width: 1.2),
+                                      borderRadius: BorderRadius.circular(30)),
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 0),
+                                  errorBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.red, width: 1.2),
+                                      borderRadius: BorderRadius.circular(30)),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context).primaryColor,
+                                          width: 1.2),
+                                      borderRadius: BorderRadius.circular(30)),
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.black26),
+                                      borderRadius: BorderRadius.circular(30)),
+                                  fillColor: Colors.white,
+                                  prefixIcon: Icon(
+                                    Icons.lock_outline,
+                                  ),
+                                  labelStyle: theme.textTheme.bodyText1
+                                      .copyWith(color: Colors.grey),
+                                  labelText: 'كلمة المرور',
                                 ),
-                                labelStyle: theme.textTheme.bodyText1
-                                    .copyWith(color: Colors.grey),
-                                labelText: 'رقم الهاتف / البريد الالكتروني',
                               ),
-                            ),
-                            SizedBox(height: 10),
-                            TextFormField(
-                              textInputAction: TextInputAction.done,
-                              autocorrect: true,
-                              focusNode: _passwordNode,
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'ادخل كلمة المرور';
-                                }
-                                if (value.length > 18 || value.length < 8)
-                                  return "تاكد من ادخالك كلمة المرور بشكل صحيح";
-                                return null;
-                              },
-                              obscureText: true,
-                              controller: _passwordController,
-                              inputFormatters: [
-                                LengthLimitingTextInputFormatter(18)
-                              ],
-                              decoration: InputDecoration(
-                                filled: true,
-                                errorMaxLines: 1,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.never,
-                                focusedErrorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Colors.red, width: 1.2),
-                                    borderRadius: BorderRadius.circular(30)),
-                                contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 15, vertical: 0),
-                                errorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Colors.red, width: 1.2),
-                                    borderRadius: BorderRadius.circular(30)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Theme.of(context).primaryColor,
-                                        width: 1.2),
-                                    borderRadius: BorderRadius.circular(30)),
-                                enabledBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.black26),
-                                    borderRadius: BorderRadius.circular(30)),
-                                fillColor: Colors.white,
-                                prefixIcon: Icon(
-                                  Icons.lock_outline,
-                                ),
-                                labelStyle: theme.textTheme.bodyText1
-                                    .copyWith(color: Colors.grey),
-                                labelText: 'كلمة المرور',
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            Builder(
-                              builder: (context) => _loading
-                                  ? Padding(
-                                      child: SpinKitCircle(
-                                          color: theme.primaryColor, size: 30),
-                                      padding: EdgeInsets.only(top: 15),
-                                    )
-                                  : Container(
-                                      width: double.infinity,
-                                      child: RaisedButton(
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 7),
-                                        child: Text(
-                                          'تسجيل دخول',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        textColor: theme.hintColor,
-                                        elevation: 1,
-                                        shape: StadiumBorder(),
-                                        color: theme.primaryColor,
-                                        highlightElevation: 0.1,
-                                        onPressed: () async {
-                                          String msg =
-                                              await submitform(firebaseToken);
-
-                                          Scaffold.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                msg,
-                                                style: theme.textTheme.bodyText2
-                                                    .copyWith(
-                                                        color: Colors.white),
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                            ),
-                            SizedBox(height: 10),
-                            Divider(
-                              height: 2,
-                              indent: 10,
-                              endIndent: 10,
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    GestureDetector(
-                                      onTap: () => Navigator.of(context)
-                                          .pushNamed('/register'),
-                                      child: Text(
-                                        'ليس لديك حساب؟',
-                                        style: TextStyle(
-                                            color: theme.primaryColor),
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.of(context)
-                                            .pushNamed(ForgetPass.routeName);
-                                      },
-                                      child: Text('لا تستطيع الوصول لحسابك؟',
-                                          style: TextStyle(
+                              SizedBox(height: 10),
+                              Builder(
+                                builder: (context) => _loading
+                                    ? Padding(
+                                        child: SpinKitCircle(
                                             color: theme.primaryColor,
-                                          )),
-                                    )
-                                  ]),
-                            ),
-                          ],
-                        )),
-                  ],
-                )),
+                                            size: 30),
+                                        padding: EdgeInsets.only(top: 15),
+                                      )
+                                    : Container(
+                                        width: double.infinity,
+                                        child: RaisedButton(
+                                          padding:
+                                              EdgeInsets.symmetric(vertical: 7),
+                                          child: Text(
+                                            'تسجيل دخول',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                          textColor: theme.hintColor,
+                                          elevation: 1,
+                                          shape: StadiumBorder(),
+                                          color: theme.primaryColor,
+                                          highlightElevation: 0.1,
+                                          onPressed: () async {
+                                            String msg =
+                                                await submitform(firebaseToken);
+
+                                            Scaffold.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  msg,
+                                                  style: theme
+                                                      .textTheme.bodyText2
+                                                      .copyWith(
+                                                          color: Colors.white),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                              ),
+                              SizedBox(height: 10),
+                              Divider(
+                                height: 2,
+                                indent: 10,
+                                endIndent: 10,
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      GestureDetector(
+                                        onTap: () => Navigator.of(context)
+                                            .pushNamed('/register'),
+                                        child: Text(
+                                          'ليس لديك حساب؟',
+                                          style: TextStyle(
+                                              color: theme.primaryColor),
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.of(context)
+                                              .pushNamed(ForgetPass.routeName);
+                                        },
+                                        child: Text('لا تستطيع الوصول لحسابك؟',
+                                            style: TextStyle(
+                                              color: theme.primaryColor,
+                                            )),
+                                      )
+                                    ]),
+                              ),
+                            ],
+                          )),
+                    ],
+                  )),
+            ),
           ),
         ),
       ),

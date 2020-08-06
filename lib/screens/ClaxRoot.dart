@@ -1,33 +1,32 @@
 // Dart & Other Packages
-import 'package:clax/Route.dart';
 import 'package:clax/providers/Auth.dart';
-import 'package:clax/screens/LandingPage.dart';
-import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 // Utils
 import 'package:clax/services/CloudMessaging.dart';
 // Providers
-// Providers
-import 'package:clax/providers/Transactions.dart';
-import 'package:clax/providers/CurrentTrip.dart';
-import 'package:clax/providers/Complains.dart';
-import 'package:clax/providers/Payment.dart';
-import 'package:clax/providers/Profile.dart';
-import 'package:clax/providers/Family.dart';
-import 'package:clax/providers/Trips.dart';
 import 'package:clax/providers/Map.dart';
+import 'package:clax/providers/Trips.dart';
+import 'package:clax/providers/Family.dart';
+import 'package:clax/providers/Profile.dart';
+import 'package:clax/providers/Payment.dart';
+import 'package:clax/providers/Complains.dart';
+import 'package:clax/providers/CurrentTrip.dart';
+import 'package:clax/providers/Transactions.dart';
+// Route Generators
+import 'package:clax/Route.dart';
 
 class ClaxRoot extends StatefulWidget {
   static const routeName = '/ClaxRoot';
+  final GlobalKey<NavigatorState> navigatorKey = new GlobalKey();
   @override
   _ClaxRootState createState() => _ClaxRootState();
 }
 
 class _ClaxRootState extends State<ClaxRoot> {
-  GlobalKey key = GlobalKey();
   NotificationHandler handler = NotificationHandler();
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   void _navigateToItemDetail(Map<String, dynamic> message) {
@@ -59,12 +58,18 @@ class _ClaxRootState extends State<ClaxRoot> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    Provider.of<AuthProvider>(context, listen: false).outerContext = context;
+  }
+
+  Future<bool> didPopRoute() async {
+    final NavigatorState navigator = widget.navigatorKey.currentState;
+    assert(navigator != null);
+    return await navigator.maybePop();
   }
 
   @override
   Widget build(BuildContext context2) {
     return MultiProvider(
-      key: key,
       providers: [
         Provider(create: (context) => ProfilesProvider()),
         Provider(create: (context) => PaymentProvider()),
@@ -85,9 +90,16 @@ class _ClaxRootState extends State<ClaxRoot> {
       ],
       child: Builder(
         builder: (context) => OverlaySupport(
-          child: Navigator(
-            onGenerateRoute: Router.generateRoute,
-            initialRoute: LandingPage.routeName,
+          // Solution for nested routing was provided here:
+          // https://github.com/rmtmckenzie/flutter_nested_navigators
+          child: WillPopScope(
+            onWillPop: () async {
+              return !await didPopRoute();
+            },
+            child: Navigator(
+              key: widget.navigatorKey,
+              onGenerateRoute: Router.generateRoute,
+            ),
           ),
         ),
       ),

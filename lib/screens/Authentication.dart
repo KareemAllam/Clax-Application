@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 // Providers
 import 'package:clax/providers/Auth.dart';
-
 // Screens
 import 'package:clax/screens/ClaxRoot.dart';
 import 'package:clax/screens/Login/Login.dart';

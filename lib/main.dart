@@ -1,13 +1,4 @@
 // Dart & Other Packages;
-import 'package:clax/Route.dart';
-import 'package:clax/commonUI.dart';
-import 'package:clax/providers/Family.dart';
-import 'package:clax/screens/Login/ForgotPassword.dart';
-import 'package:clax/screens/Authentication.dart';
-import 'package:clax/screens/Login/Login.dart';
-import 'package:clax/screens/Login/Register.dart';
-import 'package:clax/screens/Login/resetPassword.dart';
-import 'package:clax/screens/ClaxRoot.dart';
 import 'package:provider/provider.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
@@ -15,6 +6,15 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 // Providers
 import 'package:clax/providers/Auth.dart';
+// UI
+import 'package:clax/commonUI.dart';
+// Screens
+import 'package:clax/screens/ClaxRoot.dart';
+import 'package:clax/screens/Login/Login.dart';
+import 'package:clax/screens/Login/Register.dart';
+import 'package:clax/screens/Authentication.dart';
+import 'package:clax/screens/Login/resetPassword.dart';
+import 'package:clax/screens/Login/ForgotPassword.dart';
 
 void main() {
   Provider.debugCheckInvalidValueType = null;
@@ -44,7 +44,6 @@ class MyApp extends StatelessWidget {
                 // MaterialApp contains our top-level Navigator
                 initialRoute: Authentication.routeName,
                 routes: {
-                  '/': (BuildContext context) => Authentication(),
                   Authentication.routeName: (BuildContext context) =>
                       Authentication(),
                   Login.routeName: (BuildContext context) => Login(),
@@ -52,11 +51,7 @@ class MyApp extends StatelessWidget {
                       RegisterForm(),
                   ForgetPass.routeName: (BuildContext context) => ForgetPass(),
                   ResetPass.routeName: (BuildContext context) => ResetPass(),
-                  ClaxRoot.routeName: (BuildContext context) {
-                    Provider.of<AuthProvider>(context, listen: false)
-                        .outerContext = context;
-                    return ClaxRoot();
-                  },
+                  ClaxRoot.routeName: (BuildContext context) => ClaxRoot(),
                 },
                 debugShowCheckedModeBanner: false,
               )),

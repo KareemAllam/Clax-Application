@@ -1,28 +1,20 @@
 // Dart & Other Packages
-import 'package:clax/providers/Payment.dart';
-import 'package:clax/providers/Profile.dart';
-import 'package:clax/screens/Authentication.dart';
-import 'package:clax/screens/LandingPage.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:clax/screens/Login/Login.dart';
 import 'package:provider/provider.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 // Providers
 import 'package:clax/providers/Auth.dart';
-// import 'package:clax/providers/Trips.dart';
-// import 'package:clax/providers/Payment.dart';
-// import 'package:clax/providers/Profile.dart';
-// import 'package:clax/providers/CurrentTrip.dart';
-// import 'package:clax/providers/Transactions.dart';
+import 'package:clax/providers/Payment.dart';
+import 'package:clax/providers/Profile.dart';
 // Screens
-import 'package:clax/screens/ClaxRoot.dart';
+import 'package:clax/screens/Help/Help.dart';
+import 'package:clax/screens/LandingPage.dart';
 import 'package:clax/screens/Rides/Rahalatk.dart';
 import 'package:clax/screens/Rides/FreeRides.dart';
-import 'package:clax/screens/Help/Help.dart';
 import 'package:clax/screens/Settings/Settings.dart';
 import 'package:clax/screens/Complains/Complains_Screen.dart';
 import 'package:clax/screens/Payments/Payment_HomeScreen.dart';
-import 'package:clax/screens/Login/Login.dart';
 
 class MainDrawer extends StatefulWidget {
   @override
@@ -56,27 +48,12 @@ class _MainDrawerState extends State<MainDrawer> {
     bool logout =
         await Provider.of<AuthProvider>(context, listen: false).logOut();
     if (logout) {
-      // await Provider.of<PaymentProvider>(context, listen: false).init();
-      // await Provider.of<ProfilesProvider>(context, listen: false).init();
-      // await Provider.of<TripsProvider>(context, listen: false).initialize();
-      // await Provider.of<TransactionsProvider>(context, listen: false)
-      //     .initialize();
-      // await Provider.of<CurrentTripProvider>(context, listen: false).init();
-
-      BuildContext _context =
+      BuildContext outerContext =
           Provider.of<AuthProvider>(context, listen: false).outerContext;
-      Navigator.of(_context).pop();
-      Navigator.of(_context).pushReplacementNamed(Authentication.routeName);
-
-      // // Pop Current Screens
-      // Navigator.popUntil(context, (route) {
-      //   print(route.settings.name);
-      //   if (route.settings.name == "/") return true;
-      //   return false;
-      // });
-
+      // Remove the Drawer
+      Navigator.of(outerContext).pop();
       // // Push Login Screen
-      // Navigator.of(context).pushNamed(Login.routeName);
+      Navigator.of(outerContext).pushNamed(Login.routeName);
     }
   }
 
@@ -106,10 +83,6 @@ class _MainDrawerState extends State<MainDrawer> {
       child: Drawer(
           child: ListView(
         children: <Widget>[
-          // Image.asset(
-          //   'assets/images/taxi.png',
-          //   fit: BoxFit.fitWidth,
-          // ),
           Container(
             padding:
                 const EdgeInsets.only(left: 16, top: 32, right: 16, bottom: 16),
@@ -169,14 +142,17 @@ class _MainDrawerState extends State<MainDrawer> {
                 () {
                   // Get Current Route Name
                   String currentRoute = ModalRoute.of(context).settings.name;
-                  // () => Clax
+
+                  // => Clax
                   if (index['route'] == LandingPage.routeName) {
                     // Clax => Clax
                     if (currentRoute == LandingPage.routeName) {
                       // Dismiss Drawer
                       Navigator.of(context).pop();
                       return;
-                    } else {
+                    }
+                    // Payment => Clax
+                    else {
                       // Dismiss Drawer
                       Navigator.of(context).pop();
                       // Item => Clax
@@ -186,20 +162,23 @@ class _MainDrawerState extends State<MainDrawer> {
                       return;
                     }
                   }
-                  // Item => Item
-                  else if (currentRoute == index['route']) {
+
+                  // Payment => Payment
+                  else if (index['route'] == currentRoute) {
                     // Dismiss Drawer
                     Navigator.of(context).pop();
                     return;
                   }
-                  // Navigating to Different Screen
-                  if (currentRoute == LandingPage.routeName) {
+
+                  // Clax => Payment
+                  if (currentRoute != index['route'] &&
+                      currentRoute == LandingPage.routeName) {
                     // Dismiss Drawer
                     Navigator.of(context).pop();
                     // Navigate to Screen
                     Navigator.of(context).pushNamed(index['route']);
                   }
-                  // "Item => Item2"
+                  // Payment => Settings
                   else {
                     // Dismiss Drawer
                     Navigator.of(context).pop();
