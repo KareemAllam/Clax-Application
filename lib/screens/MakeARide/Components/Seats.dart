@@ -48,18 +48,18 @@ class _SeatsState extends State<Seats> {
         onPanEnd: (_) {
           if (xRight != null) {
             if (xRight < width / 2) {
-              xRight = 5;
+              xRight = 10;
               xLeft = null;
             } else {
               xRight = null;
-              xLeft = 5;
+              xLeft = 10;
             }
           } else {
             if (xLeft < width / 2) {
               xRight = null;
-              xLeft = 5;
+              xLeft = 10;
             } else {
-              xRight = 5;
+              xRight = 10;
               xLeft = null;
             }
           }
@@ -163,6 +163,11 @@ class _SeatsState extends State<Seats> {
                 padding: EdgeInsets.all(16),
                 decoration: BoxDecoration(
                     color: Theme.of(context).primaryColor,
+                    // boxShadow: [
+                    //   BoxShadow(
+                    //       color: Colors.black26, spreadRadius: 1, blurRadius: 2)
+                    // ],
+                    border: Border.all(color: Colors.white30),
                     shape: BoxShape.circle),
                 child: Icon(
                   Icons.event_seat,

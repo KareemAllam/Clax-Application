@@ -1,5 +1,4 @@
 // Flutter's Material Components
-import 'package:clax/screens/MakeARide/RideSettings.dart';
 import 'package:flutter/material.dart';
 // Dart & Other Packages
 import 'package:provider/provider.dart';
@@ -7,9 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:clax/providers/Profile.dart';
 // Screens
 //// Authentication
-import 'package:clax/screens/Login/LoadMainScreen.dart';
 import 'package:clax/screens/Login/Login.dart';
 import 'package:clax/screens/Login/Register.dart';
+import 'package:clax/screens/Login/Register2.dart';
 import 'package:clax/screens/Login/Verification.dart';
 import 'package:clax/screens/Login/ForgotPassword.dart';
 
@@ -30,7 +29,6 @@ import 'package:clax/screens/Help/UpfrontPricing.dart';
 import 'package:clax/screens/Help/PromoCodes.dart';
 
 //// Home Screens
-import 'package:clax/screens/Home/FreeRides.dart';
 import 'package:clax/screens/Home/Rahalatk.dart';
 
 //// Complains
@@ -44,21 +42,26 @@ import 'package:clax/screens/Payments/Payment_HomeScreen.dart';
 import 'package:clax/screens/Payments/Payment_History.dart';
 
 //// Tracking Screens
-import 'package:clax/screens/MakeARide/Clax.dart';
+import 'package:clax/screens/LandingPage.dart';
+import 'package:clax/screens/MakeARide/TripEnded.dart';
+import 'package:clax/screens/MakeARide/Working.dart';
 
 class Router {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(
-            builder: (_) => LoadMainScreen(), settings: settings);
+            builder: (_) => LandingPage(), settings: settings);
 
       // Clax
-      case Clax.routeName:
-        return MaterialPageRoute(builder: (_) => Clax(), settings: settings);
-      case RideSettings.routeName:
+      case LandingPage.routeName:
         return MaterialPageRoute(
-            builder: (_) => RideSettings(), settings: settings);
+            builder: (_) => LandingPage(), settings: settings);
+      case Working.routeName:
+        return MaterialPageRoute(builder: (_) => Working(), settings: settings);
+      case TripEnded.routeName:
+        return MaterialPageRoute(
+            builder: (_) => TripEnded(), settings: settings);
 
       // Login & Registration
       case Login.routeName:
@@ -66,6 +69,9 @@ class Router {
       case RegisterForm.routeName:
         return MaterialPageRoute(
             builder: (_) => RegisterForm(), settings: settings);
+      case RegisterForm2.routeName:
+        return MaterialPageRoute(
+            builder: (_) => RegisterForm2(), settings: settings);
       case Verification.routeName:
         return MaterialPageRoute(
             builder: (_) => Verification(), settings: settings);
@@ -76,9 +82,6 @@ class Router {
       // Settings
       case Account.routeName:
         return MaterialPageRoute(builder: (_) => Account(), settings: settings);
-      case FreeRides.routeName:
-        return MaterialPageRoute(
-            builder: (_) => FreeRides(), settings: settings);
       case Guide.routeName:
         return MaterialPageRoute(builder: (_) => Guide(), settings: settings);
       case More.routeName:

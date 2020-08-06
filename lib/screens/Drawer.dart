@@ -10,9 +10,8 @@ import 'package:clax/providers/Auth.dart';
 // import 'package:clax/providers/CurrentTrip.dart';
 // import 'package:clax/providers/Transactions.dart';
 // Screens
-import 'package:clax/screens/MakeARide/Clax.dart';
+import 'package:clax/screens/LandingPage.dart';
 import 'package:clax/screens/Home/Rahalatk.dart';
-import 'package:clax/screens/Home/FreeRides.dart';
 import 'package:clax/screens/Help/Help.dart';
 import 'package:clax/screens/Settings/Settings.dart';
 import 'package:clax/screens/Complains/Complains_Screen.dart';
@@ -26,13 +25,12 @@ class MainDrawer extends StatefulWidget {
 
 class _MainDrawerState extends State<MainDrawer> {
   List<Map<String, dynamic>> menu = [
-    {"title": 'كلاكس', "icon": Icons.local_taxi, "route": Clax.routeName},
-    {"title": 'رحلاتك', "icon": Icons.calendar_today, "route": Rides.routeName},
     {
-      "title": 'الرحلات المجانية',
-      "icon": Icons.card_giftcard,
-      "route": FreeRides.routeName
+      "title": 'كلاكس',
+      "icon": Icons.local_taxi,
+      "route": LandingPage.routeName
     },
+    {"title": 'رحلاتك', "icon": Icons.calendar_today, "route": Rides.routeName},
     {
       "title": 'الدفع',
       "icon": Icons.attach_money,
@@ -56,7 +54,7 @@ class _MainDrawerState extends State<MainDrawer> {
 
       // Pop Current Screens
       Navigator.popUntil(context, (route) {
-        if (route.settings.name == Clax.routeName) return true;
+        if (route.settings.name == LandingPage.routeName) return true;
         return false;
       });
       // Push Login Screen
@@ -101,9 +99,9 @@ class _MainDrawerState extends State<MainDrawer> {
                     // Get Current Route Name
                     String currentRoute = ModalRoute.of(context).settings.name;
                     // () => Clax
-                    if (index['route'] == Clax.routeName) {
+                    if (index['route'] == LandingPage.routeName) {
                       // Clax => Clax
-                      if (currentRoute == Clax.routeName) {
+                      if (currentRoute == LandingPage.routeName) {
                         // Dismiss Drawer
                         Navigator.of(context).pop();
                         return;
@@ -124,7 +122,7 @@ class _MainDrawerState extends State<MainDrawer> {
                       return;
                     }
                     // Navigating to Different Screen
-                    if (currentRoute == Clax.routeName) {
+                    if (currentRoute == LandingPage.routeName) {
                       // Dismiss Drawer
                       Navigator.of(context).pop();
                       // Navigate to Screen

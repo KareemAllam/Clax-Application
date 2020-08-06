@@ -42,44 +42,11 @@ class _PassengersInfoState extends State<PassengersInfo> {
               passengers[i].locationCoords.latitude,
               passengers[i].locationCoords.latitude))
           .ceil();
-
-      if (distance < 100)
-        Provider.of<TrackingProvider>(context, listen: false)
-            .passengers
-            .removeAt(i);
+      if (distance < 1000)
+        // Code
+        print("asd");
       else
         distances.add(distance);
-      // String distanceString = '$distance م';
-      // // km
-      // if (distance > 1000) distanceString = '${distance / 1000} كم';
-      // distance.add(
-      //   Column(
-      //     children: <Widget>[
-      //       Row(
-      //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //         children: <Widget>[
-      //           Row(children: <Widget>[
-      //             Icon(Icons.location_on, color: Colors.grey[350]),
-      //             SizedBox(width: 4),
-      //             Text(passengers[i].locationName)
-      //           ]),
-      //           Row(
-      //               mainAxisAlignment: MainAxisAlignment.start,
-      //               children: <Widget>[
-      //                 Text(passengers[i].seats.toString(),
-      //                     style: TextStyle(
-      //                         fontFamily: 'Product Sans',
-      //                         color: Colors.grey)),
-      //                 Text(" ركاب", style: TextStyle(color: Colors.grey)),
-      //               ]),
-      //           Text(distanceString,
-      //               style: TextStyle(fontFamily: 'Product Sans')),
-      //         ],
-      //       ),
-      //     ],
-      //   ),
-      // );
-
     }
     return distances;
   }

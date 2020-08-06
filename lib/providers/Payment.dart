@@ -40,23 +40,25 @@ class PaymentProvider extends ChangeNotifier {
     // Cache Management
     SharedPreferences prefs = await SharedPreferences.getInstance();
     // Retreive PaymentLog from Server
-    Response finance = await Api.get('passengers/payments/manage-financials');
+    Response finance = await Api.get('drivers/balanceHistory');
     if (finance.statusCode == 200) {
-      List bills = json.decode(finance.body);
-      if (bills.length > 0) {
+      Map result = json.decode(finance.body);
+      // Updating Balance
+      balance = result["balance"].toDouble();
+      // Bills
+      List _bills = result['_tours'];
+      if (_bills.length > 0) {
         // Assigning Result to statue
-        bills = List<BillModel>.from((json
-            .decode(finance.body)
-            .map((payment) => BillModel.fromJson(payment))).toList());
-        // Saving Result in Cahce
-        prefs.setString("bills", json.encode(bills));
+        bills = List<BillModel>.from(
+            (_bills.map((payment) => BillModel.fromJson(payment))).toList());
       } else {
         // Assigning Result to statue
         bills = [];
-        // Saving Result in Cahce
-        prefs.setString("bills", json.encode(bills));
-        notifyListeners();
       }
+      // Saving Result in Cahce
+      prefs.setDouble("balance", balance);
+      prefs.setString("bills", json.encode(bills));
+      notifyListeners();
       return ServerResponse(status: true);
     } else if (finance.statusCode == 408)
       return ServerResponse(status: false, message: "تعذر الوصول للخادم");
@@ -64,23 +66,24 @@ class PaymentProvider extends ChangeNotifier {
       return ServerResponse(status: false, message: "حدث خطأ ما.");
   }
 
-  // Add a bill
+  // Start a new bill
   Future startNewTrip(BillModel tripBill) async {
-    SharedPreferences _prefs = await SharedPreferences.getInstance();
-    // Saving Last Trip's Payment
-
-    if (bills.length != 0) {
-      balance +=
-          bills[bills.length - 1].totalSeats * bills[bills.length - 1].ppc;
-      _prefs.setDouble("balance", balance);
-      _prefs.setString("bills", json.encode(bills));
-    }
     bills.add(tripBill);
     notifyListeners();
   }
 
+  // End current bill
+  Future endTrip() async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    // Saving Last Trip's Payment
+    balance += bills[bills.length - 1].seats * bills[bills.length - 1].cost;
+    _prefs.setDouble("balance", balance);
+    _prefs.setString("bills", json.encode(bills));
+  }
+
+  // Add a passneger to the current trip
   void updateCurrentTrip(int seats) {
-    bills[bills.length - 1].totalSeats += seats;
+    bills[bills.length - 1].seats += seats;
     notifyListeners();
   }
 }

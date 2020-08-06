@@ -1,25 +1,53 @@
 /// Type: Punishment - Pay - Charge - Lend
 class BillModel {
-  String name;
-  int totalSeats;
-  double ppc;
   DateTime date;
+  String lineName;
+  double cost;
+  int seats;
 
-  BillModel({this.name, this.totalSeats, this.ppc, this.date});
+  BillModel({this.date, this.lineName, this.cost, this.seats});
 
   BillModel.fromJson(Map<String, dynamic> json) {
-    name = json['name'];
-    totalSeats = int.parse(json['totalCost'].toString());
-    ppc = double.parse(json['ppc'].toString());
-    date = DateTime.now();
+    date = DateTime.parse(json['date']);
+    (json['line'] is Map)
+        ? lineName = new Line.fromJson(json['line']).toString()
+        : lineName = json['line'] != null ? json['line'] : "غير معروف";
+
+    cost = json['cost'].toDouble();
+    seats = json['seats'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
-    data['totalCost'] = this.totalSeats;
-    data['ppc'] = this.ppc;
     data['date'] = this.date.toString();
+    if (this.lineName != null) {
+      data['line'] = this.lineName;
+    }
+    data['cost'] = this.cost;
+    data['seats'] = this.seats;
     return data;
+  }
+}
+
+class Line {
+  String from;
+  String to;
+
+  Line({this.from, this.to});
+
+  Line.fromJson(Map<String, dynamic> json) {
+    from = json['from'];
+    to = json['to'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['from'] = this.from;
+    data['to'] = this.to;
+    return data;
+  }
+
+  String toString() {
+    return from + " " + to;
   }
 }

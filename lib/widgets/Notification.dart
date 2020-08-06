@@ -49,8 +49,9 @@ showNotification(BuildContext context, String title, String subtitle,
       duration: Duration(seconds: 3));
 }
 
-showRequestNotification(BuildContext context, String title, String subtitle,
-    {Function cb, Widget trailing}) {
+showWaitPassengerNotification(
+    BuildContext context, String title, String subtitle,
+    {Function cb, Widget trailing, int seconds = 10}) {
   showOverlayNotification(
     (contex) => SafeArea(
       child: GestureDetector(
@@ -70,10 +71,10 @@ showRequestNotification(BuildContext context, String title, String subtitle,
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(title,
+                      Text("لقد وصلت مكان الركوب",
                           style:
                               Theme.of(context).textTheme.subtitle2.copyWith()),
-                      Text(subtitle,
+                      Text("رجاءاً انتظر صعود الراكب",
                           style: Theme.of(context)
                               .textTheme
                               .caption
@@ -104,10 +105,10 @@ showRequestNotification(BuildContext context, String title, String subtitle,
                       )
                     ],
                   ),
-                  CircleTimer(),
+                  CustomCircleIndicator(45),
                 ]),
           )),
     ),
-    duration: Duration(seconds: 10),
+    duration: Duration(seconds: seconds),
   );
 }

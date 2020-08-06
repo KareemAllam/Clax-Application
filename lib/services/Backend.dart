@@ -7,13 +7,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class Api {
   static Map<String, String> configHeaders;
-  static const String BaseUrl = 'http://192.168.1.5:3000/api/';
-  // static const String BaseUrl = 'https://www.clax-egyp.me/api/';
+  // static const String BaseUrl = 'http://192.168.1.2:3000/api/';
+  static const String BaseUrl = 'https://www.clax-egyp.me/api/';
 
   static Future<http.Response> get(url) async {
     // Retreive Token from Cache
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     configHeaders = {'x-login-token': _prefs.getString("loginToken")};
+
     try {
       return await http
           .get(BaseUrl + url, headers: configHeaders)
@@ -29,10 +30,18 @@ class Api {
     }
   }
 
-  static Future<http.Response> post(String url, reqBody) async {
+  static Future<http.Response> post(
+    String url,
+    dynamic reqBody, {
+    bool stringDynamic = false,
+  }) async {
     // Retreive Token from Cache
+
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     configHeaders = {'x-login-token': _prefs.getString("loginToken") ?? ""};
+
+    if (stringDynamic == true)
+      configHeaders['Content-Type'] = 'application/json';
     try {
       return await http
           .post(BaseUrl + url, headers: configHeaders, body: reqBody ?? {})

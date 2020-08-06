@@ -1,17 +1,19 @@
 // Dart & Other Packages
-import 'package:clax/models/Error.dart';
-import 'package:clax/screens/Payments/Components/PaymentExtendedAppBar.dart';
+import 'package:clax/widgets/null.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
+// Models
+import 'package:clax/models/Bill.dart';
+import 'package:clax/models/Error.dart';
 // Providers
 import 'package:clax/providers/Payment.dart';
-// Models
-import 'package:clax/models/Card.dart';
 // Widgets
-import 'package:clax/widgets/Cards.dart';
 import 'package:clax/widgets/ExtendedAppBar.dart';
+import 'package:clax/screens/Payments/widgets/Card_PaymentHistory.dart';
+// Components
+import 'package:clax/screens/Payments/Components/PaymentExtendedAppBar.dart';
 // Drawer
 import 'package:clax/screens/Drawer.dart';
 
@@ -25,13 +27,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
   double balance = 0;
   bool refreshing = false;
   bool nic = false;
-  final menuCards = const [
-    CardModel(
-        title: 'سجل مدفوعاتك',
-        icon: Icons.featured_play_list,
-        description: 'اعرف تفاصيل اكتر عن مدفوعاتك',
-        screen: "/payment/payment_history"),
-  ];
 
   Future updateData() async {
     setState(() {
@@ -52,8 +47,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Widget build(BuildContext context) {
+    List<BillModel> bills = Provider.of<PaymentProvider>(context).bills;
+    bills.sort((a, b) => b.date.compareTo(a.date));
     final height = MediaQuery.of(context).size.height;
-
     return Scaffold(
         drawer: MainDrawer(),
         appBar: AppBar(
@@ -81,16 +77,26 @@ class _PaymentScreenState extends State<PaymentScreen> {
             child: ExtendedAppbar(child: PaymentAppBarBottom()),
           ),
         ),
-        body: RefreshIndicator(
-            displacement: 10,
-            child: ListView.builder(
-              itemCount: menuCards.length,
-              physics: AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics()),
-              controller: new ScrollController(),
-              itemBuilder: (context, index) =>
-                  Cards.navigationCard(context, card: menuCards[index]),
-            ),
-            onRefresh: updateData));
+        body: bills.length == 0
+            ? Container(
+                height: height * 0.8,
+                alignment: Alignment.center,
+                child: NullContent(
+                  things: "مدفوعات",
+                ))
+            : RefreshIndicator(
+                displacement: 10,
+                child: ListView.builder(
+                  physics: AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics()),
+                  controller: ScrollController(),
+                  itemBuilder: (ctx, index) {
+                    return BillCard(
+                      bill: bills[index],
+                    );
+                  },
+                  itemCount: bills.length,
+                ),
+                onRefresh: updateData));
   }
 }

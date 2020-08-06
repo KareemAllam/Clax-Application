@@ -23,6 +23,7 @@ dependencies:
   # UI Packages
   pin_view: ^1.0.1
   select_dialog: 1.0.7
+  image_picker: ^0.6.7+2
   contact_picker: ^0.0.2
   overlay_support: ^1.0.4
   flutter_spinkit: ^4.1.2

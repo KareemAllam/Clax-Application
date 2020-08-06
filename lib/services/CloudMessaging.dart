@@ -1,9 +1,11 @@
 // Dart & Other Packages
-import 'package:clax/providers/RideSettings.dart';
 import 'package:provider/provider.dart';
-import 'package:clax/screens/MakeARide/widgets/Alert.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
+// Providers
+import 'package:clax/providers/RideSettings.dart';
+// Widgets
+import 'package:clax/screens/MakeARide/widgets/Alert.dart';
 
 class NotificationHandler {
   BuildContext context;

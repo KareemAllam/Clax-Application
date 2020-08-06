@@ -12,7 +12,6 @@ import 'package:clax/services/Backend.dart';
 class TripsProvider extends ChangeNotifier {
   // Last Trips
   List<Trip> trips = [];
-  List<Trip> favs = [];
 
   // Provider Constructor
   TripsProvider() {

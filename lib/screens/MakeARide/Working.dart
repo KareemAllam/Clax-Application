@@ -1,4 +1,5 @@
 // Dart & Other Packages
+import 'package:clax/screens/Drawer.dart';
 import 'package:clax/screens/MakeARide/Components/PassengersInfo.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
@@ -13,8 +14,8 @@ import 'package:clax/screens/MakeARide/Components/Seats.dart';
 import 'package:clax/screens/MakeARide/Components/GeolocationPermissionsRetry.dart';
 
 class Working extends StatefulWidget {
-  final Function changeState;
-  Working(this.changeState);
+  static const routeName = '/working';
+
   @override
   _WorkingState createState() => _WorkingState();
 }
@@ -51,102 +52,136 @@ class _WorkingState extends State<Working> {
   @override
   Widget build(BuildContext context) {
     bool geolocatingEnabled = false;
-    bool loadingVars = (gpsEnabled == null || permission == null);
+    bool loadingVars =
+        (gpsEnabled == null || permission != GeolocationStatus.granted);
     if (!loadingVars)
       geolocatingEnabled =
           (permission == GeolocationStatus.granted && gpsEnabled);
-    return loadingVars
-        ? Center(
-            child: IntrinsicHeight(
-              child: IntrinsicWidth(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding: EdgeInsets.all(20),
-                  child: SpinKitCircle(color: theme.primaryColor),
-                ),
-              ),
-            ),
-          )
-        : geolocatingEnabled
-            ? Stack(
-                children: <Widget>[
-                  GoogleMap(
-                    polylines: tracking.polylines.values.toSet(),
-                    markers: tracking.markers.values.toSet(),
-                    compassEnabled: false,
-                    zoomControlsEnabled: false,
-                    onCameraMoveStarted: () =>
-                        Provider.of<TrackingProvider>(context, listen: false)
-                            .driverFocued = false,
-                    minMaxZoomPreference: MinMaxZoomPreference(10, 15),
-                    onMapCreated: (GoogleMapController controller) {
-                      tracking.controller = controller;
-                      tracking.enableStreamingCurrentLocation();
-                    },
-                    initialCameraPosition: CameraPosition(
-                      target: LatLng(30.29448, 30.5486),
-                      zoom: 12.0,
-                    ),
-                    mapType: MapType.normal,
-                  ),
-                  Positioned(
-                    bottom: 5,
-                    right: 5,
-                    child: FloatingActionButton(
-                      heroTag: "locateMe",
-                      mini: true,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
+    Map<String, String> result =
+        Map<String, String>.from(ModalRoute.of(context).settings.arguments);
+    String lineName = result['lineName'];
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0.0,
+        // leading: SizedBox(),
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(Icons.play_arrow),
+              onPressed: () {
+                tracking.enableStreamingCurrentLocation();
+              }),
+          IconButton(
+              icon: Icon(Icons.stop),
+              onPressed: () {
+                tracking.disableStreamingCurrentLocation();
+              })
+        ],
+        title: Text(lineName,
+            style: Theme.of(context)
+                .textTheme
+                .bodyText1
+                .copyWith(color: Colors.white)),
+      ),
+      drawer: MainDrawer(),
+      body: WillPopScope(
+          child: loadingVars
+              ? Center(
+                  child: IntrinsicHeight(
+                    child: IntrinsicWidth(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: EdgeInsets.all(20),
+                        child: SpinKitCircle(color: theme.primaryColor),
                       ),
-                      elevation: 0,
-                      highlightElevation: 0,
-                      backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Colors.white,
-                      onPressed: () async {
-                        Provider.of<TrackingProvider>(context, listen: false)
-                            .driverFocued = true;
-                        await Provider.of<TrackingProvider>(context,
-                                listen: false)
-                            .navigatorToDriver();
-                      },
-                      child: Icon(Icons.gps_fixed),
                     ),
                   ),
-                  Positioned(
-                    bottom: 5,
-                    right: 72,
-                    child: FloatingActionButton(
-                      heroTag: "showUsers",
-                      mini: true,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      elevation: 0,
-                      highlightElevation: 0,
-                      backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Colors.white,
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
+                )
+              : geolocatingEnabled
+                  ? Stack(
+                      children: <Widget>[
+                        Builder(
+                          builder: (context) => GoogleMap(
+                            polylines: tracking.polylines.values.toSet(),
+                            markers: tracking.markers.values.toSet(),
+                            compassEnabled: false,
+                            zoomControlsEnabled: false,
+                            onCameraMoveStarted: () =>
+                                Provider.of<TrackingProvider>(context,
+                                        listen: false)
+                                    .driverFocued = false,
+                            minMaxZoomPreference: MinMaxZoomPreference(10, 20),
+                            onMapCreated: (GoogleMapController controller) {
+                              tracking.controller = controller;
+                              tracking.enableStreamingCurrentLocation();
+                            },
+                            initialCameraPosition: CameraPosition(
+                              target: LatLng(30.29448, 30.5486),
+                              zoom: 12.0,
+                            ),
+                            mapType: MapType.normal,
                           ),
-                          backgroundColor: Colors.transparent,
-                          builder: (context) => PassengersInfo(),
-                        );
-                      },
-                      child: Icon(
-                        Icons.person_pin_circle,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  Seats(),
-                ],
-              )
-            : RetryPermission();
+                        ),
+                        Positioned(
+                          bottom: 5,
+                          right: 5,
+                          child: FloatingActionButton(
+                            heroTag: "locateMe",
+                            mini: true,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            elevation: 0,
+                            highlightElevation: 0,
+                            backgroundColor: Theme.of(context).primaryColor,
+                            foregroundColor: Colors.white,
+                            onPressed: () async {
+                              Provider.of<TrackingProvider>(context,
+                                      listen: false)
+                                  .driverFocued = true;
+                              await Provider.of<TrackingProvider>(context,
+                                      listen: false)
+                                  .navigatorToDriver();
+                            },
+                            child: Icon(Icons.gps_fixed),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 5,
+                          right: 56,
+                          child: FloatingActionButton(
+                            heroTag: "showUsers",
+                            mini: true,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            elevation: 0,
+                            highlightElevation: 0,
+                            backgroundColor: Theme.of(context).primaryColor,
+                            foregroundColor: Colors.white,
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: context,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                backgroundColor: Colors.transparent,
+                                builder: (context) => PassengersInfo(),
+                              );
+                            },
+                            child: Icon(
+                              Icons.person_pin_circle,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        Seats(),
+                      ],
+                    )
+                  : RetryPermission(),
+          onWillPop: () async => false),
+    );
   }
 }

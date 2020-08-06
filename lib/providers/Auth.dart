@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 // Flutter Foundation
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 class AuthProvider extends ChangeNotifier {
   String _auth = "";
@@ -10,17 +11,14 @@ class AuthProvider extends ChangeNotifier {
   String _firebaseToken;
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
+  BuildContext outerContext;
+
   AuthProvider() {
-    getSharedPrefrence();
+    checkAuthentication();
     firebaseConfig();
   }
 
-  Future firebaseConfig() async {
-    _firebaseToken = await _firebaseMessaging.getToken();
-    // print(_firebaseToken);
-  }
-
-  Future<String> getSharedPrefrence() async {
+  Future<String> checkAuthentication() async {
     try {
       _prefs = await SharedPreferences.getInstance();
       _auth = _prefs.getString("loginToken");
@@ -29,6 +27,11 @@ class AuthProvider extends ChangeNotifier {
     } catch (_) {
       return null;
     }
+  }
+
+  Future firebaseConfig() async {
+    _firebaseToken = await _firebaseMessaging.getToken();
+    // print(_firebaseToken);
   }
 
   bool isUserAuthenticated() {

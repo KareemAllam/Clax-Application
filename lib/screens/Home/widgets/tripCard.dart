@@ -1,28 +1,32 @@
-import 'package:clax/models/Trip.dart';
-import 'package:flutter/material.dart';
+// Dart & Other Pacakges
 import 'package:intl/intl.dart' as special;
+// Flutter's Material Components
+import 'package:flutter/material.dart';
+// Models
+import 'package:clax/models/Trip.dart';
 
 class TripCard extends StatelessWidget {
   static const routeName = '/trip_card';
   final Trip trip;
-  TripCard(this.trip);
+  final int index;
+  TripCard(this.trip, this.index);
   final rate = 30;
   Widget build(BuildContext context) {
     IconData rateIcon() {
       switch (trip.rate) {
-        case 10:
+        case 1:
           return Icons.sentiment_very_dissatisfied;
           break;
-        case 20:
+        case 2:
           return Icons.sentiment_dissatisfied;
           break;
-        case 30:
+        case 3:
           return Icons.sentiment_neutral;
           break;
-        case 40:
+        case 4:
           return Icons.sentiment_satisfied;
           break;
-        case 50:
+        case 5:
           return Icons.sentiment_very_satisfied;
           break;
         default:
@@ -38,23 +42,6 @@ class TripCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Container(
-              width: 20,
-              height: MediaQuery.of(context).size.height * 0.08,
-              child: GestureDetector(
-                  onTap: () {
-                    // changeTrips(trip['_id']);
-                  },
-                  child:
-                      // trip['is_favourite']
-                      //     ? Icon(
-                      //         Icons.star,
-                      //         size: 25,
-                      //         color: Theme.of(context).accentColor,
-                      //       )
-                      //     :
-                      Icon(Icons.star_border)),
-            ),
             SizedBox(width: 15),
             Expanded(
               flex: 7,

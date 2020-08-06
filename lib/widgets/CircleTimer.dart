@@ -1,46 +1,35 @@
+// Dart & Other Packages
 import 'dart:async';
+// Flutter Material Components
 import 'package:flutter/material.dart';
 
-class CircleTimer extends StatefulWidget {
+class CustomCircleIndicator extends StatefulWidget {
+  final int seconds;
+  CustomCircleIndicator(this.seconds);
   @override
-  _CircleTimerState createState() => _CircleTimerState();
+  _CustomCircleIndicatorState createState() => _CustomCircleIndicatorState();
 }
 
-class _CircleTimerState extends State<CircleTimer> {
-  double _progress = 0.0;
-  String seconds;
-  Timer time;
-
+class _CustomCircleIndicatorState extends State<CustomCircleIndicator> {
+  Timer timer;
+  double value = 0;
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    time = Timer.periodic(
-      Duration(microseconds: 10000),
-      (Timer timer) => setState(
-        () {
-          if (_progress == 1) {
-            timer.cancel();
-          } else {
-            _progress += 0.001;
-          }
-        },
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    time.cancel();
+  void initState() {
+    super.initState();
+    double _value = (1 / (widget.seconds * 10));
+    timer = Timer.periodic(Duration(milliseconds: 100), (_timer) {
+      setState(() {
+        value += _value;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return CircularProgressIndicator(
-      backgroundColor: Colors.grey,
+      value: value,
       valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
-      strokeWidth: 3,
-      value: _progress,
+      backgroundColor: Colors.grey,
     );
   }
 }
