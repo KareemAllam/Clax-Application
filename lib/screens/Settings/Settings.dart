@@ -1,13 +1,18 @@
+// Dart & Other Packages
+import 'package:provider/provider.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 // Screen
-import 'package:clax/screens/Settings/AccountOverview.dart';
-import 'package:clax/screens/Settings/Notifications.dart';
+import 'package:clax/screens/Settings/Family.dart';
 import 'package:clax/screens/Settings/Safety.dart';
+import 'package:clax/screens/Settings/Notifications.dart';
+import 'package:clax/screens/Settings/AccountOverview.dart';
 // Components
 import 'package:clax/screens/Settings/FamilyPreviews.dart';
 // Widgets
 import 'package:clax/widgets/Cards.dart';
+// Providers
+import 'package:clax/providers/Family.dart';
 // Drawer
 import 'package:clax/screens/Drawer.dart';
 
@@ -15,6 +20,8 @@ class Settings extends StatelessWidget {
   static const routeName = '/settings';
   @override
   Widget build(BuildContext context) {
+    bool seen =
+        Provider.of<FamilyProvider>(context, listen: false).seenAlready();
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
@@ -50,7 +57,9 @@ class Settings extends StatelessWidget {
             title: 'العائلة',
             icon: Icons.person_add,
             tapHandler: () {
-              Navigator.of(context).pushNamed(Family.routeName);
+              seen
+                  ? Navigator.of(context).pushNamed(Members.routeName)
+                  : Navigator.of(context).pushNamed(Family.routeName);
             },
           ),
           Cards.listTile(

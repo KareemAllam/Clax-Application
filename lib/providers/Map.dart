@@ -2,8 +2,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:clax/screens/LandingPage.dart';
-import 'package:clax/widgets/CustomCircleIndicator.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,8 +18,12 @@ import 'package:clax/services/RealtimeDB.dart';
 // Providers
 import 'package:clax/providers/CurrentTrip.dart';
 import 'package:clax/providers/Payment.dart';
+// Screens
+import 'package:clax/screens/LandingPage.dart';
 // Components
 import 'package:clax/screens/MakeARide/RateTrip.dart';
+// Widgets
+import 'package:clax/widgets/CustomCircleIndicator.dart';
 // Application Theme
 import 'package:clax/commonUI.dart';
 
@@ -123,7 +125,7 @@ class MapProvider extends ChangeNotifier {
       await _geolocator.getCurrentPosition();
     }
     _permission = result;
-    await currentLocation();
+    // await currentLocation();
   }
 
   Future checkGPSEnabled() async {
@@ -248,7 +250,8 @@ class MapProvider extends ChangeNotifier {
     });
   }
 
-  void disableStreamingDriverLocation() {
+  void disableStreamingDriverLocation() async {
+    // Canceling Listening
     _realtimeDB.cancelReadAsync('clax-lines/$_lineId/$_driverId');
   }
 
@@ -377,6 +380,7 @@ class MapProvider extends ChangeNotifier {
               listen: false)
           .cancelTripRequest();
       showDialog(
+        useRootNavigator: false,
         context: scaffoldKey.currentContext,
         builder: (context) => AlertDialog(
           elevation: 1,
@@ -413,6 +417,7 @@ class MapProvider extends ChangeNotifier {
               color: Theme.of(scaffoldKey.currentContext).accentColor,
               fontWeight: FontWeight.bold)),
       onPressed: () {
+        Navigator.of(scaffoldKey.currentContext).pop();
         // Stop the timer
         time.cancel();
         // Change request State
@@ -450,6 +455,7 @@ class MapProvider extends ChangeNotifier {
           return false;
         });
         showDialog(
+          useRootNavigator: false,
           context: scaffoldKey.currentContext,
           builder: (context) => AlertDialog(
             elevation: 1,
@@ -494,22 +500,22 @@ class MapProvider extends ChangeNotifier {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(
-              "لقد وصل السائق",
-              style: Theme.of(scaffoldKey.currentContext)
-                  .textTheme
-                  .bodyText1
-                  .copyWith(fontWeight: FontWeight.values[5]),
-            ),
-            SizedBox(height: 2),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text("انتظر حتى تركب المكروباص ثم اضغط ركبت.",
-                    style:
-                        Theme.of(scaffoldKey.currentContext).textTheme.caption),
+                Text(
+                  "لقد وصل السائق",
+                  style: Theme.of(scaffoldKey.currentContext)
+                      .textTheme
+                      .bodyText1
+                      .copyWith(fontWeight: FontWeight.values[5]),
+                ),
                 CustomCircleIndicator(60)
               ],
             ),
+            SizedBox(height: 4),
+            Text("انتظر حتى تركب المكروباص ثم اضغط ركبت.",
+                style: Theme.of(scaffoldKey.currentContext).textTheme.caption),
           ],
         ),
       ),
@@ -532,6 +538,7 @@ class MapProvider extends ChangeNotifier {
     // show the dialog
     showDialog(
         barrierDismissible: false,
+        useRootNavigator: false,
         context: scaffoldKey.currentContext,
         builder: (BuildContext context) {
           return alert;
@@ -547,6 +554,7 @@ class MapProvider extends ChangeNotifier {
               fontWeight: FontWeight.bold)),
       onPressed: () {
         // Dismiss the Alert Dialoge Box
+        Navigator.of(scaffoldKey.currentContext).pop();
         Navigator.of(scaffoldKey.currentContext)
             .pushReplacementNamed(RateTrip.routeName);
       },
@@ -589,7 +597,7 @@ class MapProvider extends ChangeNotifier {
 
     // show the dialog
     await showDialog(
-      useRootNavigator: true,
+      useRootNavigator: false,
       context: scaffoldKey.currentContext,
       builder: (BuildContext context) {
         return alert;

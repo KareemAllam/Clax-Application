@@ -56,6 +56,7 @@ class _SearchLineState extends State<SearchLine> {
                 onPressed: () {
                   // searchResult = lines;
                   _searchController.clear();
+                  widget.searchLines("");
                   setState(() {});
                 },
               )

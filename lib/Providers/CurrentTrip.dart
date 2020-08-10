@@ -142,17 +142,19 @@ class CurrentTripProvider extends ChangeNotifier {
     // Listing to changes on RequestId
     print('clax-requests/$lineId/$requestId');
     db.readAsync('clax-requests/$lineId/$requestId', (value) async {
+      if (value == null) {
+        clearTripInfo();
+        db.cancelReadAsync('clax-requests/$lineId/$requestId');
+      }
       // print(value);
       // No Driver has accepted the request
-      if (value['status'] == "refused") {
+      else if (value['status'] == "refused") {
         cancelTripRequest();
         // TODO: Show notificaion
         showDialog(
             context: scaffoldKey.currentContext,
             builder: (context) => AlertDialog());
-      }
-
-      if (value['status'] == "pending_passenger") {
+      } else if (value['status'] == "pending_passenger") {
         // Driver Information
         Map body = {
           'tourId': value['_tour'],

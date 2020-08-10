@@ -53,9 +53,6 @@ class _VerificationState extends State<Verification> {
 
     // If User's Code is correct
     if (_userCode == _code) {
-      // Send back to the server
-      await Api.put("passengers/settings/phone-verification");
-
       // Change Current State
       bool result = await Provider.of<ProfilesProvider>(context, listen: false)
           .verifyPhone();

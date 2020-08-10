@@ -1,8 +1,7 @@
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 // Components
-import 'package:clax/screens/Settings/TrustedContacts.dart';
-// Widgets
+// import 'package:clax/screens/Settings/TrustedContacts.dart';
 
 class Safety extends StatelessWidget {
   static const routeName = '/Safety';
@@ -49,35 +48,40 @@ class Safety extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                SizedBox(height: 175),
+                SizedBox(height: 18),
                 RaisedButton(
                   child: Container(
                     alignment: Alignment.center,
                     child: Text(
                       'إضافة',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: Theme.of(context).textTheme.subtitle2,
                     ),
                     width: 175,
                     height: 50,
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.00),
-                    side: BorderSide(
-                      width: 1.0,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
+                  // shape: RoundedRectangleBorder(
+                  //   borderRadius: BorderRadius.circular(20.00),
+                  //   side: BorderSide(
+                  //     width: 1.0,
+                  //     color: Theme.of(context).primaryColor,
+                  //   ),
+                  // ),
                   padding: EdgeInsets.symmetric(
-                    vertical: 3.75,
-                    horizontal: MediaQuery.of(context).size.width / 10,
+                    vertical: 4,
+                    horizontal: 4,
                   ),
                   color: Theme.of(context).primaryColor,
                   textColor: Colors.white,
                   onPressed: () {
-                    Navigator.of(context).pushNamed(TrustedContacts.routeName);
+                    Scaffold.of(context).showSnackBar(SnackBar(
+                        backgroundColor: Theme.of(context).primaryColor,
+                        content: Text(
+                          "لم يتم الانتهاء منها بعد",
+                          style: Theme.of(context)
+                              .textTheme
+                              .subtitle2
+                              .copyWith(color: Colors.white),
+                        )));
                   },
                 )
               ],

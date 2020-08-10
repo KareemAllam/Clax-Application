@@ -31,30 +31,30 @@ class _MapPageState extends State<MapPage> {
     CurrentTrip currentTripInfo =
         Provider.of<CurrentTripProvider>(context, listen: false)
             .currentTripInfo;
-
     Map result =
         await getLinePoints(currentTripInfo.start, currentTripInfo.end);
     if (!result['status']) return;
     List<Point<num>> _polyLine = result['polyline'];
     List<LatLng> polylinePoints =
         MapConversions.stringPointToLatLngs(_polyLine);
-    map.polylines.add(Polyline(
-      polylineId: PolylineId('dynamic'),
-      visible: true,
-      startCap: Cap.roundCap,
-      geodesic: true,
-      jointType: JointType.round,
-      endCap: Cap.roundCap,
-      points: polylinePoints,
-      width: 2,
-      color: Colors.purple,
-    ));
+    map.polylines.add(
+      Polyline(
+        polylineId: PolylineId('dynamic'),
+        visible: true,
+        startCap: Cap.roundCap,
+        geodesic: true,
+        jointType: JointType.round,
+        endCap: Cap.roundCap,
+        points: polylinePoints,
+        width: 2,
+        color: Colors.purple,
+      ),
+    );
     setState(() {});
-    controller.getZoomLevel().then((zoomLevel) => controller.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(target: currentTripInfo.start, zoom: zoomLevel),
-          ),
-        ));
+    controller.getZoomLevel().then(
+          (zoomLevel) => controller.animateCamera(
+              CameraUpdate.newLatLng(currentTripInfo.pickupCoords)),
+        );
   }
 
   @override

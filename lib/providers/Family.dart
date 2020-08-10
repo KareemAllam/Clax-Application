@@ -22,6 +22,7 @@ class FamilyProvider extends ChangeNotifier {
   FamilyProvider() {
     init();
   }
+
   init() {
     familyMembers = [];
     familyRequestsReceived = [];
@@ -247,5 +248,15 @@ class FamilyProvider extends ChangeNotifier {
       return ServerResponse(
           status: false, message: "$memberName لما يعد في اسرتك");
     }
+  }
+
+  /// Check if user has already seen this section
+  bool seenAlready() {
+    if (familyMembers.length > 0 ||
+        familyRequestsReceived.length > 0 ||
+        familyRequestsSent.length > 0)
+      return true;
+    else
+      return false;
   }
 }

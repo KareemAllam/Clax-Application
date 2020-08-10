@@ -1,8 +1,5 @@
 // Dart & Other Packages
 import 'dart:convert';
-
-import 'package:clax/models/Bill.dart';
-import 'package:clax/models/Error.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 // Flutter's Material Components
@@ -11,11 +8,14 @@ import 'package:flutter/services.dart';
 // Providers
 import 'package:clax/providers/Payment.dart';
 // Models
+import 'package:clax/models/Bill.dart';
+import 'package:clax/models/Error.dart';
 import 'package:clax/models/CreditCard.dart';
 
 void showPayment(context, type, {card}) {
   Navigator.of(context).pop();
   showDialog(
+      useRootNavigator: false,
       context: context,
       builder: (BuildContext context) {
         return PaymentPopup(card, type);

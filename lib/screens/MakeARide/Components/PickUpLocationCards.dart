@@ -192,6 +192,9 @@ class _GpsLocationState extends State<GpsLocation> {
       widget.updatePickUpLodation(
           userLocation['name'], userLocation['position'], Icons.pin_drop);
 
+      setState(() {
+        loading = false;
+      });
       // Provider.of<CurrentTripProvider>(context, listen: false)
       //     .currentTripInfo
       //     .lindId = widget.line.id;
@@ -218,10 +221,6 @@ class _GpsLocationState extends State<GpsLocation> {
       // Navigator.of(context).pushNamed(RideInfo.routeName);
       // widget.cancelMethod();
     }
-
-    setState(() {
-      loading = false;
-    });
   }
 
   @override

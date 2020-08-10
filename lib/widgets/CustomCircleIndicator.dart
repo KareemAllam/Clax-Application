@@ -25,6 +25,12 @@ class _CustomCircleIndicatorState extends State<CustomCircleIndicator> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    timer.cancel();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return CircularProgressIndicator(
       value: value,

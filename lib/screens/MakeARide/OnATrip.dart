@@ -91,6 +91,7 @@ class _OnATripState extends State<OnATrip> {
     // show the dialog
     showDialog(
       context: context,
+      useRootNavigator: false,
       builder: (BuildContext context) {
         return alert;
       },
@@ -110,7 +111,6 @@ class _OnATripState extends State<OnATrip> {
         ),
         drawer: MainDrawer(),
         body: Container(
-          color: Colors.white,
           width: double.infinity,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

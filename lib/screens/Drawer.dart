@@ -61,8 +61,6 @@ class _MainDrawerState extends State<MainDrawer> {
   Widget build(BuildContext context) {
     Widget buildListTile(String title, IconData icon, Function tapHandler) =>
         Container(
-          // decoration: BoxDecoration(
-          //     border: Border(top: BorderSide(color: Colors.black12))),
           child: ListTile(
             leading:
                 Icon(icon, size: 26, color: Theme.of(context).primaryColor),
