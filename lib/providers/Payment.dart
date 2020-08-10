@@ -52,13 +52,23 @@ class PaymentProvider extends ChangeNotifier {
             (offer) => Offer.fromJson(offer),
           ));
       bool offerRemoved = false;
+      List<Offer> newOffers = [];
       offers.forEach((offer) {
         if (offer.end.isBefore(DateTime.now())) {
-          offers.remove(offer);
           offerRemoved = true;
+        } else {
+          newOffers.add(offer);
+          if (offer.offerType == "Discount")
+            discountPercent += offer.value;
+          else
+            discountAmount += offer.value;
         }
       });
-      if (offerRemoved) prefs.setString("offers", json.encode(offers));
+
+      if (offerRemoved) {
+        offers = newOffers;
+        prefs.setString("offers", json.encode(offers));
+      }
     }
 
     notifyListeners();
@@ -234,7 +244,7 @@ class PaymentProvider extends ChangeNotifier {
       );
       offers.add(_offer);
       if (_offer.offerType == "Discount")
-        discountPercent *= _offer.value;
+        discountPercent += _offer.value;
       else
         discountAmount += _offer.value;
       prefs.setString('offers', json.encode(offers));

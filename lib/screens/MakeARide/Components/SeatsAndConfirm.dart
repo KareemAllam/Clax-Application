@@ -35,7 +35,7 @@ class _SeatsAndConfirmState extends State<SeatsAndConfirm> {
           style: TextStyle(
               color: Colors.white60,
               fontWeight: FontWeight.bold)), // Dismiss the Alert Dialoge Box
-      onPressed: Navigator.of(context).pop,
+      onPressed: Navigator.of(context, rootNavigator: true).pop,
     );
     Widget continueButton = FlatButton(
       child: Text("نعم",
@@ -47,7 +47,7 @@ class _SeatsAndConfirmState extends State<SeatsAndConfirm> {
         // Pass Data to Parent Widget
         widget.startSearchingForDriver(_seatsCount, finalPrice, onlinePayment);
         // Dismiss the Alert Dialoge Box
-        Navigator.of(context).pop();
+        Navigator.of(context, rootNavigator: true).pop();
       },
     );
 

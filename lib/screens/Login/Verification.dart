@@ -28,7 +28,7 @@ class _VerificationState extends State<Verification> {
       counting = true;
     });
 
-    Future.delayed(Duration(seconds: 5), () {
+    Future.delayed(Duration(seconds: 30), () {
       setState(() {
         counting = false;
       });
