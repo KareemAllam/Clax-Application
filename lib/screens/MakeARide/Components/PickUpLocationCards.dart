@@ -63,8 +63,8 @@ class _PickUpLocationState extends State<PickUpLocation> {
                   title: "اختار من الخريطه", tapHandler: () {
                 Navigator.of(context)
                     .pushNamed(MapPickLocation.routeName, arguments: {
-                  "start": LatLng(30.795822, 31.016610),
-                  "end": LatLng(30.880436, 31.082362),
+                  "start":LatLng.fromJson(widget.line.stations[0].coordinates),
+                  "end": LatLng.fromJson(widget.line.stations.last.coordinates),
                   "stations": widget.line.stations
                 }).then((value) {
                   print(value);

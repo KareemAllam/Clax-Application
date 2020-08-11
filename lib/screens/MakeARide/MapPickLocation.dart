@@ -50,6 +50,7 @@ class _MapPickLocationState extends State<MapPickLocation> {
     start = arguments["start"];
     end = arguments["end"];
     stations = arguments['stations'];
+     
   }
 
   Future createPolyLine() async {
@@ -75,11 +76,10 @@ class _MapPickLocationState extends State<MapPickLocation> {
           color: Colors.purple,
         ));
         routeDrawin = true;
-        controller.getZoomLevel().then((zoomLevel) => controller.animateCamera(
-              CameraUpdate.newCameraPosition(
-                CameraPosition(target: start, zoom: zoomLevel),
-              ),
-            ));
+         controller.animateCamera(
+              CameraUpdate.newLatLng(start),
+            );
+            
       });
     } catch (_) {
       print("Couldn't Fetch Data");
@@ -189,9 +189,8 @@ class _MapPickLocationState extends State<MapPickLocation> {
                 onMapCreated: _onMapCreated,
                 initialCameraPosition: CameraPosition(
                   target: start,
-                  zoom: 20.0,
+                  zoom: 16.0,
                 ),
-                mapType: MapType.normal,
               )),
     );
   }

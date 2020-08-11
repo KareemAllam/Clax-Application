@@ -32,14 +32,14 @@ class RoutesProvider extends ChangeNotifier {
           ).toList();
     notifyListeners();
     // Retrieve Lines from server
-    fetchDataOnline();
+     fetchDataOnline();
   }
 
   void fetchDataOnline() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Response response = await Api.get('passengers/pairing/line');
     if (response.statusCode == 200) {
-      List<LineModel>.from(
+      lines = List<LineModel>.from(
         json.decode(response.body).map((line) => LineModel.fromJson(line)),
       ).toList();
       prefs.setString('lines', response.body);

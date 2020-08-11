@@ -65,16 +65,17 @@ class LoginState extends State<Login> {
         return "_";
       }
       // If Server Erros Occured
-      else {
-        return "تأكد من اتصالك بالإنترنت و حاول مره اخرى.";
-      }
+      else if(response.statusCode==401) 
+          return "تاكد من معلوماتك و حاول مرة اخرى.";
+      else return "تأكد من اتصالك بالإنترنت و حاول مره اخرى.";
+      
     }
     // If there is no Internet Connection
     else {
       setState(() {
         _loading = false;
       });
-      return "تاكد من معلوماتك و حاول مرة اخرى.";
+      return "تأكد من اتصالك بالإنترنت و حاول مره اخرى.";
     }
   }
 
