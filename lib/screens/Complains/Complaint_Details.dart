@@ -133,24 +133,24 @@ class _ComplainDetailsState extends State<ComplainDetails> {
                       height: 10,
                     ),
                     Row(children: <Widget>[
-                      Row(children: <Widget>[
-                        ConstrainedBox(
-                          constraints: BoxConstraints(maxWidth: 30),
-                          child: Icon(Icons.confirmation_number,
-                              color: Theme.of(context).primaryColor),
-                        ),
-                        SizedBox(width: 10),
-                        if (trip != null)
+                      if (trip != null)
+                        Row(children: <Widget>[
+                          ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: 30),
+                            child: Icon(Icons.confirmation_number,
+                                color: Theme.of(context).primaryColor),
+                          ),
+                          SizedBox(width: 10),
                           Text(trip.price.toString() ?? 2,
                               style: Theme.of(context)
                                   .textTheme
                                   .subtitle2
                                   .copyWith(fontFamily: "Product Sans")),
-                        Text(" جنية مصرى",
-                            strutStyle: StrutStyle(forceStrutHeight: true),
-                            style: Theme.of(context).textTheme.subtitle2)
-                      ]),
-                      Spacer(),
+                          Text(" جنية مصرى",
+                              strutStyle: StrutStyle(forceStrutHeight: true),
+                              style: Theme.of(context).textTheme.subtitle2)
+                        ]),
+                      if (trip != null) Spacer(),
                       Row(children: <Widget>[
                         Icon(Icons.report_problem,
                             color: Theme.of(context).primaryColor),

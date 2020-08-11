@@ -132,112 +132,115 @@ class _AccountState extends State<Account> {
       ),
       body: Form(
         key: _form,
-        child: ListView(
-          children: <Widget>[
-            Image.asset(
-              'assets/images/abcd.jpg',
-            ),
-            TextFormField(
-              initialValue: _originalProfile.name.first +
-                  " " +
-                  _originalProfile.name.last,
-              decoration: InputDecoration(
-                  labelText: 'الأسم:',
-                  filled: true,
-                  fillColor: Colors.white,
-                  prefixIcon: Icon(Icons.person)),
-              textInputAction: TextInputAction.done,
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'ادخل اسمك';
-                }
-                return null;
-              },
-              onSaved: (value) {
-                name.first = '';
-                name.last = '';
-                value = value.trimLeft();
-                value = value.trimRight();
-                if (value !=
-                    '${_originalProfile.name.first} ${_originalProfile.name.last}') {
-                  List<String> _name = value.split(' ');
-                  name.first = _name[0];
-                  name.last = _name[1];
-                }
-              },
-            ),
-            TextFormField(
-                initialValue: _originalProfile.phone,
+        child: Container(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          child: ListView(
+            children: <Widget>[
+              Image.asset(
+                'assets/images/abcd.jpg',
+              ),
+              TextFormField(
+                initialValue: _originalProfile.name.first +
+                    " " +
+                    _originalProfile.name.last,
                 decoration: InputDecoration(
-                    labelText: 'رقم الهاتف',
+                    labelText: 'الأسم:',
                     filled: true,
                     fillColor: Colors.white,
-                    prefixIcon: Icon(Icons.phone)),
+                    prefixIcon: Icon(Icons.person)),
                 textInputAction: TextInputAction.done,
-                inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
-                keyboardType: TextInputType.phone,
                 validator: (value) {
                   if (value.isEmpty) {
-                    return 'من فضلك، قم بإدخال رقم الهاتف';
-                  }
-                  if (value.length != 11) {
-                    return 'قم بإدخال الرقم بشكل صحيح';
+                    return 'ادخل اسمك';
                   }
                   return null;
                 },
                 onSaved: (value) {
-                  phone = '';
-                  if (value != _originalProfile.phone) phone = value;
-                }),
-            TextFormField(
-              controller: passwordController,
-              decoration: InputDecoration(
-                  labelText: 'كلمة السر',
-                  filled: true,
-                  fillColor: Colors.white,
-                  prefixIcon: Icon(Icons.lock)),
-              textInputAction: TextInputAction.done,
-              obscureText: true,
-              keyboardType: TextInputType.visiblePassword,
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'من فضلك، قم بإدخال كلمة المرور ';
-                }
-                if (value.length < 8) {
-                  return 'كلمة المرور ضعيفة';
-                }
+                  name.first = '';
+                  name.last = '';
+                  value = value.trimLeft();
+                  value = value.trimRight();
+                  if (value !=
+                      '${_originalProfile.name.first} ${_originalProfile.name.last}') {
+                    List<String> _name = value.split(' ');
+                    name.first = _name[0];
+                    name.last = _name[1];
+                  }
+                },
+              ),
+              TextFormField(
+                  initialValue: _originalProfile.phone,
+                  decoration: InputDecoration(
+                      labelText: 'رقم الهاتف',
+                      filled: true,
+                      fillColor: Colors.white,
+                      prefixIcon: Icon(Icons.phone)),
+                  textInputAction: TextInputAction.done,
+                  inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+                  keyboardType: TextInputType.phone,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'من فضلك، قم بإدخال رقم الهاتف';
+                    }
+                    if (value.length != 11) {
+                      return 'قم بإدخال الرقم بشكل صحيح';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) {
+                    phone = '';
+                    if (value != _originalProfile.phone) phone = value;
+                  }),
+              TextFormField(
+                controller: passwordController,
+                decoration: InputDecoration(
+                    labelText: 'كلمة السر',
+                    filled: true,
+                    fillColor: Colors.white,
+                    prefixIcon: Icon(Icons.lock)),
+                textInputAction: TextInputAction.done,
+                obscureText: true,
+                keyboardType: TextInputType.visiblePassword,
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'من فضلك، قم بإدخال كلمة المرور ';
+                  }
+                  if (value.length < 8) {
+                    return 'كلمة المرور ضعيفة';
+                  }
 
-                RegExp regExp = new RegExp(
-                    r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
-                if (regExp.hasMatch(value))
-                  return "كلمة المرور يجب ان تحتوى علي احرف كبيرةو صغيرة و ارقام";
-                return null;
-              },
-              onSaved: (value) {
-                pass = value;
-              },
-            ),
-            TextFormField(
-              initialValue: password(_originalProfile.passLength),
-              decoration: InputDecoration(
-                  labelText: 'تأكيد كلمة السر',
-                  filled: true,
-                  fillColor: Colors.white,
-                  prefixIcon: Icon(Icons.lock)),
-              textInputAction: TextInputAction.done,
-              obscureText: true,
-              keyboardType: TextInputType.visiblePassword,
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'من فضلك، قم بإدخال كلمة المرور ';
-                }
-                if (value != passwordController.text) {
-                  return 'كلمة المرور غير متاطبقة';
-                }
-                return null;
-              },
-            ),
-          ],
+                  RegExp regExp = new RegExp(
+                      r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
+                  if (regExp.hasMatch(value))
+                    return "كلمة المرور يجب ان تحتوى علي احرف كبيرةو صغيرة و ارقام";
+                  return null;
+                },
+                onSaved: (value) {
+                  pass = value;
+                },
+              ),
+              TextFormField(
+                initialValue: password(_originalProfile.passLength),
+                decoration: InputDecoration(
+                    labelText: 'تأكيد كلمة السر',
+                    filled: true,
+                    fillColor: Colors.white,
+                    prefixIcon: Icon(Icons.lock)),
+                textInputAction: TextInputAction.done,
+                obscureText: true,
+                keyboardType: TextInputType.visiblePassword,
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'من فضلك، قم بإدخال كلمة المرور ';
+                  }
+                  if (value != passwordController.text) {
+                    return 'كلمة المرور غير متاطبقة';
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

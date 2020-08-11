@@ -1,14 +1,17 @@
 // Dart & Other Pacakges
-import 'package:clax/models/Line.dart';
-import 'package:clax/providers/Tracking.dart';
-import 'package:clax/screens/MakeARide/Working.dart';
+import 'dart:io';
 import 'package:provider/provider.dart';
+import 'package:geolocator/geolocator.dart';
 // Flutter's Material Compoenents
 import 'package:flutter/material.dart';
 // Providers
+// import 'package:clax/providers/Tracking.dart';
 import 'package:clax/providers/RideSettings.dart';
 // Models
 import 'package:clax/models/Car.dart';
+import 'package:clax/models/Line.dart';
+// Screens
+import 'package:clax/screens/MakeARide/Working.dart';
 
 class StartTrip extends StatefulWidget {
   static const routeName = '/StartTrip';
@@ -248,18 +251,65 @@ class _StartTripState extends State<StartTrip> {
           Expanded(
             flex: 2,
             child: GestureDetector(
-              onTap: () {
-                Provider.of<TrackingProvider>(context, listen: false)
-                    .disableStreamingCurrentLocation();
+              onTap: () async {
+                // Retrieveing Selected Line
                 Provider.of<TripSettingsProvider>(context, listen: false)
                     .currentCar = selectedCar;
                 Provider.of<TripSettingsProvider>(context, listen: false)
                     .currnetLine = selectedLine;
 
-                Navigator.of(context).pushNamed(Working.routeName, arguments: {
-                  "lineName":
-                      '${selectedLine.start.name} - ${selectedLine.end.name}'
-                });
+                // Checking Current Internet Status
+                try {
+                  final result = await InternetAddress.lookup('google.com');
+                  // No Internet issues occured
+                  if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+                    // Check if Driver is near the line
+                    Geolocator _geolocator = Geolocator();
+                    Position currnetLocation =
+                        await _geolocator.getCurrentPosition();
+                    if (await _geolocator.distanceBetween(
+                                selectedLine.start.coordinates[0],
+                                selectedLine.start.coordinates[0],
+                                currnetLocation.latitude,
+                                currnetLocation.longitude) >
+                            30000 &&
+                        await _geolocator.distanceBetween(
+                                selectedLine.end.coordinates[0],
+                                selectedLine.end.coordinates[0],
+                                currnetLocation.latitude,
+                                currnetLocation.longitude) >
+                            30000) {
+                      Scaffold.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            "عفواً، انت لست قريب من هذا الخط",
+                            style: Theme.of(context)
+                                .textTheme
+                                .subtitle2
+                                .copyWith(color: Colors.white),
+                          ),
+                        ),
+                      );
+                    } else
+                      Navigator.of(context).pushNamed(Working.routeName,
+                          arguments: {
+                            "lineName":
+                                '${selectedLine.start.name} - ${selectedLine.end.name}'
+                          });
+                  }
+                } on SocketException catch (_) {
+                  Scaffold.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        "تأكد من اتصالك بالانترنت و حاول مره اخرى",
+                        style: Theme.of(context)
+                            .textTheme
+                            .subtitle2
+                            .copyWith(color: Colors.white),
+                      ),
+                    ),
+                  );
+                }
               },
               child: Container(
                 alignment: Alignment.center,

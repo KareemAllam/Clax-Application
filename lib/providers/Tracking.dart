@@ -54,7 +54,7 @@ class TrackingProvider extends ChangeNotifier {
   // ----- Constructores -----
   // Synchronous Constructor
   TrackingProvider() {
-    if (streamingLocation == null) getCurrentLocation();
+    if (streamingLocation == null) checkServiceState();
   }
 
   // ----- Functionality -----
@@ -67,7 +67,8 @@ class TrackingProvider extends ChangeNotifier {
     return await _geolocator.isLocationServiceEnabled();
   }
 
-  Future getCurrentLocation() async {
+  Future checkServiceState() async {
+    await _geolocator.getCurrentPosition();
     permission = await _geolocator.checkGeolocationPermissionStatus();
     gpsEnabled = await _geolocator.isLocationServiceEnabled();
     notifyListeners();
@@ -111,11 +112,22 @@ class TrackingProvider extends ChangeNotifier {
     if (result.statusCode == 200) {
       tourId = json.decode(result.body);
       // end tour data
-      Map bodyData = {"lineId": line.id, "tourId": tourId};
       // Create New Payment
       startNewTripPayment(direction);
       // Draw Route on Map
       await drawRoute();
+
+      // Check if Driver Reached Destination
+      // If it is going from `start` to `end`
+      List<double> coords;
+      direction == 0
+          ? coords = line.end.coordinates
+          : coords = line.start.coordinates;
+      if (direction == 0)
+        print('${line.start.name} => ${line.end.name}');
+      else
+        print('${line.end.name} => ${line.start.name}');
+
       //---------------------------
       // Boradcasting Tour Information
       streamingLocation = geolocator.getPositionStream(locationOptions).listen(
@@ -133,31 +145,24 @@ class TrackingProvider extends ChangeNotifier {
             ),
           );
           markers['driver'] = marker;
-
           notifyListeners();
 
           if (driverFocued)
             controller.animateCamera(CameraUpdate.newLatLng(
                 LatLng(position.latitude, position.longitude)));
+
           // Update Database with current location updates
           int seats = Provider.of<TripSettingsProvider>(
                   scaffoldKey.currentContext,
                   listen: false)
               .currnetSeats;
 
-          // Check if Driver Reached Destination
-          // If it is going from `start` to `end`
-          List<double> coords;
-          direction == 0
-              ? coords = line.end.coordinates
-              : coords = line.start.coordinates;
-          print(direction);
-          print(coords[0]);
+          // Check if Driver Reached destination
           geolocator
               .distanceBetween(
                   position.latitude, position.longitude, coords[0], coords[1])
               .then((value) {
-            print(value);
+            // print(value);
             // Driver reached the end of the Line
             if (value < 1500) {
               Api.post(
@@ -179,24 +184,23 @@ class TrackingProvider extends ChangeNotifier {
             "fireBaseId": fbToken
           });
 
-          // Check if Driver Reached destination
-          if (direction == 0) {
-            geolocator
-                .distanceBetween(position.latitude, position.longitude,
-                    line.end.coordinates[0], line.end.coordinates[1])
-                .then((double distancee) {
-              if (distancee < 1000) disableStreamingCurrentLocation();
-              Api.post('drivers/settings/end-tour', bodyData);
-            });
-          } else {
-            geolocator
-                .distanceBetween(position.latitude, position.longitude,
-                    line.end.coordinates[0], line.end.coordinates[1])
-                .then((double distancee) {
-              if (distancee < 1000) disableStreamingCurrentLocation();
-              Api.post('drivers/settings/end-tour', bodyData);
-            });
-          }
+          // if (direction == 0) {
+          //   geolocator
+          //       .distanceBetween(position.latitude, position.longitude,
+          //           line.end.coordinates[0], line.end.coordinates[1])
+          //       .then((double distancee) {
+          //     if (distancee < 1000) disableStreamingCurrentLocation();
+          //     Api.post('drivers/settings/end-tour', bodyData);
+          //   });
+          // } else {
+          //   geolocator
+          //       .distanceBetween(position.latitude, position.longitude,
+          //           line.end.coordinates[0], line.end.coordinates[1])
+          //       .then((double distancee) {
+          //     if (distancee < 1000) disableStreamingCurrentLocation();
+          //     Api.post('drivers/settings/end-tour', bodyData);
+          //   });
+          // }
         },
       );
     } else
@@ -325,6 +329,9 @@ class TrackingProvider extends ChangeNotifier {
   void trackPassengerRequest(lineId, requestId, message) {
     // Track Request from Realtime DB
     _realtimeDB.readAsync("clax-requests/$lineId/$requestId", (value) async {
+      if (value == null)
+        _realtimeDB.cancelReadAsync("clax-requests/$lineId/$requestId");
+
       // If user has cancelled the trip
       if (value['status'] == "cancel" || value['status'] == "canceled") {
         // Retreive Location
@@ -391,7 +398,7 @@ class TrackingProvider extends ChangeNotifier {
   Future navigatorToDriver() async {
     Position position = await Geolocator().getCurrentPosition();
 
-    controller.animateCamera(CameraUpdate.newLatLng(
+    controller.moveCamera(CameraUpdate.newLatLng(
         LatLng.fromJson([position.latitude, position.longitude])));
   }
 }

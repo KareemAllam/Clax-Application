@@ -40,7 +40,7 @@ class _VerificationState extends State<Verification> {
         Provider.of<ProfilesProvider>(context, listen: false).profile.phone;
     Map<String, String> body = {"phone": phone};
     Response response =
-        await Api.post('passengers/settings/phone-verification', body);
+        await Api.post('drivers/settings/phone-verification', body);
     _code = response.body;
     print(_code);
   }
@@ -53,9 +53,6 @@ class _VerificationState extends State<Verification> {
 
     // If User's Code is correct
     if (_userCode == _code) {
-      // Send back to the server
-      await Api.put("passengers/settings/phone-verification");
-
       // Change Current State
       bool result = await Provider.of<ProfilesProvider>(context, listen: false)
           .verifyPhone();

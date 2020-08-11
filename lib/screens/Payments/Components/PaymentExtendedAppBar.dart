@@ -1,7 +1,7 @@
 // Dart & Other Packages
 import 'dart:io';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 // Providers
@@ -11,6 +11,9 @@ import 'package:clax/providers/Profile.dart';
 import 'package:clax/models/Profile.dart';
 // Screens
 import 'package:clax/screens/Login/Verification.dart';
+// Widgets
+import 'package:clax/widgets/BottomSheetTitle.dart';
+import 'package:clax/widgets/Cards.dart';
 
 class PaymentAppBarBottom extends StatefulWidget {
   @override
@@ -78,7 +81,30 @@ class _PaymentAppBarBottomState extends State<PaymentAppBarBottom> {
                             // isScrollControlled: true,
                             isDismissible: true,
                             builder: (BuildContext context) {
-                              return Text("tbd");
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  BottomSheetTitle(
+                                    title: "اختار طريقة الاستقبال المناسبة",
+                                    icon: Icons.receipt,
+                                  ),
+                                  Cards.bottomSheetCard(
+                                      context, "احد فروعنا", () {},
+                                      icon: Icons.business),
+                                  Cards.bottomSheetCard(
+                                      context, "حسابك البنكي", () {},
+                                      icon: Icons.account_balance),
+                                  Cards.bottomSheetCard(
+                                      context, "فودافون كاش", () {},
+                                      img: AssetImage(
+                                          'assets/images/vodafone.png')),
+                                  SizedBox(
+                                      height: 16,
+                                      child: Container(
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor))
+                                ],
+                              );
                             });
                       } else
                         Scaffold.of(context).showSnackBar(SnackBar(
@@ -103,7 +129,7 @@ class _PaymentAppBarBottomState extends State<PaymentAppBarBottom> {
                       padding:
                           EdgeInsets.symmetric(vertical: 5, horizontal: 50),
                       child: Text(
-                        "اضافة المزيد",
+                        "استلم فلوسك",
                         style: theme.textTheme.button.copyWith(
                             color: Colors.white, fontWeight: FontWeight.bold),
                       ),

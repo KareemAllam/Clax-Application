@@ -1,11 +1,11 @@
 // Dart & Other Pacakges
 import 'dart:convert';
-import 'package:clax/models/Error.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // Flutter Foundation
 import 'package:flutter/foundation.dart';
 // Models
+import 'package:clax/models/Error.dart';
 import 'package:clax/models/Complain.dart';
 // Services
 import 'package:clax/services/Backend.dart';
@@ -30,7 +30,7 @@ class ComplainsProvider extends ChangeNotifier {
   // Fetch Data from Server
   Future<ServerResponse> serverData() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
-    Response response = await Api.get('user/mycomplaint');
+    Response response = await Api.get('drivers/complaints/all');
     if (response.statusCode == 200) {
       _complains = List<ComplainModel>.from((json
           .decode(response.body)
@@ -45,7 +45,8 @@ class ComplainsProvider extends ChangeNotifier {
 
   Future<ServerResponse> add(body) async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
-    Response result = await Api.post("user/complaint", body);
+    Response result =
+        await Api.post("drivers/complaints/add", body, stringDynamic: true);
     if (result.statusCode == 200) {
       ComplainModel complain = ComplainModel.fromJson(json.decode(result.body));
       _complains.add(complain);

@@ -22,8 +22,6 @@ class _RegisterFormState extends State<RegisterForm> {
   Color governColor = Colors.black26;
   final RegExp phone = RegExp(r'^[0-9]+$');
   final RegExp phoneEgypt = RegExp(r'^01[0125][0-9]{8}$');
-  final RegExp email = RegExp(
-      r"^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$");
   bool _nameFocused = false;
   bool _nameError = false;
   bool _hiddenPassword = true;
@@ -35,8 +33,6 @@ class _RegisterFormState extends State<RegisterForm> {
   FocusNode _firstNameNode = FocusNode();
   TextEditingController _lastName = TextEditingController();
   FocusNode _lastNameNode = FocusNode();
-  TextEditingController _email = TextEditingController();
-  FocusNode _emailNode = FocusNode();
   TextEditingController _phone = TextEditingController();
   FocusNode _phoneNode = FocusNode();
   TextEditingController _password = TextEditingController();
@@ -60,11 +56,12 @@ class _RegisterFormState extends State<RegisterForm> {
     // Input Data passed the required Conditions
     else {
       // Remove EULA not Checked Error
-      Map<String, String> body = {
-        'firstName': _firstName.text,
-        'lastName': _lastName.text,
+      Map<String, dynamic> body = {
+        'name': {
+          'first': _firstName.text,
+          'last': _lastName.text,
+        },
         'phone': _phone.text,
-        'mail': _email.text,
         'pass': _password.text,
         'fireBaseId': firebaseToken,
         'govern': selectedGovernment
@@ -115,8 +112,6 @@ class _RegisterFormState extends State<RegisterForm> {
     _firstNameNode.dispose();
     _lastName.dispose();
     _lastNameNode.dispose();
-    _email.dispose();
-    _emailNode.dispose();
     _phone.dispose();
     _phoneNode.dispose();
     _password.dispose();
@@ -356,7 +351,6 @@ class _RegisterFormState extends State<RegisterForm> {
                 TextFormField(
                   onEditingComplete: () {
                     _phoneNode.unfocus();
-                    FocusScope.of(context).requestFocus(_emailNode);
                   },
                   keyboardType: TextInputType.phone,
                   controller: _phone,

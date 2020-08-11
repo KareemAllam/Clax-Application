@@ -33,48 +33,50 @@ class _WorkingState extends State<Working> {
   // Permissions
   GeolocationStatus permission;
   bool gpsEnabled;
+  bool allGood;
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     super.didChangeDependencies();
     tracking = Provider.of<TrackingProvider>(context);
     theme = Theme.of(context);
     permission = tracking.permission;
     gpsEnabled = tracking.gpsEnabled;
+    if (gpsEnabled == null || permission != GeolocationStatus.granted) {
+      await tracking.checkServiceState();
+    } else
+      allGood = true;
   }
 
   @override
   void dispose() {
     super.dispose();
-    tracking.disableStreamingCurrentLocation();
+    // tracking.disableStreamingCurrentLocation();
   }
 
   @override
   Widget build(BuildContext context) {
-    bool geolocatingEnabled = false;
-    bool loadingVars =
-        (gpsEnabled == null || permission != GeolocationStatus.granted);
-    if (!loadingVars)
-      geolocatingEnabled =
-          (permission == GeolocationStatus.granted && gpsEnabled);
+    // Current Line as Screen Title
     Map<String, String> result =
         Map<String, String>.from(ModalRoute.of(context).settings.arguments);
     String lineName = result['lineName'];
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
         // leading: SizedBox(),
         actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.play_arrow),
-              onPressed: () {
-                tracking.enableStreamingCurrentLocation();
-              }),
-          IconButton(
-              icon: Icon(Icons.stop),
-              onPressed: () {
-                tracking.disableStreamingCurrentLocation();
-              })
+          // Debugging & Testing  UI
+          // IconButton(
+          //     icon: Icon(Icons.play_arrow),
+          //     onPressed: () {
+          //       tracking.enableStreamingCurrentLocation();
+          //     }),
+          // IconButton(
+          //     icon: Icon(Icons.stop),
+          //     onPressed: () {
+          //       tracking.disableStreamingCurrentLocation();
+          //     })
         ],
         title: Text(lineName,
             style: Theme.of(context)
@@ -84,7 +86,7 @@ class _WorkingState extends State<Working> {
       ),
       drawer: MainDrawer(),
       body: WillPopScope(
-          child: loadingVars
+          child: allGood == null
               ? Center(
                   child: IntrinsicHeight(
                     child: IntrinsicWidth(
@@ -99,7 +101,7 @@ class _WorkingState extends State<Working> {
                     ),
                   ),
                 )
-              : geolocatingEnabled
+              : gpsEnabled
                   ? Stack(
                       children: <Widget>[
                         Builder(
@@ -108,10 +110,10 @@ class _WorkingState extends State<Working> {
                             markers: tracking.markers.values.toSet(),
                             compassEnabled: false,
                             zoomControlsEnabled: false,
-                            onCameraMoveStarted: () =>
-                                Provider.of<TrackingProvider>(context,
-                                        listen: false)
-                                    .driverFocued = false,
+                            // onCameraMoveStarted: () =>
+                            //     Provider.of<TrackingProvider>(context,
+                            //             listen: false)
+                            //         .driverFocued = false,
                             minMaxZoomPreference: MinMaxZoomPreference(10, 20),
                             onMapCreated: (GoogleMapController controller) {
                               tracking.controller = controller;

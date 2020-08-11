@@ -30,6 +30,10 @@ class PaymentProvider extends ChangeNotifier {
               .decode(prefs.getString('bills'))
               .map((bill) => BillModel.fromJson(bill))).toList() ??
           [];
+      try {
+        bills = List<BillModel>.from(
+            bills.getRange(bills.length - 1 - 7, bills.length - 1));
+      } catch (err) {}
     }
     notifyListeners();
     await serverData();
@@ -51,6 +55,10 @@ class PaymentProvider extends ChangeNotifier {
         // Assigning Result to statue
         bills = List<BillModel>.from(
             (_bills.map((payment) => BillModel.fromJson(payment))).toList());
+        try {
+          bills = List<BillModel>.from(
+              bills.getRange(bills.length - 1 - 7, bills.length - 1));
+        } catch (err) {}
       } else {
         // Assigning Result to statue
         bills = [];

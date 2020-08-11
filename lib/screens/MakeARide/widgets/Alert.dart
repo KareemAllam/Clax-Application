@@ -195,6 +195,7 @@ Future<bool> showRequestDialog(BuildContext context, Map message) {
 
   // show the dialog
   return showDialog(
+    useRootNavigator: false,
     context: context,
     barrierDismissible: false,
     builder: (BuildContext context) {

@@ -1,11 +1,8 @@
 // Dart & Other Packages
 import 'package:provider/provider.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
-// Utils
-import 'package:clax/services/CloudMessaging.dart';
 // Providers
 import 'package:clax/providers/Auth.dart';
 import 'package:clax/providers/Trips.dart';
@@ -25,34 +22,6 @@ class ClaxRoot extends StatefulWidget {
 }
 
 class _ClaxRootState extends State<ClaxRoot> {
-  NotificationHandler handler = NotificationHandler();
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-  void _navigateToItemDetail(Map<String, dynamic> message) {
-    handler.handle(context, message);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) async {
-        _navigateToItemDetail(message);
-      },
-      onLaunch: (Map<String, dynamic> message) async {
-        // print("onLaunch: $message");
-        _navigateToItemDetail(message);
-      },
-      onResume: (Map<String, dynamic> message) async {
-        // print("onResume: $message");
-        _navigateToItemDetail(message);
-      },
-    );
-    _firebaseMessaging.getToken().then((String token) {
-      assert(token != null);
-      // print("Push Messaging token: $token");
-    });
-  }
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -69,14 +38,12 @@ class _ClaxRootState extends State<ClaxRoot> {
   Widget build(BuildContext context2) {
     return MultiProvider(
       providers: [
-        Provider(create: (context) => AuthProvider()),
         Provider(create: (context) => ProfilesProvider()),
         Provider(create: (context) => PaymentProvider()),
         Provider(create: (context) => ComplainsProvider()),
         Provider(create: (context) => TripsProvider()),
         Provider(create: (context) => TripSettingsProvider()),
         Provider(create: (context) => TrackingProvider()),
-        ChangeNotifierProvider(create: (context) => AuthProvider()),
         ChangeNotifierProvider(create: (context) => ProfilesProvider()),
         ChangeNotifierProvider(create: (context) => PaymentProvider()),
         ChangeNotifierProvider(create: (context) => ComplainsProvider()),
@@ -85,9 +52,9 @@ class _ClaxRootState extends State<ClaxRoot> {
         ChangeNotifierProvider(create: (context) => TripSettingsProvider()),
       ],
       child: Builder(
+        // Solution for nested routing was provided here:
+        // https://github.com/rmtmckenzie/flutter_nested_navigators
         builder: (context) => OverlaySupport(
-          // Solution for nested routing was provided here:
-          // https://github.com/rmtmckenzie/flutter_nested_navigators
           child: WillPopScope(
             onWillPop: () async {
               return !await didPopRoute();

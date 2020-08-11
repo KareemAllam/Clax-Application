@@ -1,12 +1,11 @@
 // Dart & Other Packages
 import 'dart:convert';
 import 'dart:typed_data';
-
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 // Flutter's Material Components
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:clax/services/Backend.dart';
 // Providers
 import 'package:clax/providers/Auth.dart';
+// Widgets
+import 'package:clax/widgets/Alerts.dart';
 
 class RegisterForm2 extends StatefulWidget {
   static const routeName = '/register2';
@@ -40,6 +41,9 @@ class _RegisterForm2State extends State<RegisterForm2> {
   ];
   bool _termsChecked = false;
   bool _loading = false;
+  bool p1Error = false;
+  bool p2Error = false;
+  bool p3Error = false;
   Widget _eulaCondition = SizedBox(height: 0);
 
   /// Profile Licence CarPapers
@@ -64,14 +68,13 @@ class _RegisterForm2State extends State<RegisterForm2> {
               width: double.infinity,
               color: Theme.of(context).primaryColor,
               child: Row(children: <Widget>[
-                Icon(FontAwesomeIcons.image,
-                    color: Theme.of(context).accentColor),
+                Icon(FontAwesomeIcons.image, color: Colors.white),
                 SizedBox(width: 16),
                 Text(
                   "حدد مكان الصورة",
                   style: Theme.of(context)
                       .textTheme
-                      .bodyText1
+                      .subtitle2
                       .copyWith(color: Colors.white),
                 )
               ]),
@@ -90,7 +93,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
                 Navigator.of(context).pop();
               },
               child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: EdgeInsets.only(right: 16, top: 8, bottom: 4),
                   child: Row(children: <Widget>[
                     Icon(Icons.image, color: Theme.of(context).primaryColor),
                     SizedBox(width: 16),
@@ -111,7 +114,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
                 Navigator.of(context).pop();
               },
               child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: EdgeInsets.only(right: 16, bottom: 16, top: 8),
                   child: Row(children: <Widget>[
                     Icon(Icons.camera_alt,
                         color: Theme.of(context).primaryColor),
@@ -120,7 +123,6 @@ class _RegisterForm2State extends State<RegisterForm2> {
                         style: Theme.of(context).textTheme.subtitle2),
                   ])),
             ),
-            SizedBox(height: 4)
           ],
         ),
       ),
@@ -147,10 +149,21 @@ class _RegisterForm2State extends State<RegisterForm2> {
         _eulaCondition = SizedBox(height: 0);
       });
 
+    p1Error = false;
+    p2Error = false;
+    p3Error = false;
+
     // Input Data passed the required Conditions
-    if (pictures['Profile'].length == 0 ||
-        pictures['Licence'].length == 0 ||
-        pictures['CarPapers'].length == 0) {
+    if (pictures['Profile'].length == 0) {
+      error = true;
+      p1Error = true;
+    }
+    if (pictures['Licence'].length == 0) {
+      error = true;
+      p2Error = true;
+    }
+    if (pictures['CarPapers'].length == 0) {
+      p3Error = true;
       error = true;
     }
 
@@ -183,19 +196,10 @@ class _RegisterForm2State extends State<RegisterForm2> {
       /// 'fireBaseId': firebaseToken,
       /// 'govern': selectedGovernment
       Map<String, dynamic> body = args['data'];
-      body.addAll(
-        Map<String, dynamic>.from(
-          {
-            'passLength': (body['pass'] as String).length,
-            'profilePic': Map<String, dynamic>.from(
-                {"data": pictures['Profile']['image']}),
-            'licence': Map<String, dynamic>.from(
-                {"data": pictures['Licence']['image']}),
-            'carLicence': Map<String, dynamic>.from(
-                {"data": pictures['CarPapers']['image']}),
-          },
-        ),
-      );
+      body['passLength'] = (body['pass'] as String).length;
+      body['profilePic'] = {"data": pictures['Profile']['image']};
+      body['license'] = {"data": pictures['Licence']['image']};
+      body['criminalRecord'] = {"data": pictures['CarPapers']['image']};
 
       // Disable Register Button
       setState(() {
@@ -203,14 +207,20 @@ class _RegisterForm2State extends State<RegisterForm2> {
       });
 
       // Register The User from on Server
-      Response result =
-          await Api.post("drivers/register", body, stringDynamic: true);
+      Response result = await Api.post("drivers/register", json.encode(body),
+          stringDynamic: true);
       // If User's info is correct
       if (result.statusCode == 200) {
         Provider.of<AuthProvider>(context, listen: false)
             .logIn(result.headers['x-login-token']);
         Navigator.pop(context);
-        Navigator.pushReplacementNamed(context, '/homescreen');
+        Navigator.pop(context);
+        oneButtonAlertDialoge(
+          context,
+          title: "شكرا لتسجيلك معانا في كلاكس",
+          description: "سنقوم بالاتصال بك في اقرب وقت لإتمام عملية التسجيل",
+        );
+
         // Enable Register Button
         setState(() {
           _loading = true;
@@ -318,7 +328,8 @@ class _RegisterForm2State extends State<RegisterForm2> {
                     decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey[350])),
+                        border: Border.all(
+                            color: p1Error ? Colors.red : Colors.grey[350])),
                     child: Row(children: <Widget>[
                       Icon(Icons.account_box,
                           color: Theme.of(context).primaryColor),
@@ -344,7 +355,8 @@ class _RegisterForm2State extends State<RegisterForm2> {
                     decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey[350])),
+                        border: Border.all(
+                            color: p2Error ? Colors.red : Colors.grey[350])),
                     child: Row(children: <Widget>[
                       Icon(FontAwesomeIcons.addressCard,
                           color: Theme.of(context).primaryColor),
@@ -371,7 +383,8 @@ class _RegisterForm2State extends State<RegisterForm2> {
                     decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey[350])),
+                        border: Border.all(
+                            color: p3Error ? Colors.red : Colors.grey[350])),
                     child: Row(children: <Widget>[
                       Icon(Icons.insert_drive_file,
                           color: Theme.of(context).primaryColor),
@@ -431,8 +444,17 @@ class _RegisterForm2State extends State<RegisterForm2> {
                           onPressed: () async {
                             var result = await register();
                             if (result == 2)
-                              Scaffold.of(context).showSnackBar(SnackBar(
-                                  content: Text("تعذر الوصول للانترنت.")));
+                              Scaffold.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "تعذر الوصول للانترنت.",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .subtitle2
+                                        .copyWith(color: Colors.white),
+                                  ),
+                                ),
+                              );
                             else if (result != 0)
                               Scaffold.of(context).showSnackBar(SnackBar(
                                   content: Text(

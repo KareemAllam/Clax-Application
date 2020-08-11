@@ -1,4 +1,6 @@
 // Dart & Other Packages
+import 'package:clax/providers/Payment.dart';
+import 'package:clax/providers/Profile.dart';
 import 'package:provider/provider.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
@@ -11,8 +13,6 @@ import 'package:clax/providers/Auth.dart';
 // import 'package:clax/providers/Transactions.dart';
 // Screens
 import 'package:clax/screens/LandingPage.dart';
-import 'package:clax/screens/Home/Rahalatk.dart';
-import 'package:clax/screens/Help/Help.dart';
 import 'package:clax/screens/Settings/Settings.dart';
 import 'package:clax/screens/Complains/Complains_Screen.dart';
 import 'package:clax/screens/Payments/Payment_HomeScreen.dart';
@@ -30,7 +30,6 @@ class _MainDrawerState extends State<MainDrawer> {
       "icon": Icons.local_taxi,
       "route": LandingPage.routeName
     },
-    {"title": 'رحلاتك', "icon": Icons.calendar_today, "route": Rides.routeName},
     {
       "title": 'الدفع',
       "icon": Icons.attach_money,
@@ -38,27 +37,18 @@ class _MainDrawerState extends State<MainDrawer> {
     },
     {"title": 'الشكاوي', "icon": Icons.feedback, "route": Complains.routeName},
     {"title": 'الإعدادات', "icon": Icons.settings, "route": Settings.routeName},
-    {"title": 'مساعدة', "icon": Icons.help, "route": Help.routeName},
   ];
 
   void logout() async {
     bool logout =
         await Provider.of<AuthProvider>(context, listen: false).logOut();
     if (logout) {
-      // await Provider.of<PaymentProvider>(context, listen: false).init();
-      // await Provider.of<ProfilesProvider>(context, listen: false).init();
-      // await Provider.of<TripsProvider>(context, listen: false).initialize();
-      // await Provider.of<TransactionsProvider>(context, listen: false)
-      //     .initialize();
-      // await Provider.of<CurrentTripProvider>(context, listen: false).init();
-
-      // Pop Current Screens
-      Navigator.popUntil(context, (route) {
-        if (route.settings.name == LandingPage.routeName) return true;
-        return false;
-      });
-      // Push Login Screen
-      Navigator.of(context).pushReplacementNamed(Login.routeName);
+      BuildContext outerContext =
+          Provider.of<AuthProvider>(context, listen: false).outerContext;
+      // Remove the Drawer
+      Navigator.of(outerContext).pop();
+      // // Push Login Screen
+      Navigator.of(outerContext).pushNamed(Login.routeName);
     }
   }
 
@@ -66,8 +56,6 @@ class _MainDrawerState extends State<MainDrawer> {
   Widget build(BuildContext context) {
     Widget buildListTile(String title, IconData icon, Function tapHandler) =>
         Container(
-          decoration: BoxDecoration(
-              border: Border(top: BorderSide(color: Colors.black12))),
           child: ListTile(
             leading:
                 Icon(icon, size: 26, color: Theme.of(context).primaryColor),
@@ -82,15 +70,66 @@ class _MainDrawerState extends State<MainDrawer> {
           ),
         );
 
+    String _name =
+        Provider.of<ProfilesProvider>(context).profile.name.toString();
+    double balance = Provider.of<PaymentProvider>(context).balance;
+
     return SafeArea(
       child: Drawer(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
           children: <Widget>[
-            Image.asset(
-              'assets/images/taxi.png',
-              width: double.infinity,
-              fit: BoxFit.fitWidth,
+            Container(
+              padding: const EdgeInsets.only(
+                  left: 16, top: 32, right: 16, bottom: 16),
+              decoration: BoxDecoration(
+                image: const DecorationImage(
+                  image: const AssetImage(
+                    'assets/images/texture.png',
+                  ),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Image.asset(
+                      'assets/images/logo.png',
+                      height: 64,
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(_name,
+                                strutStyle: StrutStyle(forceStrutHeight: true),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline6
+                                    .copyWith(color: Colors.white)),
+                            SizedBox(height: 12),
+                            Text('$balance جنيه',
+                                strutStyle: StrutStyle(forceStrutHeight: true),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyText1
+                                    .copyWith(color: Colors.white60)),
+                          ],
+                        ),
+                        Transform.rotate(
+                          angle: 22 / 7,
+                          child: IconButton(
+                              icon: Icon(Icons.exit_to_app),
+                              padding: EdgeInsets.all(0),
+                              alignment: Alignment.centerRight,
+                              onPressed: logout,
+                              color: Colors.white),
+                        )
+                      ],
+                    ),
+                  ]),
             ),
             ...menu.map((index) => buildListTile(
                   index['title'],
@@ -98,14 +137,17 @@ class _MainDrawerState extends State<MainDrawer> {
                   () {
                     // Get Current Route Name
                     String currentRoute = ModalRoute.of(context).settings.name;
-                    // () => Clax
+
+                    // => Clax
                     if (index['route'] == LandingPage.routeName) {
                       // Clax => Clax
                       if (currentRoute == LandingPage.routeName) {
                         // Dismiss Drawer
                         Navigator.of(context).pop();
                         return;
-                      } else {
+                      }
+                      // Payment => Clax
+                      else {
                         // Dismiss Drawer
                         Navigator.of(context).pop();
                         // Item => Clax
@@ -115,20 +157,23 @@ class _MainDrawerState extends State<MainDrawer> {
                         return;
                       }
                     }
-                    // Item => Item
-                    else if (currentRoute == index['route']) {
+
+                    // Payment => Payment
+                    else if (index['route'] == currentRoute) {
                       // Dismiss Drawer
                       Navigator.of(context).pop();
                       return;
                     }
-                    // Navigating to Different Screen
-                    if (currentRoute == LandingPage.routeName) {
+
+                    // Clax => Payment
+                    if (currentRoute != index['route'] &&
+                        currentRoute == LandingPage.routeName) {
                       // Dismiss Drawer
                       Navigator.of(context).pop();
                       // Navigate to Screen
                       Navigator.of(context).pushNamed(index['route']);
                     }
-                    // "Item => Item2"
+                    // Payment => Settings
                     else {
                       // Dismiss Drawer
                       Navigator.of(context).pop();
@@ -138,7 +183,6 @@ class _MainDrawerState extends State<MainDrawer> {
                     }
                   },
                 )),
-            Spacer(),
             buildListTile(
               "تسجيل الخروج",
               Icons.exit_to_app,

@@ -8,7 +8,36 @@ import 'package:clax/models/Card.dart';
 class Cards {
   Cards._();
 
-  /// Desitnation Card used to
+  static Widget bottomSheetCard(
+      BuildContext context, String title, Function onPressed,
+      {AssetImage img, IconData icon}) {
+    assert(
+        img == null || icon == null, 'Cannot provide both a img and a icon\n');
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(color: Colors.black12),
+        ),
+      ),
+      width: double.infinity,
+      child: Row(
+        children: <Widget>[
+          icon == null
+              ? Image(image: img, height: 24)
+              : Icon(
+                  icon,
+                  color: Theme.of(context).primaryColor,
+                ),
+          SizedBox(width: 16),
+          Text(title, style: Theme.of(context).textTheme.subtitle2)
+        ],
+      ),
+    );
+  }
+
+  /// <image>
   static Widget destinationCard(BuildContext context,
       {String fromTo, String cost}) {
     return Card(

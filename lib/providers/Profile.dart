@@ -26,7 +26,7 @@ class ProfilesProvider with ChangeNotifier {
       notifyListeners();
     }
     try {
-      Response account = await Api.get('passengers/settings/me');
+      Response account = await Api.get('drivers/settings/me');
       if (account.statusCode == 200) {
         Map<String, dynamic> profile = json.decode(account.body);
         _profile = ProfileModel.fromJson(profile);
@@ -39,8 +39,7 @@ class ProfilesProvider with ChangeNotifier {
   Future<ServerResponse> updateProfile(Map<String, dynamic> changes) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String, dynamic> originalAccount = _profile.toJson();
-    Response account =
-        await Api.put('passengers/settings/me', reqBody: changes);
+    Response account = await Api.put('drivers/settings/me', reqBody: changes);
     if (account.statusCode == 200) {
       changes.forEach((key, value) => originalAccount["$key"] = value);
       _profile = ProfileModel.fromJson(originalAccount);
@@ -56,7 +55,7 @@ class ProfilesProvider with ChangeNotifier {
 
   Future<bool> verifyPhone() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    Response result = await Api.put("passengers/settings/phone-verification");
+    Response result = await Api.put("drivers/settings/phone-verification");
     if (result.statusCode == 200) {
       _profile.phoneVerified = true;
       String updatedProfile = json.encode(_profile.toJson());

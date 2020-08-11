@@ -18,6 +18,11 @@ class AuthProvider extends ChangeNotifier {
     firebaseConfig();
   }
 
+  Future firebaseConfig() async {
+    _firebaseToken = await _firebaseMessaging.getToken();
+    // print(_firebaseToken);
+  }
+
   Future<String> checkAuthentication() async {
     try {
       _prefs = await SharedPreferences.getInstance();
@@ -27,11 +32,6 @@ class AuthProvider extends ChangeNotifier {
     } catch (_) {
       return null;
     }
-  }
-
-  Future firebaseConfig() async {
-    _firebaseToken = await _firebaseMessaging.getToken();
-    // print(_firebaseToken);
   }
 
   bool isUserAuthenticated() {

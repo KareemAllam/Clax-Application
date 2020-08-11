@@ -63,12 +63,12 @@ class _PassengersInfoState extends State<PassengersInfo> {
           ),
           passengers.length == 0
               ? Container(
-                  color: Colors.white,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   padding: EdgeInsets.symmetric(vertical: 20),
                   child:
                       Center(child: NullContent(things: "ركاب", vPadding: 10)))
               : Container(
-                  color: Colors.white,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

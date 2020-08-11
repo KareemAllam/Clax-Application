@@ -1,9 +1,9 @@
 // Flutter's Material Components
+import 'package:clax/screens/Help/Help.dart';
 import 'package:flutter/material.dart';
 // Screen
 import 'package:clax/screens/Settings/AccountOverview.dart';
 import 'package:clax/screens/Settings/Notifications.dart';
-import 'package:clax/screens/Settings/Safety.dart';
 // Widgets
 import 'package:clax/widgets/Cards.dart';
 // Drawer
@@ -37,18 +37,18 @@ class Settings extends StatelessWidget {
           ),
           Cards.listTile(
             context,
-            title: 'الأمان',
-            icon: Icons.security,
-            tapHandler: () {
-              Navigator.of(context).pushNamed(Safety.routeName);
-            },
-          ),
-          Cards.listTile(
-            context,
             title: 'الإشعارات',
             icon: Icons.notifications,
             tapHandler: () {
               Navigator.of(context).pushNamed(Notifications.routeName);
+            },
+          ),
+          Cards.listTile(
+            context,
+            title: 'المساعدة',
+            icon: Icons.help,
+            tapHandler: () {
+              Navigator.of(context).pushNamed(Help.routeName);
             },
           ),
           Divider(

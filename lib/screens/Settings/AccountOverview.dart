@@ -23,9 +23,16 @@ class AccountOverview extends StatefulWidget {
 
 class _AccountOverviewState extends State<AccountOverview> {
   bool _refreshing = false;
+  ProfileModel profileData;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    profileData = Provider.of<ProfilesProvider>(context).profile;
+  }
+
   @override
   Widget build(BuildContext context) {
-    ProfileModel profileData = Provider.of<ProfilesProvider>(context).profile;
     return Scaffold(
         appBar: AppBar(
           title: Text(

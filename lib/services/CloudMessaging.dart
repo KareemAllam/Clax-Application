@@ -50,6 +50,7 @@ class NotificationHandler {
         )));
     // set up the AlertDialog
     showDialog(
+        useRootNavigator: false,
         context: context,
         builder: (context) => AlertDialog(
               backgroundColor: Colors.transparent,

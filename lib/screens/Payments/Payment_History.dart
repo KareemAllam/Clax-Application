@@ -71,6 +71,7 @@ class _PaymentHistoryState extends State<PaymentHistory> {
                   things: "مدفوعات",
                 ))
             : ListView.builder(
+                reverse: true,
                 physics: AlwaysScrollableScrollPhysics(
                     parent: BouncingScrollPhysics()),
                 controller: _controller,

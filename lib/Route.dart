@@ -1,9 +1,5 @@
 // Flutter's Material Components
 import 'package:flutter/material.dart';
-// Dart & Other Packages
-import 'package:provider/provider.dart';
-// Providers
-import 'package:clax/providers/Profile.dart';
 // Screens
 //// Authentication
 import 'package:clax/screens/Login/Login.dart';
@@ -17,7 +13,6 @@ import 'package:clax/screens/Settings/AccountOverview.dart';
 import 'package:clax/screens/Settings/Notifications.dart';
 import 'package:clax/screens/Settings/Settings.dart';
 import 'package:clax/screens/Settings/EditAccount.dart';
-import 'package:clax/screens/Settings/Safety.dart';
 import 'package:clax/screens/Settings/TrustedContacts.dart';
 
 //// Help
@@ -27,9 +22,6 @@ import 'package:clax/screens/Help/Help.dart';
 import 'package:clax/screens/Help/Cancellations.dart';
 import 'package:clax/screens/Help/UpfrontPricing.dart';
 import 'package:clax/screens/Help/PromoCodes.dart';
-
-//// Home Screens
-import 'package:clax/screens/Home/Rahalatk.dart';
 
 //// Complains
 import 'package:clax/screens/Complains/Complaint_Details.dart';
@@ -86,10 +78,7 @@ class Router {
         return MaterialPageRoute(builder: (_) => Guide(), settings: settings);
       case More.routeName:
         return MaterialPageRoute(builder: (_) => More(), settings: settings);
-      case Rides.routeName:
-        return MaterialPageRoute(builder: (_) => Rides(), settings: settings);
-      case Safety.routeName:
-        return MaterialPageRoute(builder: (_) => Safety(), settings: settings);
+
       case Cancellations.routeName:
         return MaterialPageRoute(
             builder: (_) => Cancellations(), settings: settings);
@@ -97,11 +86,7 @@ class Router {
         return MaterialPageRoute(builder: (_) => Help(), settings: settings);
       case Settings.routeName:
         return MaterialPageRoute(
-            builder: (_) => Provider<ProfilesProvider>(
-                  create: (settings) => ProfilesProvider(),
-                  child: Settings(),
-                ),
-            settings: settings);
+            builder: (_) => Settings(), settings: settings);
       case TrustedContacts.routeName:
         return MaterialPageRoute(
             builder: (_) => TrustedContacts(), settings: settings);

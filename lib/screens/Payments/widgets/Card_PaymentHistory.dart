@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:clax/models/Bill.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+// Dart & Other Packages
 import 'package:intl/intl.dart' as intl;
+// Flutter Material Components
+import 'package:flutter/material.dart';
+// Models
+import 'package:clax/models/Bill.dart';
 
 List days = [
   'السبت',
@@ -22,17 +24,16 @@ class BillCard extends StatelessWidget {
       decoration: BoxDecoration(
           color: Colors.white,
           border: Border(bottom: BorderSide(color: Colors.grey[300]))),
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
       child: Row(children: [
-        Expanded(
-          flex: 1,
-          child: Container(
-            alignment: Alignment.centerRight,
-            child: Icon(FontAwesomeIcons.route,
-                color: Theme.of(context).primaryColor),
-          ),
-        ),
-        SizedBox(width: 15),
+        // Expanded(
+        //   flex: 1,
+        //   child: Container(
+        //     alignment: Alignment.centerRight,
+        //     child: Icon(FontAwesomeIcons.route,
+        //         color: Theme.of(context).primaryColor),
+        //   ),
+        // ),
         Expanded(
           flex: 3,
           child: Container(
@@ -60,7 +61,7 @@ class BillCard extends StatelessWidget {
           ),
         ),
         Expanded(
-          flex: 1,
+          flex: 2,
           child: Container(
             alignment: Alignment.center,
             child: Text(

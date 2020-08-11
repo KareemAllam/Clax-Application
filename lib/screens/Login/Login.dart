@@ -52,27 +52,32 @@ class LoginState extends State<Login> {
       Map<String, String> body = {
         "phone": _usernameController.text.trim(),
         "pass": _passwordController.text,
+        "firebaseId": firebaseToken
       };
 
       Response response = await Api.post('drivers/login', body);
-
-      if (response.statusCode == 200) {
-        //  Update Cache with id
-        Provider.of<AuthProvider>(context, listen: false)
-            .logIn(response.headers['x-login-token']);
-        Navigator.of(context).pushReplacementNamed(ClaxRoot.routeName);
-        setState(() {
-          _loading = false;
-        });
-        return "";
-      }
-
-      // If Server Erros Occured
-      else {
-        setState(() {
-          _loading = false;
-        });
-        return "تأكد من معلومات و حاول مره اخرى";
+      setState(() {
+        _loading = false;
+      });
+      switch (response.statusCode) {
+        // Everything is correct
+        case 200:
+          //  Update Cache with id
+          Provider.of<AuthProvider>(context, listen: false)
+              .logIn(response.headers['x-login-token']);
+          Navigator.of(context).pushReplacementNamed(ClaxRoot.routeName);
+          return "";
+          break;
+        // UnAuthorizaed
+        case 401:
+          if (response.body == "Driver isn't verified yet.")
+            return "عذراً، لا تستطيع استخدام حسابك بعد. \nسنتصل بك في اقرب وقت لإتمام عملية التسجيل";
+          return "تأكد من معلومات و حاول مره اخرى";
+          break;
+        // No-Internet Connection
+        default:
+          return "تأكد من اتصالك بالانترنت و حاول مره اخرى";
+          break;
       }
     }
     // If there is no Internet Connection
@@ -80,15 +85,14 @@ class LoginState extends State<Login> {
       setState(() {
         _loading = false;
       });
-      return "تأكد من اتصالك بالانترنت و حاول مره اخرى";
+      return "تأكد من معلومات و حاول مره اخرى";
     }
   }
 
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final ThemeData theme = Theme.of(context);
-    final String firebaseToken = Provider.of<AuthProvider>(context).fbToken;
-
+    String firebaseToken = Provider.of<AuthProvider>(context).fbToken;
     return Scaffold(
       body: WillPopScope(
         onWillPop: () => Future.value(false),
@@ -104,8 +108,9 @@ class LoginState extends State<Login> {
                         height: height * 0.4,
                         alignment: Alignment.centerRight,
                         child: RichText(
-                            textAlign: TextAlign.start,
-                            text: TextSpan(children: [
+                          textAlign: TextAlign.start,
+                          text: TextSpan(
+                            children: [
                               TextSpan(
                                 text: "مرحبا بك",
                                 style: theme.textTheme.headline3.copyWith(
@@ -127,7 +132,9 @@ class LoginState extends State<Login> {
                                     color: theme.primaryColor,
                                     fontWeight: FontWeight.w800),
                               ),
-                            ])),
+                            ],
+                          ),
+                        ),
                       ),
                       Form(
                           key: _formKey,
@@ -139,7 +146,7 @@ class LoginState extends State<Login> {
                                   value = value.trim();
                                   // Empte Textfield
                                   if (value.isEmpty) {
-                                    return 'ادخل رقم الهاتف / البريد الالكتروني الخاص بك';
+                                    return 'ادخل رقم الهاتف';
                                   }
                                   // User Entered a Phone Number
                                   else if (phone.hasMatch(value)) {
@@ -163,6 +170,11 @@ class LoginState extends State<Login> {
                                 style: theme.textTheme.bodyText1.copyWith(
                                     fontFamily: "Product Sans",
                                     fontWeight: FontWeight.w600),
+                                maxLength: 11,
+                                inputFormatters: [
+                                  WhitelistingTextInputFormatter.digitsOnly
+                                ],
+                                keyboardType: TextInputType.phone,
                                 textInputAction: TextInputAction.next,
                                 focusNode: _usernameNode,
                                 cursorColor: theme.primaryColor,
@@ -173,6 +185,7 @@ class LoginState extends State<Login> {
                                       .requestFocus(_passwordNode);
                                 },
                                 decoration: InputDecoration(
+                                  counterText: '',
                                   filled: true,
                                   floatingLabelBehavior:
                                       FloatingLabelBehavior.never,
@@ -199,7 +212,7 @@ class LoginState extends State<Login> {
                                   ),
                                   labelStyle: theme.textTheme.bodyText1
                                       .copyWith(color: Colors.grey),
-                                  labelText: 'رقم الهاتف / البريد الالكتروني',
+                                  labelText: 'رقم الهاتف',
                                 ),
                               ),
                               SizedBox(height: 10),
@@ -280,6 +293,9 @@ class LoginState extends State<Login> {
                                                 await submitform(firebaseToken);
                                             Scaffold.of(context).showSnackBar(
                                               SnackBar(
+                                                backgroundColor:
+                                                    Theme.of(context)
+                                                        .primaryColor,
                                                 content: Text(
                                                   result,
                                                   style: theme
@@ -307,8 +323,10 @@ class LoginState extends State<Login> {
                                         MainAxisAlignment.spaceBetween,
                                     children: <Widget>[
                                       GestureDetector(
-                                        onTap: () => Navigator.of(context)
-                                            .pushNamed('/register'),
+                                        onTap: () async {
+                                          Navigator.of(context)
+                                              .pushNamed('/register');
+                                        },
                                         child: Text(
                                           'ليس لديك حساب؟',
                                           style: TextStyle(

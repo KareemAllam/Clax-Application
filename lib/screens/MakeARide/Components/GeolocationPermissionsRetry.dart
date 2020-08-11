@@ -30,7 +30,7 @@ class RetryPermission extends StatelessWidget {
                     GestureDetector(
                       onTap:
                           Provider.of<TrackingProvider>(context, listen: false)
-                              .getCurrentLocation,
+                              .checkServiceState,
                       child: Container(
                         padding:
                             EdgeInsets.symmetric(horizontal: 16, vertical: 8),

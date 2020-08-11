@@ -72,11 +72,15 @@ class _ForgetPassState extends State<ForgetPass> {
                                   ),
                                 )),
                                 Expanded(
-                                    child: Image.asset(
-                                  'assets/images/lock.png',
-                                  height: 150,
-                                  fit: BoxFit.fitHeight,
-                                ))
+                                    child: Icon(Icons.lock,
+                                        color: Theme.of(context).accentColor,
+                                        size: 120)
+                                    // child: Image.asset(
+                                    //   'assets/images/lock.png',
+                                    //   height: 150,
+                                    //   fit: BoxFit.fitHeight,
+                                    // ),
+                                    )
                               ],
                             )),
                         Padding(
@@ -105,7 +109,7 @@ class _ForgetPassState extends State<ForgetPass> {
                               print(value);
                               // Empte Textfield
                               if (value.isEmpty) {
-                                return 'ادخل رقم الهاتف / البريد الالكتروني الخاص بك';
+                                return 'ادخل رقم الهاتف';
                               }
                               // User Entered a Phone Number
                               else if (phone.hasMatch(value)) {
@@ -114,18 +118,11 @@ class _ForgetPassState extends State<ForgetPass> {
                                 if (value.length != 11)
                                   return 'تأكد من ادخال رقمك بشكل صحيح.';
                                 // Everything is good
-                                if (phoneEgypt.hasMatch(value)) return null;
-                                // Wrong Phone Number Format
-                                return 'هذا الرقم غير صحيح. تأكد من الرقم و حاول مره اخرى.';
+                                else if (phoneEgypt.hasMatch(value))
+                                  return null;
                               }
-                              // User Entered wrong information
-                              else if (!email.hasMatch(value)) {
-                                return "تأكد من ادخال بياناتك بشكل صحيح";
-                              }
-                              // User Entered a valid mail
-                              else {
-                                return null;
-                              }
+                              // Wrong Phone Number Format
+                              return 'هذا الرقم غير صحيح. تأكد من الرقم و حاول مره اخرى.';
                             },
                             style: Theme.of(context)
                                 .textTheme
@@ -147,7 +144,14 @@ class _ForgetPassState extends State<ForgetPass> {
                                   FloatingLabelBehavior.never,
                               contentPadding: EdgeInsets.symmetric(
                                   horizontal: 15, vertical: 0),
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.black26),
+                                  borderRadius: BorderRadius.circular(30)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.black26),
+                                  borderRadius: BorderRadius.circular(30)),
                               border: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.black26),
                                   borderRadius: BorderRadius.circular(30)),
                               fillColor: Colors.white,
                               prefixIcon: Icon(

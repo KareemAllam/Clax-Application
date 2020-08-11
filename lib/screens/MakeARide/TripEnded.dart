@@ -1,11 +1,7 @@
 // Flutter's Material Components
 import 'package:flutter/material.dart';
-// Screens
-import 'package:clax/screens/MakeARide/StartTrip.dart';
 // Widgets
 import 'package:clax/widgets/FormInput.dart';
-import 'package:clax/widgets/LoadingButton.dart';
-// Main Drawer
 
 class TripEnded extends StatefulWidget {
   static const routeName = "/tripEnded";
@@ -23,10 +19,9 @@ class _TripEndedState extends State<TripEnded> {
   }
 
   void endTrip() {
-    // TODO: Add feedback sysmtem to driver
     // Return to StartTrip
     Navigator.of(context).pop();
-    Navigator.of(context).pushReplacementNamed(StartTrip.routeName);
+    // Navigator.of(context).pushReplacementNamed(StartTrip.routeName);
   }
 
   @override
@@ -45,20 +40,50 @@ class _TripEndedState extends State<TripEnded> {
                   .copyWith(color: Colors.white)),
         ),
         body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Text("انتهت الرحلة بنجاح",
-                style: Theme.of(context).textTheme.headline6),
             SizedBox(height: 16),
             FormInput(
                 title: "علق على الرحلة",
                 placeholder: "هل حدث اي مشكلة في الرحلة؟",
                 description: _feedbackController),
-            SizedBox(height: 24),
-            LoadingButton(
-              label: "قدم شكوى",
-              handleTap: endTrip,
-            ),
+            Spacer(),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  flex: 2,
+                  child: GestureDetector(
+                    onTap: endTrip,
+                    child: Container(
+                      padding: EdgeInsets.all(12),
+                      alignment: Alignment.center,
+                      color: Theme.of(context).primaryColor,
+                      child: Text("متابعه",
+                          style: Theme.of(context)
+                              .textTheme
+                              .subtitle2
+                              .copyWith(color: Colors.white)),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: GestureDetector(
+                    onTap: endTrip,
+                    child: Container(
+                      padding: EdgeInsets.all(12),
+                      alignment: Alignment.center,
+                      color: Colors.red,
+                      child: Text("قدم شكوى",
+                          style: Theme.of(context)
+                              .textTheme
+                              .subtitle2
+                              .copyWith(color: Colors.white)),
+                    ),
+                  ),
+                )
+              ],
+            )
           ],
         ),
       ),
