@@ -52,7 +52,9 @@ class ComplainsProvider extends ChangeNotifier {
       notifyListeners();
       return ServerResponse(status: true);
     } else
-      return ServerResponse(status: false, message: "تعذر الوصول للخادم");
+      return ServerResponse(
+          status: false,
+          message: "تعذر الوصول للخادم. حاول مره اخرى في وقت لاحق");
   }
 
   List<ComplainModel> get complains => _complains;

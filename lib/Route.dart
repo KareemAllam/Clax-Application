@@ -1,10 +1,6 @@
 // Flutter's Material Components
 import 'package:clax/screens/LandingPage.dart';
 import 'package:flutter/material.dart';
-// Dart & Other Packages
-import 'package:provider/provider.dart';
-// Providers
-import 'package:clax/providers/Profile.dart';
 // Screens
 //// Authentication
 import 'package:clax/screens/Login/Verification.dart';
@@ -107,11 +103,7 @@ class Router {
             builder: (_) => PayOptions(), settings: settings);
       case Settings.routeName:
         return MaterialPageRoute(
-            builder: (_) => Provider<ProfilesProvider>(
-                  create: (settings) => ProfilesProvider(),
-                  child: Settings(),
-                ),
-            settings: settings);
+            builder: (_) => Settings(), settings: settings);
       case TrustedContacts.routeName:
         return MaterialPageRoute(
             builder: (_) => TrustedContacts(), settings: settings);

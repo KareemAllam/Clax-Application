@@ -97,40 +97,41 @@ class _WriteAComplainState extends State<WriteAComplain> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
-        appBar: AppBar(
-          actions: <Widget>[
-            Builder(
-              builder: (context) => IconButton(
-                  icon: Icon(Icons.refresh),
-                  onPressed: () async {
-                    bool result =
-                        await Provider.of<TripsProvider>(context).serverData();
-                    if (!result)
-                      Scaffold.of(context).showSnackBar(SnackBar(
-                          content: Text(
-                              "تعذر الوصول للإنترنت. تأكد من اتصالك بالإنترنت و حاول مره اخرى.",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .caption
-                                  .copyWith(color: Colors.white))));
-                  }),
-            )
-          ],
-          elevation: 0.0,
-          title: Text(
-            'اكتب شكوى جديدة',
-            style: Theme.of(context)
-                .textTheme
-                .bodyText1
-                .copyWith(color: Colors.white),
-          ),
+      appBar: AppBar(
+        actions: <Widget>[
+          Builder(
+            builder: (context) => IconButton(
+                icon: Icon(Icons.refresh),
+                onPressed: () async {
+                  bool result =
+                      await Provider.of<TripsProvider>(context).serverData();
+                  if (!result)
+                    Scaffold.of(context).showSnackBar(SnackBar(
+                        content: Text(
+                            "تعذر الوصول للإنترنت. تأكد من اتصالك بالإنترنت و حاول مره اخرى.",
+                            style: Theme.of(context)
+                                .textTheme
+                                .caption
+                                .copyWith(color: Colors.white))));
+                }),
+          )
+        ],
+        elevation: 0.0,
+        title: Text(
+          'اكتب شكوى جديدة',
+          style: Theme.of(context)
+              .textTheme
+              .bodyText1
+              .copyWith(color: Colors.white),
         ),
-        body: GestureDetector(
-          // Connected to Internet
-          onTap: () {
-            FocusScope.of(context).requestFocus(new FocusNode());
-          },
-          child: ListView(children: [
+      ),
+      body: GestureDetector(
+        // Connected to Internet
+        onTap: () {
+          FocusScope.of(context).requestFocus(new FocusNode());
+        },
+        child: ListView(
+          children: [
             SizedBox(height: 16),
             Container(
                 padding: EdgeInsets.only(right: 16, bottom: 8),
@@ -219,14 +220,32 @@ class _WriteAComplainState extends State<WriteAComplain> {
                 title: "اوصف الشكوى",
                 placeholder: descriptionPlaceHolder,
                 description: description),
-            LoadingButton(
-              label: "قدم شكوى",
-              handleTap: () async {
-                ServerResponse result = await submitForm();
-                if (result.status) Navigator.of(context).pop();
-              },
+            Builder(
+              builder: (context) => LoadingButton(
+                label: "قدم شكوى",
+                handleTap: () async {
+                  ServerResponse result = await submitForm();
+                  if (result.status)
+                    Navigator.of(context).pop();
+                  else
+                    Scaffold.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Colors.red,
+                        content: Text(
+                          result.message,
+                          style: Theme.of(context)
+                              .textTheme
+                              .subtitle2
+                              .copyWith(color: Colors.white),
+                        ),
+                      ),
+                    );
+                },
+              ),
             ),
-          ]),
-        ));
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -1,10 +1,13 @@
 // Dart & Other Packages
-import 'package:clax/models/CurrentDriver.dart';
-import 'package:clax/models/CurrentTrip.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
-// Utils
+// Models
+import 'package:clax/models/CurrentTrip.dart';
+import 'package:clax/models/CurrentDriver.dart';
+// Services
+import 'package:clax/services/CloudMessaging.dart';
 // Providers
 import 'package:clax/providers/Map.dart';
 import 'package:clax/providers/CurrentTrip.dart';
@@ -26,6 +29,30 @@ class _LandingPageState extends State<LandingPage> {
   bool onATrip = false;
   bool searching = false;
   String driverId;
+
+  NotificationHandler handler = NotificationHandler();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  void _navigateToItemDetail(Map<String, dynamic> message) {
+    handler.handle(context, message);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        _navigateToItemDetail(message);
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        // print("onLaunch: $message");
+        _navigateToItemDetail(message);
+      },
+      onResume: (Map<String, dynamic> message) async {
+        // print("onResume: $message");
+        _navigateToItemDetail(message);
+      },
+    );
+  }
 
   @override
   void didChangeDependencies() {

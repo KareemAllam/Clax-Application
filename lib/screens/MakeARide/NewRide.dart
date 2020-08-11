@@ -1,6 +1,7 @@
 // Dart & Other Packages
 import 'dart:io';
 import 'package:clax/models/Error.dart';
+import 'package:clax/providers/Routes.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -25,8 +26,8 @@ import 'package:clax/screens/MakeARide/widgets/LineInfo.dart';
 import 'package:clax/screens/MakeARide/widgets/SearchLine.dart';
 // Drawer
 import 'package:clax/screens/Drawer.dart';
-// Static Data
-import 'package:clax/appMap.dart';
+// // Static Data
+// import 'package:clax/appMap.dart';
 
 class StartARide extends StatefulWidget {
   static const routeName = '/startARide';
@@ -58,17 +59,19 @@ class _StartARideState extends State<StartARide> with TickerProviderStateMixin {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _originalLines = kiroMap();
-    _searchLines = _originalLines;
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _originalLines = kiroMap();
+  //   _searchLines = _originalLines;
+  // }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     theme = Theme.of(context);
+    _originalLines = Provider.of<RoutesProvider>(context).lines;
+    _searchLines = _originalLines;
     balance = Provider.of<PaymentProvider>(context).balance;
   }
 
@@ -263,6 +266,12 @@ class _StartARideState extends State<StartARide> with TickerProviderStateMixin {
       appBar: AppBar(
         key: _scaffoldKey,
         elevation: 0.0,
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(Icons.refresh),
+              onPressed: Provider.of<RoutesProvider>(context, listen: false)
+                  .fetchDataOnline)
+        ],
         title: Text('رحلة جديدة',
             style: Theme.of(context)
                 .textTheme
