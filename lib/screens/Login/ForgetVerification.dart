@@ -2,32 +2,33 @@
 import 'dart:async';
 import 'package:http/http.dart';
 import 'package:pin_view/pin_view.dart';
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 // Flutter's Material Components
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 // Backend
 import 'package:clax/services/Backend.dart';
-// Providers
-import 'package:clax/providers/Profile.dart';
+// Screens
+import 'package:clax/screens/Login/resetPassword.dart';
 
-class Verification extends StatefulWidget {
-  static const routeName = '/verification';
+class ForgetVerification extends StatefulWidget {
+  static const routeName = '/ForgetVerification';
   @override
-  _VerificationState createState() => _VerificationState();
+  _ForgetVerificationState createState() => _ForgetVerificationState();
 }
 
-class _VerificationState extends State<Verification> {
+class _ForgetVerificationState extends State<ForgetVerification> {
   bool counting = false;
   bool _enabled = true;
   String _code;
   String _userCode;
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  Map<String, dynamic> args = Map();
+
   void startTimer() {
     setState(() {
       counting = true;
     });
-
     Future.delayed(Duration(seconds: 30), () {
       setState(() {
         counting = false;
@@ -36,12 +37,27 @@ class _VerificationState extends State<Verification> {
   }
 
   void getCode() async {
-    String phone =
-        Provider.of<ProfilesProvider>(context, listen: false).profile.phone;
-    Map<String, String> body = {"phone": phone};
-    Response response =
-        await Api.post('passengers/settings/phone-verification', body);
-    _code = response.body;
+    Response response = await Api.post(
+        "signing/passengers/forgotten-password", {"user": args['code']});
+    if (response.statusCode == 200) {
+      SharedPreferences _prefs = await SharedPreferences.getInstance();
+      // Saving Temporary Token
+      _prefs.setString("loginToken", response.headers['x-login-token']);
+      // Saving Code
+      _code = response.body;
+    } else
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text(
+            "تعذر الوصول للخادم. \n تأكد من اتصالك بالانترنت و حاول مره اخرى ",
+            style: Theme.of(context)
+                .textTheme
+                .subtitle2
+                .copyWith(color: Colors.white),
+          ),
+        ),
+      );
     print(_code);
   }
 
@@ -54,23 +70,7 @@ class _VerificationState extends State<Verification> {
     // If User's Code is correct
     if (_userCode == _code) {
       // Change Current State
-      bool result = await Provider.of<ProfilesProvider>(context, listen: false)
-          .verifyPhone();
-
-      // If internet connection went off
-      if (!result)
-        _scaffoldKey.currentState.showSnackBar(SnackBar(
-            content: Text(
-              ".تأكد من اتصالك بالانترنت و حاول مره اخرى",
-              style: Theme.of(context)
-                  .textTheme
-                  .caption
-                  .copyWith(color: Colors.white),
-            ),
-            backgroundColor: Colors.red));
-      else {
-        Navigator.of(context).pop();
-      }
+      Navigator.of(context).pushReplacementNamed(ResetPass.routeName);
     }
 
     // If User's Code is incorrect
@@ -91,10 +91,12 @@ class _VerificationState extends State<Verification> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    getCode();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    Map<String, dynamic> args =
+        Map<String, dynamic>.from(ModalRoute.of(context).settings.arguments);
+    _code = args['code'];
+    print(_code);
   }
 
   Widget build(BuildContext context) {
@@ -225,7 +227,6 @@ class _VerificationState extends State<Verification> {
                                 color: purple, fontWeight: FontWeight.w600))
                       ]),
                     ),
-              Spacer(flex: 2),
             ]),
           ),
         ),

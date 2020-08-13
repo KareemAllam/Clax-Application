@@ -43,11 +43,17 @@ class ComplainsProvider extends ChangeNotifier {
     }
   }
 
-  Future<ServerResponse> add(body) async {
+  Future<ServerResponse> add(requestBody, String lineName) async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
-    Response result =
-        await Api.post("passengers/complaints/add", body, stringDynamic: true);
+    Response result = await Api.post("passengers/complaints/add", requestBody,
+        stringDynamic: true);
     if (result.statusCode == 200) {
+      Map<String, dynamic> body = json.decode(result.body);
+      ComplainModel _complaint = ComplainModel.fromJson(body);
+      if (body['_trip'] != null) {
+        _complaint.lineName = lineName;
+      }
+      _complains.add(_complaint);
       _prefs.setString("complains", json.encode(_complains));
       notifyListeners();
       return ServerResponse(status: true);

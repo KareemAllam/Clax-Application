@@ -12,7 +12,7 @@ import 'package:clax/services/Backend.dart';
 class TripsProvider extends ChangeNotifier {
   // Last Trips
   List<Trip> trips = [];
-
+  bool offersNotification = false;
   // Provider Constructor
   TripsProvider() {
     init();
@@ -34,6 +34,8 @@ class TripsProvider extends ChangeNotifier {
           .decode(_prefs.getString("pastTrips"))
           .forEach((trip) => trips.add(Trip.fromJson(trip)));
 
+    if (_prefs.getBool("offersNotification") != null)
+      offersNotification = _prefs.getBool("offersNotification");
     notifyListeners();
   }
 
@@ -63,8 +65,10 @@ class TripsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void favTrip(index) {
-    trips[index].favorite = !trips[index].favorite;
+  void changeOffersNotification(bool value) async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    _prefs.setBool("offersNotification", value);
+    offersNotification = value;
     notifyListeners();
   }
 }

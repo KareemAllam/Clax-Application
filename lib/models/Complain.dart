@@ -41,7 +41,7 @@ class ComplainModel {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['response'] = this.response;
+    data['response'] = this.response ?? null;
     data['status'] = this.status;
     data['subject'] = this.subject;
     data['text'] = this.text;
@@ -51,9 +51,9 @@ class ComplainModel {
       data['_trip'] = Map();
       data['_trip']['_line'] = this.lineName;
       data['_trip']["_driver"] = {"name": Map(), "profilePic": Map()};
-      data['_trip']["_driver"]['name'] = this.driverName.toJson();
+      data['_trip']["_driver"]['name'] = this.driverName?.toJson();
       data['_trip']['_driver']['profilePic']['data'] =
-          JSON.base64Encode(this.profilePic.toList());
+          JSON.base64Encode(this.profilePic.toList()) ?? null;
     }
     return data;
   }

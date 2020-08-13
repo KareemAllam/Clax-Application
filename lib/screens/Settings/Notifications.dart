@@ -1,7 +1,9 @@
 // Flutter's Material Components
+import 'package:clax/providers/Trips.dart';
 import 'package:flutter/material.dart';
 // Widgets
 import 'package:clax/widgets/Cards.dart';
+import 'package:provider/provider.dart';
 
 class Notifications extends StatefulWidget {
   static const routeName = '/Notifications';
@@ -11,8 +13,13 @@ class Notifications extends StatefulWidget {
 }
 
 class _NotificationsState extends State<Notifications> {
-  bool _not1 = false;
-  bool _not2 = false;
+  bool offersNotification = false;
+  bool safetyTracking = false;
+  @override
+  void initState() {
+    super.initState();
+    offersNotification = Provider.of<TripsProvider>(context).offersNotification;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,26 +41,22 @@ class _NotificationsState extends State<Notifications> {
                     context: context,
                     title: 'العروض الخاصه',
                     description: 'عند وجود عروض أو رحلات مجانية',
-                    currentValue: _not1,
-                    updatedValue: (newValue) {
+                    currentValue: offersNotification,
+                    updatedValue: (bool newValue) {
                       setState(
                         () {
-                          _not1 = newValue;
+                          offersNotification = newValue;
+                          Provider.of<TripsProvider>(context)
+                              .changeOffersNotification(newValue);
                         },
                       );
                     }),
                 Cards.switchListTile(
                   context: context,
                   title: 'تتبع الرحلة',
-                  description: 'تتبع خطوات الرحلة',
-                  currentValue: _not2,
-                  updatedValue: (newValue) {
-                    setState(
-                      () {
-                        _not2 = newValue;
-                      },
-                    );
-                  },
+                  description: 'اسمح لافراد عائلتك بتتبعك في اي وقت',
+                  currentValue: safetyTracking,
+                  updatedValue: null,
                 ),
                 Container(
                   alignment: Alignment.center,

@@ -32,7 +32,7 @@ class RoutesProvider extends ChangeNotifier {
           ).toList();
     notifyListeners();
     // Retrieve Lines from server
-     fetchDataOnline();
+    fetchDataOnline();
   }
 
   void fetchDataOnline() async {

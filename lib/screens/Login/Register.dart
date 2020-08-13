@@ -49,6 +49,7 @@ class _RegisterFormState extends State<RegisterForm> {
   Widget _eulaCondition = SizedBox(height: 0);
   List<String> goverments = staticGoverments;
   String selectedGovernment;
+  bool govenmentError = false;
   String password;
   TextEditingController _firstName = TextEditingController();
   FocusNode _firstNameNode = FocusNode();
@@ -69,21 +70,23 @@ class _RegisterFormState extends State<RegisterForm> {
     bool result = _formKey.currentState.validate();
 
     // If Conditions aren't met or EULA isn't checks
-    if (!_termsChecked | !result) {
+    if (!_termsChecked || !result || selectedGovernment == null) {
       if (!_termsChecked)
         // Show EULA not Checked Error
-        setState(() {
-          _eulaCondition = Text("يجب ان توافق علي الشروط و الأحكام",
-              style: Theme.of(context)
-                  .textTheme
-                  .caption
-                  .copyWith(color: Colors.red));
-        });
+        _eulaCondition = Text("يجب ان توافق علي الشروط و الأحكام",
+            style: Theme.of(context)
+                .textTheme
+                .caption
+                .copyWith(color: Colors.red));
       // Remove EULA not Checked Error
       else
-        setState(() {
-          _eulaCondition = SizedBox(height: 0);
-        });
+        _eulaCondition = SizedBox(height: 0);
+
+      if (selectedGovernment == null) {
+        govenmentError = true;
+      } else
+        govenmentError = false;
+      setState(() {});
       return 0;
     }
     // Input Data passed the required Conditions
@@ -457,6 +460,12 @@ class _RegisterFormState extends State<RegisterForm> {
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white,
+                    focusedErrorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                        borderRadius: BorderRadius.circular(30)),
+                    errorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                        borderRadius: BorderRadius.circular(30)),
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 15, vertical: 0),
                     enabledBorder: OutlineInputBorder(
@@ -508,6 +517,12 @@ class _RegisterFormState extends State<RegisterForm> {
                     fillColor: Colors.white,
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+                    focusedErrorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                        borderRadius: BorderRadius.circular(30)),
+                    errorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                        borderRadius: BorderRadius.circular(30)),
                     enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black26),
                         borderRadius: BorderRadius.circular(30)),
@@ -559,6 +574,12 @@ class _RegisterFormState extends State<RegisterForm> {
                     fillColor: Colors.white,
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+                    focusedErrorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                        borderRadius: BorderRadius.circular(30)),
+                    errorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                        borderRadius: BorderRadius.circular(30)),
                     enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black26),
                         borderRadius: BorderRadius.circular(30)),
@@ -619,6 +640,12 @@ class _RegisterFormState extends State<RegisterForm> {
                     fillColor: Colors.white,
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+                    focusedErrorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                        borderRadius: BorderRadius.circular(30)),
+                    errorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                        borderRadius: BorderRadius.circular(30)),
                     enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black26),
                         borderRadius: BorderRadius.circular(30)),
@@ -641,7 +668,7 @@ class _RegisterFormState extends State<RegisterForm> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(30),
                       border: Border.all(
-                        color: Colors.black26,
+                        color: govenmentError ? Colors.red : Colors.black26,
                       )),
                   padding: EdgeInsets.symmetric(horizontal: 15, vertical: 0),
                   child: DropdownButton(
@@ -716,8 +743,15 @@ class _RegisterFormState extends State<RegisterForm> {
                             onPressed: () async {
                               var result = await register(firebaseToken);
                               if (result == 2)
-                                Scaffold.of(context).showSnackBar(SnackBar(
-                                    content: Text("تعذر الوصول للانترنت.")));
+                                Scaffold.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      "تعذر الوصول للانترنت.",
+                                      style: textTheme.bodyText2
+                                          .copyWith(color: Colors.white),
+                                    ),
+                                  ),
+                                );
                               else if (result != 0)
                                 Scaffold.of(context).showSnackBar(SnackBar(
                                     content: Text(

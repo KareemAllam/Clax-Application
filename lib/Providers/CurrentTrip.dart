@@ -148,12 +148,115 @@ class CurrentTripProvider extends ChangeNotifier {
       }
       // print(value);
       // No Driver has accepted the request
-      else if (value['status'] == "refused") {
+      else if (value['status'] == "cancel") {
+        cancelTripRequest();
+        showDialog(
+          context: scaffoldKey.currentContext,
+          builder: (context) => AlertDialog(
+            backgroundColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
+            titlePadding: EdgeInsets.all(0),
+            contentPadding: EdgeInsets.all(0),
+            title: Container(
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(5),
+                      topRight: Radius.circular(5))),
+              padding:
+                  EdgeInsets.only(top: 20, right: 15, left: 15, bottom: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "لا يوجد سائق متاح ف حالياً",
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyText1
+                        .copyWith(fontWeight: FontWeight.values[5]),
+                  ),
+                  SizedBox(height: 2),
+                  Text("حاول مره اخرى في وقت لاحق",
+                      style: Theme.of(context).textTheme.caption)
+                ],
+              ),
+            ),
+            content: Container(
+                color: Theme.of(context).primaryColor,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    FlatButton(
+                      child: Text("حسنا",
+                          style: TextStyle(
+                              color: Theme.of(context).accentColor,
+                              fontWeight: FontWeight.bold)),
+                      onPressed: () async {
+                        // Dismiss the Alert Dialoge Box
+                        Navigator.of(context, rootNavigator: true).pop();
+                      },
+                    ),
+                  ],
+                )),
+          ),
+        );
+      } else if (value['status'] == "refused") {
         cancelTripRequest();
         // TODO: Show notificaion
         showDialog(
-            context: scaffoldKey.currentContext,
-            builder: (context) => AlertDialog());
+          context: scaffoldKey.currentContext,
+          builder: (context) => AlertDialog(
+            backgroundColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
+            titlePadding: EdgeInsets.all(0),
+            contentPadding: EdgeInsets.all(0),
+            title: Container(
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(5),
+                      topRight: Radius.circular(5))),
+              padding:
+                  EdgeInsets.only(top: 20, right: 15, left: 15, bottom: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "لا يوجد سائق متاح ف حالياً",
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyText1
+                        .copyWith(fontWeight: FontWeight.values[5]),
+                  ),
+                  SizedBox(height: 2),
+                  Text("حاول مره اخرى في وقت لاحق",
+                      style: Theme.of(context).textTheme.caption)
+                ],
+              ),
+            ),
+            content: Container(
+                color: Theme.of(context).primaryColor,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    FlatButton(
+                      child: Text("حسنا",
+                          style: TextStyle(
+                              color: Theme.of(context).accentColor,
+                              fontWeight: FontWeight.bold)),
+                      onPressed: () async {
+                        // Dismiss the Alert Dialoge Box
+                        Navigator.of(context, rootNavigator: true).pop();
+                      },
+                    ),
+                  ],
+                )),
+          ),
+        );
       } else if (value['status'] == "pending_passenger") {
         // Driver Information
         Map body = {

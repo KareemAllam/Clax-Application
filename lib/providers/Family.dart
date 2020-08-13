@@ -131,7 +131,7 @@ class FamilyProvider extends ChangeNotifier {
 
   /// Add a member request.
   Future<ServerResponse> makeRequest(Contact contact) async {
-    String number = phoneNumber(contact.phoneNumber.number, userView: true);
+    String number = phoneNumber(contact.phoneNumber.number);
     Response result =
         await Api.put('passengers/family/add', reqBody: {"phone": number});
     if (result.statusCode == 200) {
@@ -154,6 +154,8 @@ class FamilyProvider extends ChangeNotifier {
       return ServerResponse(status: true);
     } else if (result.statusCode == 408)
       return ServerResponse(status: false, message: "تعذر الوصول للخادم");
+    else if (result.statusCode == 400)
+      return ServerResponse(status: false, message: "لا يمكنك اضافة نفسك");
     else
       return ServerResponse(status: false, message: "هذا الرقم غير مسجل لدينا");
   }

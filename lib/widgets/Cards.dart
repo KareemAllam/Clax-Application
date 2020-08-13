@@ -147,7 +147,7 @@ class Cards {
               .copyWith(color: Colors.black38),
         ),
         value: currentValue,
-        onChanged: updatedValue,
+        onChanged: updatedValue == null ? null : updatedValue,
       ),
     );
   }

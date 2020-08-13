@@ -38,6 +38,9 @@ class _AccountState extends State<Account> {
       loading = true;
     });
     final isValid = _form.currentState.validate();
+    setState(() {
+      loading = false;
+    });
     if (!isValid)
       return ServerResponse(
           status: false, message: 'تاكد من ادخال البيانات بشكل صحيح');
@@ -59,9 +62,11 @@ class _AccountState extends State<Account> {
     if (email != '')
       finalData['mail'] = email == '' ? _originalProfile.mail : email;
 
-    if (verifyPassword(pass, _originalProfile.passHashed)) {
-      finalData['pass'] = pass;
-      finalData['passLength'] = pass.length.toString();
+    if (!pass.contains("*")) {
+      if (verifyPassword(pass, _originalProfile.passHashed)) {
+        finalData['pass'] = pass;
+        finalData['passLength'] = pass.length.toString();
+      }
     }
 
     if (finalData.isNotEmpty) {
@@ -108,24 +113,27 @@ class _AccountState extends State<Account> {
                 onPressed: loading
                     ? () {}
                     : () async {
-                        ServerResponse result = await _saveForm();
-                        // Internet Connection
-                        if (!result.status)
-                          Scaffold.of(context).showSnackBar(
-                            SnackBar(
-                              backgroundColor: Colors.red,
-                              content: Text(
-                                "لقد تعذر الوصول للخادم. حاول مره اخرى في وقت لاحق",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyText2
-                                    .copyWith(color: Colors.white),
-                                strutStyle: StrutStyle(forceStrutHeight: true),
-                              ),
-                            ),
-                          );
+                        await _saveForm();
+                        // ServerResponse result = await _saveForm();
+                        // // Internet Connection
+                        // if (!result.status)
+                        //   Scaffold.of(context).showSnackBar(
+                        //     SnackBar(
+                        //       backgroundColor: Colors.red,
+                        //       content: Text(
+                        //         result.message,
+                        //         //  "لقد تعذر الوصول للخادم. حاول مره اخرى في وقت لاحق"
+                        //         style: Theme.of(context)
+                        //             .textTheme
+                        //             .bodyText2
+                        //             .copyWith(color: Colors.white),
+                        //         strutStyle: StrutStyle(forceStrutHeight: true),
+                        //       ),
+                        //     ),
+                        //   );
                         // Phone Data Changed
-                        else if (phone != '')
+                        // else
+                        if (phone != '')
                           Navigator.of(context)
                               .pushReplacementNamed(Verification.routeName);
                       });
@@ -173,19 +181,30 @@ class _AccountState extends State<Account> {
                 decoration: InputDecoration(
                     labelText: 'رقم الهاتف',
                     filled: true,
+                    counterText: "",
                     fillColor: Colors.white,
                     prefixIcon: Icon(Icons.phone)),
                 textInputAction: TextInputAction.done,
-                inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+                inputFormatters: [
+                  BlacklistingTextInputFormatter(RegExp('[\\-|\\ ]')),
+                  WhitelistingTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(11)
+                ],
+                maxLength: 11,
                 keyboardType: TextInputType.phone,
                 validator: (value) {
-                  if (value.isEmpty) {
-                    return 'من فضلك، قم بإدخال رقم الهاتف';
+                  RegExp phone = RegExp(r'^[0-9]+$');
+                  if (phone.hasMatch(value)) {
+                    // Wrong number of numbers.
+                    if (value.length != 11)
+                      return 'تأكد من ادخال رقمك بشكل صحيح.';
+                    // Everything is good
+                    RegExp phoneEgypt = RegExp(r'^01[0125][0-9]{8}$');
+                    if (phoneEgypt.hasMatch(value)) return null;
+                    // Wrong Phone Number Format
+                    return 'هذه الشركه غير مسجلة لدينا.';
                   }
-                  if (value.length != 11) {
-                    return 'قم بإدخال الرقم بشكل صحيح';
-                  }
-                  return null;
+                  return 'تأكد من ادخال رقمك بشكل صحيح.';
                 },
                 onSaved: (value) {
                   phone = '';
@@ -194,6 +213,9 @@ class _AccountState extends State<Account> {
             TextFormField(
                 initialValue: _originalProfile.mail,
                 cursorColor: Theme.of(context).primaryColor,
+                inputFormatters: [
+                  BlacklistingTextInputFormatter(RegExp('[\\-|\\ ]')),
+                ],
                 decoration: InputDecoration(
                     labelText: 'البريد الالكتروني',
                     filled: true,
@@ -202,10 +224,18 @@ class _AccountState extends State<Account> {
                 textInputAction: TextInputAction.done,
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
-                  if (value.isEmpty) {
-                    return 'من فضلك، قم بإدخال البريد الإلكتروني';
+                  if (value == "") {
+                    return "من فضلك، ادخالك البريد الالكتروني";
                   }
-                  return null;
+                  RegExp email = RegExp(
+                      r"^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$");
+                  if (!email.hasMatch(value)) {
+                    return "تأكد من ادخال البريد الالكتروني بشكل صحيح";
+                  }
+                  // User Entered a valid mail
+                  else {
+                    return null;
+                  }
                 },
                 onSaved: (value) {
                   email = '';
@@ -228,7 +258,6 @@ class _AccountState extends State<Account> {
                 if (value.length < 8) {
                   return 'كلمة المرور ضعيفة';
                 }
-
                 RegExp regExp = new RegExp(
                     r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
                 if (regExp.hasMatch(value))

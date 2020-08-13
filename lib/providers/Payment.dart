@@ -265,8 +265,27 @@ class PaymentProvider extends ChangeNotifier {
       offers = List<Offer>.from(json.decode(response.body).map(
             (offer) => Offer.fromJson(offer),
           ));
-      prefs.setString('offers', json.encode(offers));
 
+      bool offerRemoved = false;
+      List<Offer> newOffers = [];
+      offers.forEach((offer) {
+        if (offer.end.isBefore(DateTime.now())) {
+          offerRemoved = true;
+        } else {
+          newOffers.add(offer);
+          if (offer.offerType == "Discount")
+            discountPercent += offer.value;
+          else
+            discountAmount += offer.value;
+        }
+      });
+
+      if (offerRemoved) {
+        offers = newOffers;
+        prefs.setString("offers", json.encode(offers));
+      }
+
+      prefs.setString('offers', json.encode(offers));
       notifyListeners();
       return ServerResponse(status: true);
     } else

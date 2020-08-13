@@ -88,7 +88,7 @@ class _WriteAComplainState extends State<WriteAComplain> {
 
     ServerResponse result =
         await Provider.of<ComplainsProvider>(context, listen: false)
-            .add(json.encode(body));
+            .add(json.encode(body), selectedTrip.lineName);
 
     return result;
   }
@@ -104,7 +104,8 @@ class _WriteAComplainState extends State<WriteAComplain> {
                 icon: Icon(Icons.refresh),
                 onPressed: () async {
                   bool result =
-                      await Provider.of<TripsProvider>(context).serverData();
+                      await Provider.of<TripsProvider>(context, listen: false)
+                          .serverData();
                   if (!result)
                     Scaffold.of(context).showSnackBar(SnackBar(
                         content: Text(

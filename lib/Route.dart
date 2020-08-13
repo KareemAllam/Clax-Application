@@ -1,7 +1,7 @@
 // Flutter's Material Components
-import 'package:clax/screens/LandingPage.dart';
 import 'package:flutter/material.dart';
 // Screens
+import 'package:clax/screens/LandingPage.dart';
 //// Authentication
 import 'package:clax/screens/Login/Verification.dart';
 //// Settings

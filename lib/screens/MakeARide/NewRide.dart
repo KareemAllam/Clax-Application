@@ -1,7 +1,5 @@
 // Dart & Other Packages
 import 'dart:io';
-import 'package:clax/models/Error.dart';
-import 'package:clax/providers/Routes.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -9,19 +7,23 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/material.dart';
 // Models
 import 'package:clax/models/Line.dart';
+import 'package:clax/models/Error.dart';
 import 'package:clax/models/Station.dart';
 import 'package:clax/models/CurrentTrip.dart';
 // Providers
+import 'package:clax/providers/Routes.dart';
+import 'package:clax/providers/Profile.dart';
 import 'package:clax/providers/Payment.dart';
 import 'package:clax/providers/CurrentTrip.dart';
 // Screens
-import 'package:clax/screens/MakeARide/widgets/FromCard.dart';
+import 'package:clax/screens/Login/Verification.dart';
 import 'package:clax/screens/Payments/Payment_HomeScreen.dart';
 // Components
 import 'package:clax/screens/MakeARide/Components/PickUpInfo.dart';
 import 'package:clax/screens/MakeARide/Components/SeatsAndConfirm.dart';
 import 'package:clax/screens/MakeARide/Components/PickUpLocationCards.dart';
 // Widgets
+import 'package:clax/screens/MakeARide/widgets/FromCard.dart';
 import 'package:clax/screens/MakeARide/widgets/LineInfo.dart';
 import 'package:clax/screens/MakeARide/widgets/SearchLine.dart';
 // Drawer
@@ -52,7 +54,7 @@ class _StartARideState extends State<StartARide> with TickerProviderStateMixin {
   Map<String, dynamic> pickuplocation = Map();
   // Animation Var
   bool loading = false;
-
+  bool phoneVerified;
   void setPickUpLodation(String name, LatLng coords, IconData icon) {
     setState(() {
       pickuplocation = {"name": name, "coords": coords, 'icon': icon};
@@ -73,6 +75,7 @@ class _StartARideState extends State<StartARide> with TickerProviderStateMixin {
     _originalLines = Provider.of<RoutesProvider>(context).lines;
     _searchLines = _originalLines;
     balance = Provider.of<PaymentProvider>(context).balance;
+    phoneVerified = Provider.of<ProfilesProvider>(context).phoneVerified;
   }
 
   void searchLines(String start) {
@@ -148,6 +151,7 @@ class _StartARideState extends State<StartARide> with TickerProviderStateMixin {
     // show the dialog
     showDialog(
       context: context,
+      useRootNavigator: false,
       builder: (BuildContext context) {
         return alert;
       },
@@ -161,7 +165,19 @@ class _StartARideState extends State<StartARide> with TickerProviderStateMixin {
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         if (balance < line.cost.toDouble())
           noEnoughMoneyDB();
-        else {
+        else if (Provider.of<ProfilesProvider>(context, listen: false)
+                .phoneVerified !=
+            true) {
+          Scaffold.of(_scaffoldKey.currentContext).showSnackBar(SnackBar(
+              backgroundColor: theme.primaryColor,
+              action: SnackBarAction(
+                  label: "تفعيل",
+                  onPressed: () =>
+                      Navigator.of(context).pushNamed(Verification.routeName)),
+              content: Text("برجاء تفعيل هاتفك اولاًَ.",
+                  style: theme.textTheme.subtitle2
+                      .copyWith(color: Colors.white))));
+        } else {
           FocusScope.of(context).unfocus();
           setState(() {
             originalLine = line;
@@ -262,69 +278,83 @@ class _StartARideState extends State<StartARide> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        key: _scaffoldKey,
-        elevation: 0.0,
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.refresh),
-              onPressed: Provider.of<RoutesProvider>(context, listen: false)
-                  .fetchDataOnline)
-        ],
-        title: Text('رحلة جديدة',
-            style: Theme.of(context)
-                .textTheme
-                .bodyText1
-                .copyWith(color: Colors.white)),
-      ),
-      drawer: MainDrawer(),
-      body: loading
-          ? Center(child: SpinKitCircle(color: Theme.of(context).primaryColor))
-          : balance == null
-              ? SpinKitCircle(color: theme.primaryColor)
-              : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    finalLine == null
-                        ? Container(
-                            color: theme.scaffoldBackgroundColor,
-                            padding: EdgeInsets.only(
-                                bottom: 10, left: 10, right: 10, top: 15),
-                            child: SearchLine(searchLines),
-                          )
-                        : LineInfo(finalLine, swapDirection, clearLine),
-                    finalLine == null
-                        ? Expanded(
-                            child: ListView.builder(
-                              itemCount: _searchLines.length,
-                              itemExtent: 80,
-                              physics: AlwaysScrollableScrollPhysics(
-                                  parent: BouncingScrollPhysics()),
-                              itemBuilder: (context, index) => FromCard(
-                                line: _searchLines[index],
-                                onTap: selectLine,
-                              ),
-                            ),
-                          )
-                        : pickuplocation['name'] == null
-                            ? PickUpLocation(
-                                line: finalLine,
-                                setPickUpLodation: setPickUpLodation,
-                              )
-                            : Expanded(
-                                child: Column(
-                                  children: <Widget>[
-                                    PickupInfo(
-                                        pickuplocation, clearPickUpLocation),
-                                    SeatsAndConfirm(balance, finalLine.cost,
-                                        searchForDriver),
-                                  ],
+    return WillPopScope(
+      onWillPop: () async {
+        if (pickuplocation.isEmpty)
+          clearPickUpLocation();
+        else
+          clearLine();
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          key: _scaffoldKey,
+          elevation: 0.0,
+          actions: <Widget>[
+            IconButton(
+                icon: Icon(Icons.refresh),
+                onPressed: Provider.of<RoutesProvider>(context, listen: false)
+                    .fetchDataOnline)
+          ],
+          title: Text('رحلة جديدة',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyText1
+                  .copyWith(color: Colors.white)),
+        ),
+        drawer: MainDrawer(),
+        body: loading
+            ? Center(
+                child: SpinKitCircle(color: Theme.of(context).primaryColor))
+            : balance == null || phoneVerified == null
+                ? Center(
+                    child: Container(
+                        padding: EdgeInsets.all(16),
+                        child: SpinKitCircle(color: theme.primaryColor)),
+                  )
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      finalLine == null
+                          ? Container(
+                              color: theme.scaffoldBackgroundColor,
+                              padding: EdgeInsets.only(
+                                  bottom: 10, left: 10, right: 10, top: 15),
+                              child: SearchLine(searchLines),
+                            )
+                          : LineInfo(finalLine, swapDirection, clearLine),
+                      finalLine == null
+                          ? Expanded(
+                              child: ListView.builder(
+                                itemCount: _searchLines.length,
+                                itemExtent: 80,
+                                physics: AlwaysScrollableScrollPhysics(
+                                    parent: BouncingScrollPhysics()),
+                                itemBuilder: (context, index) => FromCard(
+                                  line: _searchLines[index],
+                                  onTap: selectLine,
                                 ),
-                              )
-                  ],
-                ),
+                              ),
+                            )
+                          : pickuplocation['name'] == null
+                              ? PickUpLocation(
+                                  line: finalLine,
+                                  setPickUpLodation: setPickUpLodation,
+                                )
+                              : Expanded(
+                                  child: Column(
+                                    children: <Widget>[
+                                      PickupInfo(
+                                          pickuplocation, clearPickUpLocation),
+                                      SeatsAndConfirm(balance, finalLine.cost,
+                                          searchForDriver),
+                                    ],
+                                  ),
+                                )
+                    ],
+                  ),
+      ),
     );
   }
 }

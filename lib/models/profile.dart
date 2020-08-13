@@ -22,7 +22,9 @@ class ProfileModel {
     mail = json['mail'];
     phone = json['phone'];
     passHashed = json['pass'];
-    passLength = json['passLength'];
+    passLength = json['passLength'] is String
+        ? int.parse(json['passLength'])
+        : json['passLength'];
     mailVerified = json['mail_verified'];
     phoneVerified = json['phone_verified'];
   }

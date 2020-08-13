@@ -45,7 +45,7 @@ class RealtimeDB {
   /// Cancel reading asynchronously from db
   /// with specified child.
   void cancelReadAsync(String child) {
-    // print("canceled successfully...");
+    print("canceled successfully...");
     try {
       events[child].cancel();
     } catch (_) {}

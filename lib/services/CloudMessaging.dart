@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 // Providers
+import 'package:clax/providers/Trips.dart';
 import 'package:clax/providers/Payment.dart';
 // import 'package:clax/providers/CurrentTrip.dart';
 // import 'package:clax/providers/Map.dart';
@@ -22,7 +23,9 @@ class NotificationHandler {
       //   // await driverArrived(message['data']['driverId']);
       //   break;
       case "offer":
-        offer(message['data']['offer']);
+        if (Provider.of<TripsProvider>(context, listen: false)
+                .offersNotification ==
+            true) offer(message['data']['offer']);
         break;
       default:
         // defaultAction(message);

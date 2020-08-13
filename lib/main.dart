@@ -15,6 +15,7 @@ import 'package:clax/screens/Login/Register.dart';
 import 'package:clax/screens/Authentication.dart';
 import 'package:clax/screens/Login/resetPassword.dart';
 import 'package:clax/screens/Login/ForgotPassword.dart';
+import 'package:clax/screens/Login/ForgetVerification.dart';
 
 void main() {
   Provider.debugCheckInvalidValueType = null;
@@ -50,6 +51,8 @@ class MyApp extends StatelessWidget {
             RegisterForm.routeName: (BuildContext context) => RegisterForm(),
             ForgetPass.routeName: (BuildContext context) => ForgetPass(),
             ResetPass.routeName: (BuildContext context) => ResetPass(),
+            ForgetVerification.routeName: (BuildContext context) =>
+                ForgetVerification(),
             ClaxRoot.routeName: (BuildContext context) => ClaxRoot(),
           },
           debugShowCheckedModeBanner: false,

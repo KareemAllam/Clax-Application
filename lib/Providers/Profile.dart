@@ -12,24 +12,25 @@ import 'package:clax/services/Backend.dart';
 
 class ProfilesProvider with ChangeNotifier {
   // Initial Data
-  ProfileModel _profile = ProfileModel();
+  ProfileModel profile = ProfileModel();
 
   // Provider's Useless Constructor
   ProfilesProvider() {
     init();
   }
+
   // Async Constructor
   Future init() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getString('profile') != null) {
-      _profile = ProfileModel.fromJson(json.decode(prefs.getString('profile')));
+      profile = ProfileModel.fromJson(json.decode(prefs.getString('profile')));
       notifyListeners();
     }
     try {
       Response account = await Api.get('passengers/settings/me');
       if (account.statusCode == 200) {
-        Map<String, dynamic> profile = json.decode(account.body);
-        _profile = ProfileModel.fromJson(profile);
+        Map<String, dynamic> _profile = json.decode(account.body);
+        profile = ProfileModel.fromJson(_profile);
         prefs.setString('profile', account.body);
         notifyListeners();
       }
@@ -38,19 +39,25 @@ class ProfilesProvider with ChangeNotifier {
 
   Future<ServerResponse> updateProfile(Map<String, dynamic> changes) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    Map<String, dynamic> originalAccount = _profile.toJson();
-    Response account =
+    Map<String, dynamic> originalAccount = profile.toJson();
+    Response response =
         await Api.put('passengers/settings/me', reqBody: changes);
-    if (account.statusCode == 200) {
+    if (response.statusCode == 200) {
       changes.forEach((key, value) => originalAccount["$key"] = value);
-      _profile = ProfileModel.fromJson(originalAccount);
-      prefs.setString('profile', json.encode(originalAccount));
+      profile = ProfileModel.fromJson(originalAccount);
+      prefs.setString('profile', json.encode(profile));
       notifyListeners();
       return ServerResponse(status: true);
-    } else {
-      _profile = ProfileModel.fromJson(originalAccount);
+    } else if (response.statusCode == 499) {
+      profile = ProfileModel.fromJson(originalAccount);
       notifyListeners();
-      return ServerResponse(status: false, message: "تعذر الوصول للخادم");
+      return ServerResponse(status: false, message: response.body);
+    } else {
+      profile = ProfileModel.fromJson(originalAccount);
+      notifyListeners();
+      return ServerResponse(
+          status: false,
+          message: "تعذر الوصول للخادم. حاول مرة اخرى في وقت لاحق");
     }
   }
 
@@ -58,14 +65,13 @@ class ProfilesProvider with ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Response result = await Api.put("passengers/settings/phone-verification");
     if (result.statusCode == 200) {
-      _profile.phoneVerified = true;
-      String updatedProfile = json.encode(_profile.toJson());
+      profile.phoneVerified = true;
+      String updatedProfile = json.encode(profile.toJson());
       prefs.setString('profile', updatedProfile);
       return true;
     } else
       return false;
   }
 
-  bool get phoneVerified => _profile.phoneVerified;
-  ProfileModel get profile => _profile;
+  bool get phoneVerified => profile.phoneVerified;
 }
