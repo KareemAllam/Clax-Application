@@ -278,7 +278,8 @@ class _RegisterFormState extends State<RegisterForm> {
                               scrollPadding: EdgeInsets.all(0),
                               inputFormatters: [
                                 WhitelistingTextInputFormatter(
-                                    RegExp('[أ-ي \\-أ-ي]+\$')),
+                                  RegExp("^([A-Z][a-z]+)\$|^([ء-ي]+)\$"),
+                                ),
                                 LengthLimitingTextInputFormatter(10)
                               ],
                               validator: (value) {
@@ -345,7 +346,7 @@ class _RegisterFormState extends State<RegisterForm> {
                               focusNode: _lastNameNode,
                               inputFormatters: [
                                 WhitelistingTextInputFormatter(
-                                    RegExp('[أ-ي\\-أ-ي]+\$')),
+                                    RegExp("^([A-Z][a-z]+)\$|^([ء-ي]+)\$")),
                                 LengthLimitingTextInputFormatter(10)
                               ],
                               cursorColor: purple,

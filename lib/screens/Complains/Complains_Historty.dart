@@ -25,9 +25,8 @@ class ComplaintsHistory extends StatefulWidget {
 class _ComplaintsHistoryState extends State<ComplaintsHistory> {
   bool loading = false;
   ScrollController _controller = ScrollController();
-
   List<Trip> trips;
-  ComplainsProvider _complainsProvider;
+  List<ComplainModel> complains = [];
 
   @override
   void dispose() {
@@ -39,12 +38,11 @@ class _ComplaintsHistoryState extends State<ComplaintsHistory> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     trips = Provider.of<TripsProvider>(context).trips;
-    _complainsProvider = Provider.of<ComplainsProvider>(context);
+    complains = Provider.of<ComplainsProvider>(context).complains;
   }
 
   @override
   Widget build(BuildContext context) {
-    List<ComplainModel> complains = _complainsProvider.complains ?? [];
     complains.sort((a, b) => b.date.compareTo(a.date));
     return Scaffold(
       appBar: AppBar(
@@ -61,7 +59,7 @@ class _ComplaintsHistoryState extends State<ComplaintsHistory> {
                   setState(() {
                     loading = true;
                   });
-                  ServerResponse result = await _complainsProvider.serverData();
+                  ServerResponse result = await  Provider.of<ComplainsProvider>(context,listen: false).serverData();
                   setState(() {
                     loading = false;
                   });

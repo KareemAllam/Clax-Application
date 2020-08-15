@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:clax/models/Trip.dart';
 import 'package:clax/models/Bill.dart';
 import 'package:clax/models/CurrentTrip.dart';
-import 'package:clax/models/CurrentDriver.dart';
 // Providers
 import 'package:clax/providers/Trips.dart';
 import 'package:clax/providers/Payment.dart';
@@ -46,9 +45,6 @@ class _RateTripState extends State<RateTrip> {
     CurrentTrip tripInfo =
         Provider.of<CurrentTripProvider>(context, listen: false)
             .currentTripInfo;
-    CurrentDriver driverInfo =
-        Provider.of<CurrentTripProvider>(context, listen: false)
-            .currentDriverInfo;
 
     // Adjusting Payment History
     BillModel bill = BillModel(
@@ -67,7 +63,6 @@ class _RateTripState extends State<RateTrip> {
         cost: tripInfo.finalCost,
         seats: tripInfo.seats,
         date: tripInfo.startDate,
-        driverPicture: driverInfo.profilePic,
         rate: userSubmitted ? driverRate * 1 : 3);
 
     // Register User's Feedback

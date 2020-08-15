@@ -1,6 +1,5 @@
 // Dart
 import 'dart:core';
-import 'dart:typed_data';
 
 class Trip {
   String id;
@@ -9,19 +8,16 @@ class Trip {
   int seats;
   DateTime date;
   String lineName;
-  String driverName;
-  Uint8List driverPicture;
 
   // Optional
-  Trip(
-      {this.id,
-      this.date,
-      this.seats,
-      this.cost,
-      this.lineName,
-      this.driverName,
-      this.rate = 0,
-      this.driverPicture});
+  Trip({
+    this.id,
+    this.date,
+    this.seats,
+    this.cost,
+    this.lineName,
+    this.rate = 0,
+  });
 
   Trip.fromJson(Map<String, dynamic> json) {
     id = json['_id'];
@@ -30,10 +26,6 @@ class Trip {
     seats = json['seats'];
     date = json['date'] == null ? DateTime.now() : DateTime.parse(json['date']);
     lineName = json['_line'] ?? null;
-    driverName = json['driverName'] ?? '';
-    driverPicture = json['driverPicture'] == null
-        ? Uint8List(1)
-        : Uint8List.fromList(json['driverPicture']);
   }
 
   Map<String, dynamic> toJson() {
@@ -44,8 +36,6 @@ class Trip {
     data['seats'] = this.seats;
     data['cost'] = this.cost;
     data['rate'] = this.rate ?? 0;
-    data['driverPicture'] = this.driverPicture ?? '';
-    data['driverName'] = this.driverName ?? 'جاري التجميل';
     return data;
   }
 }

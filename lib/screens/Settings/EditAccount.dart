@@ -151,6 +151,11 @@ class _AccountState extends State<Account> {
               initialValue: _originalProfile.name.first +
                   " " +
                   _originalProfile.name.last,
+              inputFormatters: [
+                WhitelistingTextInputFormatter(RegExp(
+                    "^([A-Z][a-z]+([ ]?[a-z]?['-]?[A-Z][a-z]+)*)\$|^([ء-ي]+([ ]?[ء-ي]))*\$")),
+                LengthLimitingTextInputFormatter(10)
+              ],
               decoration: InputDecoration(
                   labelText: 'الأسم:',
                   filled: true,

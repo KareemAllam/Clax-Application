@@ -1,6 +1,7 @@
 // Dart & Other Pacakges
 import 'dart:convert';
 import 'package:clax/models/Error.dart';
+import 'package:clax/models/Trip.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // Flutter Foundation
@@ -43,7 +44,7 @@ class ComplainsProvider extends ChangeNotifier {
     }
   }
 
-  Future<ServerResponse> add(requestBody, String lineName) async {
+  Future<ServerResponse> add(requestBody, {Trip selectedTrip}) async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     Response result = await Api.post("passengers/complaints/add", requestBody,
         stringDynamic: true);
@@ -51,7 +52,7 @@ class ComplainsProvider extends ChangeNotifier {
       Map<String, dynamic> body = json.decode(result.body);
       ComplainModel _complaint = ComplainModel.fromJson(body);
       if (body['_trip'] != null) {
-        _complaint.lineName = lineName;
+        _complaint.lineName = selectedTrip.lineName;
       }
       _complains.add(_complaint);
       _prefs.setString("complains", json.encode(_complains));

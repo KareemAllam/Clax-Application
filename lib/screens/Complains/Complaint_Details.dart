@@ -1,5 +1,6 @@
 // Dart & Other Packages
 import 'package:intl/intl.dart' as intl;
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 // Models
@@ -128,14 +129,39 @@ class _ComplainDetailsState extends State<ComplainDetails> {
                       height: 10,
                     ),
                     Row(children: <Widget>[
-                      Icon(Icons.report_problem,
-                          color: Theme.of(context).primaryColor),
-                      SizedBox(width: 16),
-                      Text(
-                        complain.code.toString().substring(0, 5),
-                        strutStyle: StrutStyle(forceStrutHeight: true),
-                        style: Theme.of(context).textTheme.subtitle2.copyWith(
-                            fontFamily: "Product Sans", color: Colors.grey),
+                      if (complain.lineName != null)
+                        Row(
+                          children: <Widget>[
+                            Icon(FontAwesomeIcons.route,
+                                color: Theme.of(context).primaryColor),
+                            SizedBox(width: 16),
+                            Text(
+                              complain.lineName,
+                              strutStyle: StrutStyle(forceStrutHeight: true),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .subtitle2
+                                  .copyWith(color: Colors.grey),
+                            ),
+                            SizedBox(width: 16),
+                          ],
+                        ),
+                      Row(
+                        children: <Widget>[
+                          Icon(Icons.report_problem,
+                              color: Theme.of(context).primaryColor),
+                          SizedBox(width: 16),
+                          Text(
+                            complain.code.toString().substring(0, 5),
+                            strutStyle: StrutStyle(forceStrutHeight: true),
+                            style: Theme.of(context)
+                                .textTheme
+                                .subtitle2
+                                .copyWith(
+                                    fontFamily: "Product Sans",
+                                    color: Colors.grey),
+                          ),
+                        ],
                       )
                     ]),
                   ]),

@@ -11,6 +11,8 @@ import 'package:clax/providers/Payment.dart';
 import 'package:clax/models/Bill.dart';
 import 'package:clax/models/Error.dart';
 import 'package:clax/models/CreditCard.dart';
+// Screens
+import 'package:clax/screens/Payments/Payment_PaypalWeb.dart';
 
 void showPayment(context, type, {card}) {
   Navigator.of(context).pop();
@@ -84,7 +86,7 @@ class _PaymentPopupState extends State<PaymentPopup> {
     } else {
       //Api request
       setState(() {
-        error = [true, "رجاءً تأكد من معلوماتك و حاول مره اخرى"];
+        error = [false, "رجاءً تأكد من معلوماتك و حاول مره اخرى"];
         loading = true;
       });
       ServerResponse result =
@@ -95,7 +97,7 @@ class _PaymentPopupState extends State<PaymentPopup> {
           loading = false;
           error = [false];
         });
-        return true;
+        return result.message;
       } else {
         setState(() {
           loading = false;
@@ -196,11 +198,14 @@ class _PaymentPopupState extends State<PaymentPopup> {
                   Navigator.pop(context, false);
                 }
               } else {
-                String result = await paypalCharge();
+                var result = await paypalCharge();
                 if (result != 'error') {
                   Navigator.pop(context);
-                  Navigator.of(context)
-                      .pushNamed('/payment/paypal', arguments: {'url': result});
+                  Navigator.of(context).pushNamed(PaypalWeb.routeName,
+                      arguments: {
+                        'url': result,
+                        'amount': double.parse(amount.text)
+                      });
                 }
               }
             },

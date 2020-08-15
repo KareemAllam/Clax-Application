@@ -32,7 +32,7 @@ class ComplainModel {
     code = json['code'] ?? 404;
     date = DateTime.parse(json['date']) ?? DateTime.now();
     if (json["_trip"] != null) {
-      lineName = json['_trip']['_line'];
+      lineName = json['_trip']['_line'] ?? "غير معرف";
       driverName = NameModel.fromJson(json['_trip']["_driver"]['name']);
       profilePic =
           JSON.base64Decode(json['_trip']["_driver"]["profilePic"]['data']);

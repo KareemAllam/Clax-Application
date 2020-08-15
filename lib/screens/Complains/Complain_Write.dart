@@ -88,7 +88,7 @@ class _WriteAComplainState extends State<WriteAComplain> {
 
     ServerResponse result =
         await Provider.of<ComplainsProvider>(context, listen: false)
-            .add(json.encode(body), selectedTrip.lineName);
+            .add(json.encode(body), selectedTrip: selectedTrip ?? null);
 
     return result;
   }
@@ -228,7 +228,7 @@ class _WriteAComplainState extends State<WriteAComplain> {
                   ServerResponse result = await submitForm();
                   if (result.status)
                     Navigator.of(context).pop();
-                  else
+                  else if (result.message != '')
                     Scaffold.of(context).showSnackBar(
                       SnackBar(
                         backgroundColor: Colors.red,

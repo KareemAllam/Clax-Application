@@ -184,18 +184,38 @@ class PaymentProvider extends ChangeNotifier {
 
   // Charge user via Paypal ==> Increase Blanace
   Future<ServerResponse> chargePaypal(String amount) async {
-    Response result = await Api.post(
-        'passengers/payments/manage-financials/paypal/charge-paypal',
-        {"amount": amount});
+    Response result =
+        await Api.post('passengers/paypal/charge-paypal', {"amount": amount});
     if (result.statusCode == 200) {
-      _balance += int.parse(amount);
-      notifyListeners();
+      // _balance += int.parse(amount);
+      // notifyListeners();
       return ServerResponse(status: true, message: result.body);
     } else if (result.statusCode == 408) {
       return ServerResponse(status: false, message: "تعذر الوصول للخادم");
     } else
       return ServerResponse(
-          status: false, message: "لا يوجد لديك رصيد لعملية التحويل.");
+          status: false,
+          message:
+              "حدثت مشكلة في عملية التحويل.\nتأكد من ليدك رصيد كافي و حاول مرة اخرى");
+  }
+
+  // Charge user via Paypal ==> Increase Blanace
+  Future<ServerResponse> finishPaypal(double amount) async {
+    Response response = await Api.post(
+      "passengers/paypal/success",
+      {"amount": amount.toString()},
+    );
+    if (response.statusCode == 200) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      _balance = _balance + amount;
+      prefs.setDouble('balance', _balance);
+      notifyListeners();
+      return ServerResponse(status: true);
+    } else
+      return ServerResponse(
+          status: false,
+          message:
+              "حدثت مشكلة في عملية التحويل.\nتأكد من ليدك رصيد كافي و حاول مرة اخرى");
   }
 
   // Add Payment Card

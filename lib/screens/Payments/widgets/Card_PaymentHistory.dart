@@ -1,7 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:clax/models/Bill.dart';
-import 'package:intl/intl.dart' as intl;
+// Dart & Other Pacakges
 import 'dart:math';
+import 'package:intl/intl.dart' as intl;
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+// Flutter Material Components
+import 'package:flutter/material.dart';
+// Models
+import 'package:clax/models/Bill.dart';
 
 class BillCard extends StatelessWidget {
   final BillModel bill;
@@ -21,7 +25,11 @@ class BillCard extends StatelessWidget {
       title = bill.description;
       msg = 'اجرة السائق';
     } else if (bill.type == "Charge") {
-      icon = Icon(Icons.payment, color: Theme.of(context).primaryColor);
+      if (bill.description == "Paypal")
+        icon = Icon(FontAwesomeIcons.paypal,
+            color: Theme.of(context).primaryColor);
+      else
+        icon = Icon(Icons.payment, color: Theme.of(context).primaryColor);
       title = bill.description;
       msg = 'تم إضافة';
     } else if (bill.type == "Lend") {

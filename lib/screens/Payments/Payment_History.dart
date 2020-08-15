@@ -37,7 +37,7 @@ class _PaymentHistoryState extends State<PaymentHistory> {
 
     double height = MediaQuery.of(context).size.height;
 
-    updateData() async {
+    void updateData() async {
       setState(() {
         loading = true;
       });

@@ -22,10 +22,53 @@ class FreeRides extends StatefulWidget {
 }
 
 class _FreeRidesState extends State<FreeRides> {
+  GlobalKey<ScaffoldState> key = GlobalKey<ScaffoldState>();
   TextEditingController promoCodeController = TextEditingController();
   bool tapped = false;
   bool loading = false;
   List<Offer> offers;
+
+  void validateOfferCode() async {
+    setState(() {
+      tapped = true;
+    });
+    FocusScope.of(context).unfocus();
+    if (promoCodeController.text.length < 3) {
+      key.currentState.showSnackBar(SnackBar(
+        content: Text(
+          "تأكد من رقم البروموكود بشكل صحيح",
+          style: Theme.of(context)
+              .textTheme
+              .bodyText2
+              .copyWith(color: Colors.white),
+        ),
+      ));
+      setState(() {
+        tapped = false;
+      });
+      return;
+    }
+    ServerResponse result =
+        await Provider.of<PaymentProvider>(context, listen: false)
+            .addOffer(promoCodeController.text);
+    if (!result.status) {
+      key.currentState.showSnackBar(SnackBar(
+        backgroundColor: Colors.red,
+        content: Text(
+          result.message,
+          style: Theme.of(context)
+              .textTheme
+              .bodyText2
+              .copyWith(color: Colors.white),
+        ),
+      ));
+      promoCodeController.clear();
+    }
+    setState(() {
+      tapped = false;
+    });
+  }
+
   @override
   void didChangeDependencies() {
     offers = Provider.of<PaymentProvider>(context).offers;
@@ -41,40 +84,39 @@ class _FreeRidesState extends State<FreeRides> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: key,
       appBar: AppBar(
         elevation: 0.0,
         actions: <Widget>[
-          Builder(
-              builder: (context) => IconButton(
-                  icon: loading
-                      ? SpinKitCircle(color: Colors.white, size: 24)
-                      : Icon(Icons.refresh),
-                  onPressed: () async {
-                    setState(() {
-                      loading = true;
-                    });
-                    ServerResponse result = await Provider.of<PaymentProvider>(
-                            context,
-                            listen: false)
+          IconButton(
+              icon: loading
+                  ? SpinKitCircle(color: Colors.white, size: 24)
+                  : Icon(Icons.refresh),
+              onPressed: () async {
+                setState(() {
+                  loading = true;
+                });
+                ServerResponse result =
+                    await Provider.of<PaymentProvider>(context, listen: false)
                         .fetchOffers();
-                    if (!result.status) {
-                      Scaffold.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor: Colors.red,
-                          content: Text(
-                            result.message,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyText2
-                                .copyWith(color: Colors.white),
-                          ),
-                        ),
-                      );
-                    }
-                    setState(() {
-                      loading = false;
-                    });
-                  }))
+                if (!result.status) {
+                  key.currentState.showSnackBar(
+                    SnackBar(
+                      backgroundColor: Colors.red,
+                      content: Text(
+                        result.message,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText2
+                            .copyWith(color: Colors.white),
+                      ),
+                    ),
+                  );
+                }
+                setState(() {
+                  loading = false;
+                });
+              })
         ],
         title: Text('الرحلات المجانية',
             style: Theme.of(context)
@@ -89,100 +131,62 @@ class _FreeRidesState extends State<FreeRides> {
         },
         child: SingleChildScrollView(
           child: Container(
-            height: MediaQuery.of(context).size.height,
             color: Theme.of(context).scaffoldBackgroundColor,
             width: double.infinity,
             padding: EdgeInsets.all(8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Builder(
-                  builder: (context) => TextField(
-                    controller: promoCodeController,
-                    textInputAction: TextInputAction.done,
-                    inputFormatters: [
-                      WhitelistingTextInputFormatter(RegExp("[a-zA-Z0-9]"))
-                    ],
-                    maxLength: 6,
-                    cursorColor: Theme.of(context).primaryColor,
-                    decoration: InputDecoration(
-                      filled: true,
-                      counterText: '',
-                      floatingLabelBehavior: FloatingLabelBehavior.never,
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 15, vertical: 0),
-                      border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey[350]),
-                          borderRadius: BorderRadius.circular(30)),
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey[350]),
-                          borderRadius: BorderRadius.circular(30)),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Theme.of(context).primaryColor),
-                          borderRadius: BorderRadius.circular(30)),
-                      fillColor: Colors.white,
-                      suffix: GestureDetector(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 2),
-                          child: Text('يلا كلاكس',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyText2
-                                  .copyWith(
-                                      color: Theme.of(context).primaryColor)),
-                        ),
-                        onTap: tapped
-                            ? null
-                            : () async {
-                                setState(() {
-                                  tapped = true;
-                                });
-                                FocusScope.of(context).unfocus();
-                                if (promoCodeController.text.length < 6) {
-                                  Scaffold.of(context).showSnackBar(SnackBar(
-                                    content: Text(
-                                      "تأكد من رقم البروموكود و حاول مره اخرى",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyText2
-                                          .copyWith(color: Colors.white),
-                                    ),
-                                  ));
-                                  return;
-                                }
-                                ServerResponse result =
-                                    await Provider.of<PaymentProvider>(context,
-                                            listen: false)
-                                        .addOffer(promoCodeController.text);
-                                if (!result.status) {
-                                  Scaffold.of(context).showSnackBar(SnackBar(
-                                    backgroundColor: Colors.red,
-                                    content: Text(
-                                      result.message,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyText2
-                                          .copyWith(color: Colors.white),
-                                    ),
-                                  ));
-                                }
-                                promoCodeController.clear();
-                                setState(() {
-                                  tapped = true;
-                                });
-                              },
-                      ),
-                      prefixIcon: Icon(
-                        Icons.card_giftcard,
-                        size: 20,
-                      ),
-                      labelStyle: Theme.of(context)
-                          .textTheme
-                          .bodyText2
-                          .copyWith(color: Colors.grey),
-                      labelText: 'ادخل بروموكود جديد',
+                TextField(
+                  controller: promoCodeController,
+                  textInputAction: TextInputAction.done,
+                  inputFormatters: [
+                    WhitelistingTextInputFormatter(RegExp("[a-zA-Z0-9]")),
+                  ],
+                  maxLength: 30,
+                  cursorColor: Theme.of(context).primaryColor,
+                  decoration: InputDecoration(
+                    filled: true,
+                    counterText: '',
+                    floatingLabelBehavior: FloatingLabelBehavior.never,
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey[350]),
+                        borderRadius: BorderRadius.circular(30)),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey[350]),
+                        borderRadius: BorderRadius.circular(30)),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Theme.of(context).primaryColor),
+                        borderRadius: BorderRadius.circular(30)),
+                    fillColor: Colors.white,
+                    suffix: tapped
+                        ? SpinKitCircle(
+                            color: Theme.of(context).primaryColor, size: 8)
+                        : GestureDetector(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 2),
+                              child: Text('يلا كلاكس',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText2
+                                      .copyWith(
+                                          color:
+                                              Theme.of(context).primaryColor)),
+                            ),
+                            onTap: tapped ? null : validateOfferCode,
+                          ),
+                    prefixIcon: Icon(
+                      Icons.card_giftcard,
+                      size: 20,
                     ),
+                    labelStyle: Theme.of(context)
+                        .textTheme
+                        .bodyText2
+                        .copyWith(color: Colors.grey),
+                    labelText: 'ادخل بروموكود جديد',
                   ),
                 ),
                 SizedBox(height: 8),
