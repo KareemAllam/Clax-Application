@@ -24,14 +24,13 @@ class RealtimeDB {
   }
 
   /// Reading a snapshot from firebase once.
-  void readOnce(String child) async {
+  Future<Map<String, dynamic>> readOnce(String child) async {
     _databaseRefrences[child] =
         FirebaseDatabase.instance.reference().child(child);
     DataSnapshot snapshot = await _databaseRefrences[child].orderByKey().once();
-    var result = snapshot.value.values as Iterable;
-    for (var item in result) {
-      print(item);
-    }
+    Map<String, dynamic> result =
+        Map<String, dynamic>.from(snapshot.value.values);
+    return result;
   }
 
   /// Reading a snapshot from firebase on value changed.

@@ -1,14 +1,15 @@
 // Dart & Other Packages
-import 'package:clax/providers/Profile.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 // Flutter's Material Components
 import 'package:flutter/material.dart';
 // Provider
+import 'package:clax/providers/Profile.dart';
 import 'package:clax/providers/Tracking.dart';
 import 'package:clax/providers/RideSettings.dart';
 // Screens
+import 'package:clax/screens/MakeARide/Working.dart';
 import 'package:clax/screens/MakeARide/StartTrip.dart';
 // Components
 import 'package:clax/screens/MakeARide/Break.dart';
@@ -29,9 +30,14 @@ class _LandingPageState extends State<LandingPage> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   // Driver allowed to use the app?
-  bool phoneVerified;
+  TrackingProvider tracking;
   // Driver is currenlty taking a break?
-  bool working = false;
+  bool phoneVerified;
+  // Driver is currenlty taking a working?
+  bool canWork = false;
+  bool onGoingTrip = false;
+  String tourId;
+  String lineName;
 
   void _navigateToItemDetail(Map<String, dynamic> message) {
     handler.handle(context, message);
@@ -53,20 +59,24 @@ class _LandingPageState extends State<LandingPage> with WidgetsBindingObserver {
         _navigateToItemDetail(message);
       },
     );
-    _firebaseMessaging.getToken().then((String token) {
-      assert(token != null);
-      // print("Push Messaging token: $token");
-    });
+    Provider.of<TrackingProvider>(context, listen: false).scaffoldKey =
+        _scaffoldKey;
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    Provider.of<TrackingProvider>(context, listen: false).scaffoldKey =
-        _scaffoldKey;
-    working = Provider.of<TripSettingsProvider>(context).working;
     phoneVerified =
         Provider.of<ProfilesProvider>(context).profile.phoneVerified;
+    tracking = Provider.of<TrackingProvider>(context);
+    canWork = Provider.of<TripSettingsProvider>(context).canWork;
+    onGoingTrip = Provider.of<TripSettingsProvider>(context).onGoingTrip;
+    if (onGoingTrip == true) {
+      lineName =
+          Provider.of<TripSettingsProvider>(context).currnetLine.lineName();
+      if (lineName == null) lineName = "جاري التحميل";
+    } else
+      lineName = null;
   }
 
   @override
@@ -80,9 +90,15 @@ class _LandingPageState extends State<LandingPage> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  changeWorkingState(state) {
-    Provider.of<TripSettingsProvider>(context, listen: false).working = state;
-    setState(() => working = state);
+  void canWorkState(currentState) async {
+    Provider.of<TripSettingsProvider>(context, listen: false)
+        .canWorkState(currentState);
+  }
+
+  Future onGoingTripState(bool currentState, String _lineName) async {
+    lineName = _lineName;
+    Provider.of<TripSettingsProvider>(context, listen: false)
+        .onGoingTripState(currentState);
   }
 
   @override
@@ -93,22 +109,25 @@ class _LandingPageState extends State<LandingPage> with WidgetsBindingObserver {
           key: _scaffoldKey,
           drawer: MainDrawer(),
           appBar: AppBar(
-            // actions: <Widget>[
-            //   if (working)
-            //     IconButton(
-            //         icon: Icon(Icons.settings),
-            //         onPressed: () =>
-            //             Navigator.of(context).pushNamed(RideSettings.routeName)),
-            //   if (working)
-            //     IconButton(
-            //         icon: Icon(
-            //           Icons.free_breakfast,
-            //           color: Colors.white,
-            //         ),
-            //         onPressed: changeWorkingState),
-            // ],
+            actions: <Widget>[
+              // Debugging & Testing  UI
+              // IconButton(
+              //     icon: Icon(Icons.play_arrow),
+              //     onPressed: () {
+              //       tracking.enableStreamingCurrentLocation();
+              //     }),
+              if (onGoingTrip == true)
+                IconButton(
+                    icon: Icon(Icons.stop),
+                    onPressed: () async {
+                      await tracking.disableStreamingCurrentLocation();
+                    })
+            ],
             elevation: 0.0,
-            title: Text(working ? 'على الطريق' : "استراحة",
+            title: Text(
+                canWork == true
+                    ? lineName == null ? 'على الطريق' : lineName
+                    : "استراحة",
                 style: Theme.of(context)
                     .textTheme
                     .bodyText1
@@ -120,9 +139,11 @@ class _LandingPageState extends State<LandingPage> with WidgetsBindingObserver {
                   padding: EdgeInsets.all(16),
                   child: SpinKitCircle(color: Theme.of(context).primaryColor),
                 )
-              : working == true
-                  ? StartTrip(changeWorkingState)
-                  : TakeABreak(changeWorkingState)),
+              : canWork == true
+                  ? onGoingTrip == true
+                      ? Working()
+                      : StartTrip(onGoingTripState, canWorkState)
+                  : TakeABreak(canWorkState)),
     );
   }
 }

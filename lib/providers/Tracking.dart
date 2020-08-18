@@ -1,5 +1,4 @@
 // Flutter's Material Component
-import 'package:clax/screens/MakeARide/TripEnded.dart';
 import 'package:flutter/material.dart';
 // Dart & Other Packages
 import 'dart:math';
@@ -9,7 +8,6 @@ import 'dart:typed_data';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:overlay_support/overlay_support.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 // Services
 import 'package:clax/services/GoogleApi.dart';
@@ -17,7 +15,6 @@ import 'package:clax/services/RealtimeDB.dart';
 import 'package:clax/services/Backend.dart';
 // Provider
 import 'package:clax/providers/Auth.dart';
-import 'package:clax/providers/Profile.dart';
 import 'package:clax/providers/Payment.dart';
 import 'package:clax/providers/RideSettings.dart';
 // Models
@@ -28,6 +25,8 @@ import 'package:clax/models/PassengerInfo.dart';
 import 'package:clax/utils/MapConversions.dart';
 // Widgets
 import 'package:clax/screens/MakeARide/widgets/Alert.dart';
+// Screens
+import 'package:clax/screens/MakeARide/TripEnded.dart';
 
 class TrackingProvider extends ChangeNotifier {
   // ----- Properties -----
@@ -50,7 +49,7 @@ class TrackingProvider extends ChangeNotifier {
   // Users Informations
   LatLng currentLocation;
   List<PassengerInfo> passengers = [];
-
+  bool waitingPassenger = false;
   // ----- Constructores -----
   // Synchronous Constructor
   TrackingProvider() {
@@ -121,17 +120,17 @@ class TrackingProvider extends ChangeNotifier {
       // If it is going from `start` to `end`
       List<double> coords;
       direction == 0
-          ? coords = line.end.coordinates
-          : coords = line.start.coordinates;
+          ? coords = line.stations.last.coordinates
+          : coords = line.stations.first.coordinates;
       if (direction == 0)
-        print('${line.start.name} => ${line.end.name}');
+        print('${line.from} => ${line.to}');
       else
-        print('${line.end.name} => ${line.start.name}');
+        print('${line.to} => ${line.from}');
 
       //---------------------------
       // Boradcasting Tour Information
       streamingLocation = geolocator.getPositionStream(locationOptions).listen(
-        (Position position) {
+        (Position position) async {
           currentLocation = LatLng(position.latitude, position.longitude);
 
           // Update the only marker
@@ -140,7 +139,7 @@ class TrackingProvider extends ChangeNotifier {
             icon: BitmapDescriptor.fromBytes(icon),
             position: LatLng(position.latitude, position.longitude),
             infoWindow: InfoWindow(
-              title: "Dynamic Movement",
+              title: "المكان الحالي:",
               snippet: "Lat: ${position.latitude}, Long: ${position.longitude}",
             ),
           );
@@ -165,12 +164,8 @@ class TrackingProvider extends ChangeNotifier {
             // print(value);
             // Driver reached the end of the Line
             if (value < 1500) {
-              Api.post(
-                'drivers/settings/end-tour',
-                {"lineId": line.id, "tourId": tourId},
-              );
-              print('driver arrived');
               disableStreamingCurrentLocation();
+              tourId = null;
               Navigator.of(scaffoldKey.currentContext)
                   .pushNamed(TripEnded.routeName);
             }
@@ -183,7 +178,7 @@ class TrackingProvider extends ChangeNotifier {
             "direction": direction,
             "fireBaseId": fbToken
           });
-
+          // if (!waitingPassenger) await checkNearPassengers();
           // if (direction == 0) {
           //   geolocator
           //       .distanceBetween(position.latitude, position.longitude,
@@ -203,7 +198,10 @@ class TrackingProvider extends ChangeNotifier {
           // }
         },
       );
-    } else
+    } else {
+      Provider.of<TripSettingsProvider>(scaffoldKey.currentContext,
+              listen: false)
+          .onGoingTripState(false);
       scaffoldKey.currentState.showSnackBar(
         SnackBar(
           backgroundColor: Colors.red,
@@ -217,23 +215,25 @@ class TrackingProvider extends ChangeNotifier {
           ),
         ),
       );
+    }
   }
 
-  void disableStreamingCurrentLocation() {
+  Future disableStreamingCurrentLocation() async {
     if (streamingLocation != null) {
-      streamingLocation.cancel();
+      await streamingLocation.cancel();
       streamingLocation = null;
       LineModel line = Provider.of<TripSettingsProvider>(
               scaffoldKey.currentContext,
               listen: false)
           .currnetLine;
-      String id = Provider.of<ProfilesProvider>(scaffoldKey.currentContext,
-              listen: false)
-          .id;
-      _realtimeDB.deleteMainNode('clax-lines/${line.id}/$id');
+      _realtimeDB.deleteMainNode('clax-lines/${line.id}/$tourId');
+      await Api.post(
+        'drivers/settings/end-tour',
+        {"lineId": line.id, "tourId": tourId},
+      );
       Provider.of<TripSettingsProvider>(scaffoldKey.currentContext,
               listen: false)
-          .working = false;
+          .onGoingTripState(false);
       Provider.of<PaymentProvider>(scaffoldKey.currentContext, listen: false)
           .endTrip();
     }
@@ -257,7 +257,7 @@ class TrackingProvider extends ChangeNotifier {
   /// as a String
   /// E. g. passenger.locationCoords.toString();
   void removePassenger(String requestId) {
-    markers[requestId] = null;
+    markers.removeWhere((key, value) => value.markerId == MarkerId(requestId));
     passengers.removeWhere((element) => element.requestId == requestId);
     notifyListeners();
   }
@@ -268,8 +268,9 @@ class TrackingProvider extends ChangeNotifier {
             listen: false)
         .currnetLine;
 
-    Map route = await getLinePoints(LatLng.fromJson(line.start.coordinates),
-        LatLng.fromJson(line.end.coordinates));
+    Map route = await getLinePoints(
+        LatLng.fromJson(line.stations[0].coordinates),
+        LatLng.fromJson(line.stations.last.coordinates));
 
     if (!route['status']) return;
 
@@ -289,7 +290,7 @@ class TrackingProvider extends ChangeNotifier {
     );
     notifyListeners();
     controller.animateCamera(
-        CameraUpdate.newLatLng(LatLng.fromJson(line.start.coordinates)));
+        CameraUpdate.newLatLng(LatLng.fromJson(line.stations[0].coordinates)));
   }
 
   Future<int> isDriverNearStart(double driverLat, double driverLng) async {
@@ -297,11 +298,12 @@ class TrackingProvider extends ChangeNotifier {
             scaffoldKey.currentContext,
             listen: false)
         .currnetLine
-        .start
+        .stations
+        .first
         .coordinates);
     double distance = await _geolocator.distanceBetween(
         lineStart.latitude, lineStart.longitude, driverLat, driverLng);
-    if (distance > 750)
+    if (distance > 2000)
       return 1;
     else
       return 0;
@@ -316,8 +318,8 @@ class TrackingProvider extends ChangeNotifier {
     String billTitle;
     // Driver is traveling from `start` to `end`
     direction == 0
-        ? billTitle = '${line.start.name} - ${line.end.name}'
-        : billTitle = '${line.end.name} - ${line.start.name}';
+        ? billTitle = '${line.from} - ${line.to}'
+        : billTitle = '${line.to} - ${line.from}';
     Provider.of<PaymentProvider>(scaffoldKey.currentContext, listen: false)
         .startNewTrip(BillModel(
             lineName: billTitle,
@@ -327,39 +329,40 @@ class TrackingProvider extends ChangeNotifier {
   }
 
   void trackPassengerRequest(lineId, requestId, message) {
+    PassengerInfo _passenger;
     // Track Request from Realtime DB
-    _realtimeDB.readAsync("clax-requests/$lineId/$requestId", (value) async {
+    _realtimeDB.readAsync("clax-requests/$requestId", (value) async {
       if (value == null)
-        _realtimeDB.cancelReadAsync("clax-requests/$lineId/$requestId");
-
+        _realtimeDB.cancelReadAsync("clax-requests/$requestId");
+      //-------------------------------
       // If user has cancelled the trip
-      if (value['status'] == "cancel" || value['status'] == "canceled") {
-        // Retreive Location
-        List<double> coords =
-            List<double>.from(json.decode(message['data']['station_location']));
+      else if (value['status'] == "cancel" || value['status'] == "canceled") {
         // Show Notification to Driver
-        showSimpleNotification(Text("عذراً، قام الراكب بالغاء الطلب"));
-        removePassenger(LatLng.fromJson(coords).toString());
+        showNotification(
+            scaffoldKey.currentContext, "عذراً، قام الراكب بالغاء الطلب", "");
         // Stop Reading
         _realtimeDB.cancelReadAsync("clax-requests/$lineId/$requestId");
       }
-
+      //-------------------------------
       // If user has confirmed the trip
       else if (value['status'] == "waiting") {
         // Show Notification to Driver
-        showSimpleNotification(Text("الراكب ينتظرك على الطريق"));
+        showNotification(scaffoldKey.currentContext, "الراكب ينتظرك على الطريق",
+            "لمعرفة معلومات اكثر عن الراكب، اضغط الزر ف الاسفل");
         // Retreive Location
-        List<double> coords =
-            List<double>.from(json.decode(message['data']['station_location']));
+        // lat , lng
+        Map<String, dynamic> coords =
+            json.decode(message['data']['station_location']);
         // Add Passenger to
-        addPassenger(PassengerInfo(
+        _passenger = PassengerInfo(
           message['data']['station_name'],
-          LatLng.fromJson(coords),
+          LatLng(coords['lat'], coords['lng']),
           int.parse(message['data']['seats']),
           requestId,
-        ));
+        );
+        addPassenger(_passenger);
       }
-
+      //-------------------------------
       // If user has cancelled the trip after pairing
       else if (value['status'] == "passenger_cancelled") {
         // Stop Reading
@@ -370,7 +373,16 @@ class TrackingProvider extends ChangeNotifier {
         showNotification(scaffoldKey.currentContext, "قام الراكب بإلغاء الطلب.",
             "تم اضافة سعر الرحلة لحسابك");
       }
+      //-------------------------------
+      // if Driver arrived
+      else if (value['status'] == "arrived") {
+        waitingPassenger = true;
+        passengers.removeWhere((passenger) => passenger == _passenger);
+        notifyListeners();
+        showWaitPassenger(_passenger);
+      }
 
+      //-------------------------------
       // If user has cancelled the trip after pairing
       else if (value['status'] == "done") {
         // Stop Reading
@@ -379,25 +391,196 @@ class TrackingProvider extends ChangeNotifier {
             .updateCurrentTrip(int.parse(message['data']['seats']));
         // Show Notification to Driver
         showNotification(scaffoldKey.currentContext, "صعد الراكب بنجاح",
-            "تم اضافة ثمن الرحلة لحسابك. راجع حسابك بعد انتهاء الرحلة.",
-            trailing: MaterialButton(
-              onPressed: () {},
-              color: Colors.green,
-              textColor: Colors.white,
-              child: Icon(
-                Icons.check,
-                color: Colors.white,
-              ),
-              padding: EdgeInsets.all(16),
-              shape: CircleBorder(),
-            ));
+            "تم اضافة ثمن الرحلة لحسابك. راجع حسابك بعد انتهاء الرحلة.");
+        removePassenger(requestId);
       }
     });
   }
 
+  // Check if Passengers Near driver
+  // Future checkNearPassengers() async {
+  //   if (passengers.length != 0) {
+  //     List _clone = passengers;
+
+  //     for (PassengerInfo passenger in _clone) {
+  //       double distance = await _geolocator.distanceBetween(
+  //           passenger.locationCoords.latitude,
+  //           passenger.locationCoords.longitude,
+  //           currentLocation.latitude,
+  //           currentLocation.longitude);
+  //       if (distance < 80) {
+  //         waitingPassenger = true;
+  //         streamingLocation.pause();
+  //         passengers.removeWhere((_passenger) => _passenger == passenger);
+  //         notifyListeners();
+  //         _realtimeDB.updateChild(
+  //             'clax-requests/${passenger.requestId}', {"status": "arrived"});
+  //         showWaitPassenger(passenger);
+  //       }
+  //     }
+  //   }
+  //   // passengers.removeWhere((passenger) {
+  //   //   _geolocator
+  //   //       .distanceBetween(
+  //   //           passenger.locationCoords.latitude,
+  //   //           passenger.locationCoords.longitude,
+  //   //           currentLocation.latitude,
+  //   //           currentLocation.longitude)
+  //   //       .then((distance) {
+  //   //     bool passengerNear= distance < 300;
+  //   //     if (passengerNear) {
+  //   //       streamingLocation.pause();
+  //   //       _realtimeDB.updateChild(
+  //   //           'clax-requests/${passenger.requestId}', {"status": "arrived"});
+  //   //       showWaitPassenger(passenger);
+  //   //     }
+  //   //     return passengerNear;
+  //   //   });
+  //   // });
+  // }
+
+  void showWaitPassenger(passenger) async {
+    // show the dialog
+    await showDialog(
+      useRootNavigator: false,
+      barrierDismissible: false,
+      context: scaffoldKey.currentContext,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.transparent,
+          title: Container(
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(5), topRight: Radius.circular(5))),
+            padding: EdgeInsets.only(top: 20, right: 15, left: 15, bottom: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  "رجاءاً انتظر حتى يصعد الراكب",
+                  style: Theme.of(scaffoldKey.currentContext)
+                      .textTheme
+                      .bodyText1
+                      .copyWith(fontWeight: FontWeight.values[5]),
+                ),
+              ],
+            ),
+          ),
+          buttonPadding: EdgeInsets.all(0),
+          actionsPadding: EdgeInsets.all(0),
+          titlePadding: EdgeInsets.all(0),
+          contentPadding: EdgeInsets.all(0),
+          content: Container(
+            color: Theme.of(scaffoldKey.currentContext).primaryColor,
+            child: FlatButton(
+                child: Text("حسنا",
+                    style: TextStyle(
+                        color: Theme.of(scaffoldKey.currentContext).accentColor,
+                        fontWeight: FontWeight.bold)),
+                onPressed: () {
+                  // Dismiss the Alert Dialoge Box
+                  Navigator.of(scaffoldKey.currentContext, rootNavigator: false)
+                      .pop();
+                  didPassengerRide(passenger);
+                }),
+          ),
+        );
+      },
+    );
+  }
+
+  void didPassengerRide(PassengerInfo passenger) async {
+    await showDialog(
+      useRootNavigator: false,
+      barrierDismissible: false,
+      context: scaffoldKey.currentContext,
+      builder: (BuildContext context) {
+        Timer time = Timer(Duration(minutes: 1), () {
+          Navigator.of(context, rootNavigator: false).pop();
+        });
+        return AlertDialog(
+          backgroundColor: Colors.transparent,
+          title: Container(
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(5), topRight: Radius.circular(5))),
+            padding: EdgeInsets.only(top: 20, right: 15, left: 15, bottom: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  "هل صعد الراكب بعد ؟",
+                  style: Theme.of(scaffoldKey.currentContext)
+                      .textTheme
+                      .bodyText1
+                      .copyWith(fontWeight: FontWeight.values[5]),
+                ),
+              ],
+            ),
+          ),
+          buttonPadding: EdgeInsets.all(0),
+          actionsPadding: EdgeInsets.all(0),
+          titlePadding: EdgeInsets.all(0),
+          contentPadding: EdgeInsets.all(0),
+          content: Container(
+              color: Theme.of(scaffoldKey.currentContext).primaryColor,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  FlatButton(
+                      child: Text("نعم",
+                          style: TextStyle(
+                              color: Theme.of(scaffoldKey.currentContext)
+                                  .accentColor,
+                              fontWeight: FontWeight.bold)),
+                      onPressed: () {
+                        time.cancel();
+                        _realtimeDB.updateChild(
+                            "clax-requests/${passenger.requestId}",
+                            {'status': 'done'});
+                        _realtimeDB.cancelReadAsync(passenger.requestId);
+                        Provider.of<PaymentProvider>(scaffoldKey.currentContext,
+                                listen: false)
+                            .updateCurrentTrip(passenger.seats);
+                        removePassenger(passenger.requestId);
+                        waitingPassenger = false;
+                        // Dismiss the Alert Dialoge Box
+                        Navigator.of(scaffoldKey.currentContext,
+                                rootNavigator: false)
+                            .pop();
+                      }),
+                  FlatButton(
+                      child: Text("لا ارى الراكب",
+                          style: TextStyle(
+                              color: Colors.red, fontWeight: FontWeight.bold)),
+                      onPressed: () {
+                        time.cancel();
+                        _realtimeDB.updateChild(
+                            "clax-requests/${passenger.requestId}",
+                            {'status': 'passenger_cancelled'});
+                        _realtimeDB.cancelReadAsync(
+                            "clax-requests/${passenger.requestId}");
+                        Provider.of<PaymentProvider>(scaffoldKey.currentContext,
+                                listen: false)
+                            .updateCurrentTrip(passenger.seats);
+                        removePassenger(passenger.requestId);
+                        waitingPassenger = false;
+                        // Dismiss the Alert Dialoge Box
+                        Navigator.of(scaffoldKey.currentContext,
+                                rootNavigator: false)
+                            .pop();
+                      })
+                ],
+              )),
+        );
+      },
+    );
+  }
+
   Future navigatorToDriver() async {
     Position position = await Geolocator().getCurrentPosition();
-
     controller.moveCamera(CameraUpdate.newLatLng(
         LatLng.fromJson([position.latitude, position.longitude])));
   }

@@ -68,7 +68,7 @@ class _PassengersInfoState extends State<PassengersInfo> {
                   child:
                       Center(child: NullContent(things: "ركاب", vPadding: 10)))
               : Container(
-                  color: Theme.of(context).scaffoldBackgroundColor,
+                  color: Colors.white,
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -78,9 +78,9 @@ class _PassengersInfoState extends State<PassengersInfo> {
                               .map((e) => Row(
                                     children: <Widget>[
                                       Icon(Icons.location_on,
-                                          color: Colors.grey[350]),
+                                          color: Colors.red),
                                       SizedBox(width: 4),
-                                      Text(e.locationName)
+                                      Text(e.locationName.split(',')[1])
                                     ],
                                   ))
                               .toList(),
@@ -114,13 +114,9 @@ class _PassengersInfoState extends State<PassengersInfo> {
                                     return Column(
                                         children: snapshot.data
                                             .map(
-                                              (e) => Text(
-                                                  e > 1000
-                                                      ? '${e / 1000} كم'
-                                                      : '$e م',
-                                                  style: TextStyle(
-                                                      fontFamily:
-                                                          'Product Sans')),
+                                              (e) => Text(e > 1000
+                                                  ? '${e / 1000} كم'
+                                                  : '$e م'),
                                             )
                                             .toList());
                               }

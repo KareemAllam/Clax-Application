@@ -20,7 +20,7 @@ class _TripEndedState extends State<TripEnded> {
 
   void endTrip() {
     // Return to StartTrip
-    Navigator.of(context).pop();
+    Navigator.of(context, rootNavigator: false).pop();
     // Navigator.of(context).pushReplacementNamed(StartTrip.routeName);
   }
 

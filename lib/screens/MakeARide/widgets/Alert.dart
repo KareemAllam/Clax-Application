@@ -26,28 +26,28 @@ showNotification(BuildContext context, String title, String subtitle,
             color: Colors.grey[350],
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(title,
-                        style:
-                            Theme.of(context).textTheme.subtitle2.copyWith()),
-                    Text(subtitle,
-                        style: Theme.of(context)
-                            .textTheme
-                            .caption
-                            .copyWith(color: Colors.black45))
-                  ],
-                ),
-                trailing ??
-                    Image.asset(
-                      'assets/images/logo.png',
-                      height: 40,
-                    )
-              ]),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(title,
+                      style: Theme.of(context).textTheme.subtitle2.copyWith()),
+                  trailing ??
+                      Image.asset(
+                        'assets/images/logo.png',
+                        height: 40,
+                      )
+                ],
+              ),
+              Text(subtitle,
+                  style: Theme.of(context)
+                      .textTheme
+                      .caption
+                      .copyWith(color: Colors.black45))
+            ],
+          ),
         ),
       ),
     ),
@@ -62,10 +62,12 @@ Future<bool> showRequestDialog(BuildContext context, Map message) {
   String requestId = message['data']['request'];
 
   // Timeout
+  // TODO: RequestId not lineId/RequestId
+  // notification "request" -> "5e71650f4b168835e419a6df/5f3856631b256a00444a7f58"
   Timer time = Timer.periodic(Duration(seconds: 10), (Timer timer) {
     FirebaseDatabase.instance
         .reference()
-        .child("clax-requests/$lineId/$requestId")
+        .child("clax-requests/$requestId")
         .update({"status": "refused"});
     Navigator.of(context).pop();
     timer.cancel();
@@ -79,7 +81,7 @@ Future<bool> showRequestDialog(BuildContext context, Map message) {
       time.cancel();
       FirebaseDatabase.instance
           .reference()
-          .child("clax-requests/$lineId/$requestId")
+          .child("clax-requests/$requestId")
           .update({"status": "idle"});
       Navigator.of(context).pop();
     },
@@ -92,8 +94,8 @@ Future<bool> showRequestDialog(BuildContext context, Map message) {
       time.cancel();
       FirebaseDatabase.instance
           .reference()
-          .child("clax-requests/$lineId/$requestId")
-          .update({"status": "pending_passenger", "tourId": tourId});
+          .child("clax-requests/$requestId")
+          .update({"status": "pending_passenger", "_tour": tourId});
       Provider.of<TrackingProvider>(context, listen: false)
           .trackPassengerRequest(lineId, requestId, message);
       Navigator.of(context).pop();
@@ -111,12 +113,12 @@ Future<bool> showRequestDialog(BuildContext context, Map message) {
               topLeft: Radius.circular(5), topRight: Radius.circular(5))),
       padding: EdgeInsets.only(top: 15, right: 15, left: 15, bottom: 20),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Row(
-                mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Transform.rotate(
                     angle: 45,
@@ -124,53 +126,46 @@ Future<bool> showRequestDialog(BuildContext context, Map message) {
                         color: Color(0xffd6a57c), size: 20),
                   ),
                   SizedBox(width: 8),
-                  Text(
-                    message['notification']["title"],
-                    style: Theme.of(context).textTheme.bodyText2.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).primaryColor),
-                  )
+                  Text(message['notification']["title"],
+                      style: Theme.of(context).textTheme.bodyText2.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor)),
                 ],
               ),
-              Text(message['notification']["body"],
-                  style: Theme.of(context).textTheme.caption),
-              Divider(color: Colors.grey[350], height: 8),
-              SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              CustomCircleIndicator(10)
+            ],
+          ),
+          Text(message['notification']["body"],
+              style: Theme.of(context).textTheme.caption),
+          SizedBox(height: 8),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text("مكان الانتظار:",
-                              style: Theme.of(context).textTheme.caption),
-                          Text("عدد الركاب:",
-                              style: Theme.of(context).textTheme.caption),
-                        ],
-                      ),
-                      SizedBox(width: 8),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(message["data"]['station_name'],
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .caption
-                                  .copyWith(color: Colors.black87)),
-                          Text(message["data"]['seats'],
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .caption
-                                  .copyWith(color: Colors.black87)),
-                        ],
-                      )
-                    ],
-                  ),
-                  CustomCircleIndicator(10)
+                  Text("مكان الانتظار:",
+                      style: Theme.of(context).textTheme.caption),
+                  Text("عدد الركاب:",
+                      style: Theme.of(context).textTheme.caption),
+                ],
+              ),
+              SizedBox(width: 8),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                      (message["data"]['station_name'] as String).split(",")[1],
+                      style: Theme.of(context)
+                          .textTheme
+                          .caption
+                          .copyWith(color: Colors.black87)),
+                  Text(message["data"]['seats'],
+                      style: Theme.of(context)
+                          .textTheme
+                          .caption
+                          .copyWith(color: Colors.black87)),
                 ],
               )
             ],

@@ -13,6 +13,7 @@ import 'package:clax/screens/Authentication.dart';
 import 'package:clax/screens/Login/Register.dart';
 import 'package:clax/screens/Login/Register2.dart';
 import 'package:clax/screens/Login/resetPassword.dart';
+import 'package:clax/screens/Login/ForgetVerification.dart';
 import 'package:clax/screens/Login/ForgotPassword.dart';
 // UI
 import 'package:clax/commonUI.dart';
@@ -52,6 +53,8 @@ class MyApp extends StatelessWidget {
             RegisterForm2.routeName: (BuildContext context) => RegisterForm2(),
             ForgetPass.routeName: (BuildContext context) => ForgetPass(),
             ResetPass.routeName: (BuildContext context) => ResetPass(),
+            ForgetVerification.routeName: (BuildContext context) =>
+                ForgetVerification(),
             ClaxRoot.routeName: (BuildContext context) => ClaxRoot(),
           },
           debugShowCheckedModeBanner: false,

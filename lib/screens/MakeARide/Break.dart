@@ -9,8 +9,8 @@ import 'package:clax/providers/Profile.dart';
 import 'package:clax/screens/Login/Verification.dart';
 
 class TakeABreak extends StatefulWidget {
-  final Function changeState;
-  TakeABreak(this.changeState);
+  final Function authenticatedUser;
+  TakeABreak(this.authenticatedUser);
   @override
   _TakeABreakState createState() => _TakeABreakState();
 }
@@ -27,7 +27,7 @@ class _TakeABreakState extends State<TakeABreak> {
                   .profile
                   .phoneVerified;
           if (phoneVerified)
-            widget.changeState(true);
+            widget.authenticatedUser(true);
           else
             Scaffold.of(context).showSnackBar(SnackBar(
                 backgroundColor: Theme.of(context).primaryColor,

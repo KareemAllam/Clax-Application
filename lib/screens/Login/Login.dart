@@ -43,7 +43,7 @@ class LoginState extends State<Login> {
     super.dispose();
   }
 
-  Future<String> submitform(firebaseToken) async {
+  Future<String> submitform(String firebaseToken) async {
     setState(() {
       _loading = true;
     });
@@ -52,7 +52,7 @@ class LoginState extends State<Login> {
       Map<String, String> body = {
         "phone": _usernameController.text.trim(),
         "pass": _passwordController.text,
-        "firebaseId": firebaseToken
+        "fireBaseId": firebaseToken
       };
 
       Response response = await Api.post('drivers/login', body);

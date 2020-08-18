@@ -15,9 +15,9 @@ class NotificationHandler {
     String type = message['data']['type'];
     switch (type) {
       case "tripRequest":
-        bool working =
-            Provider.of<TripSettingsProvider>(context, listen: false).working;
-        if (working) {
+        bool canWork =
+            Provider.of<TripSettingsProvider>(context, listen: false).canWork;
+        if (canWork) {
           int currentSeats =
               Provider.of<TripSettingsProvider>(context, listen: false)
                   .currnetSeats;
