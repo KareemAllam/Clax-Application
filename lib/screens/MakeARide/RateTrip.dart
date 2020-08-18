@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 // Models
 import 'package:clax/models/Trip.dart';
-import 'package:clax/models/Bill.dart';
 import 'package:clax/models/CurrentTrip.dart';
 // Providers
 import 'package:clax/providers/Trips.dart';
@@ -46,15 +45,13 @@ class _RateTripState extends State<RateTrip> {
         Provider.of<CurrentTripProvider>(context, listen: false)
             .currentTripInfo;
 
-    // Adjusting Payment History
-    BillModel bill = BillModel(
-        amount: tripInfo.finalCost,
-        date: DateTime.now(),
-        type: "Pay",
-        description: tripInfo.lineName);
-    await Provider.of<PaymentProvider>(context, listen: false).add(bill);
-    // Set App State to Idle
-    Provider.of<CurrentTripProvider>(context, listen: false).clearTripInfo();
+    // // Adjusting Payment History
+    // BillModel bill = BillModel(
+    //     amount: tripInfo.finalCost,
+    //     date: DateTime.now(),
+    //     type: "Pay",
+    //     description: tripInfo.lineName);
+    // await Provider.of<PaymentProvider>(context, listen: false).add(bill);
 
     // Adjusting Trips History
     Trip _trip = Trip(
@@ -71,25 +68,23 @@ class _RateTripState extends State<RateTrip> {
           'clax-requests/${tripInfo.lindId}/${tripInfo.requestId}',
           {"feedback": _description.text, "rate": driverRate});
 
-    // Add Tripto Cache
+    // Add Trip to Cache
     await Provider.of<TripsProvider>(context, listen: false).addTrip(_trip);
 
     // Adjusting Payment Balance
     if (tripInfo.onlinePayment)
-      Provider.of<PaymentProvider>(context, listen: false).setBalance =
-          -tripInfo.finalCost;
+      Provider.of<PaymentProvider>(context, listen: false)
+          .updateBalance(-tripInfo.finalCost);
 
     // Clear Trip State
     await Provider.of<CurrentTripProvider>(context, listen: false)
-        .clearTripInfo();
+        .cancelSearchingTrip();
 
     // Return to Main Screen
-    if (userSubmitted) {
-      Navigator.of(context).popUntil((route) {
-        if (route.settings.name == LandingPage.routeName) return true;
-        return false;
-      });
-    }
+    Navigator.of(context, rootNavigator: false).popUntil((route) {
+      if (route.settings.name == LandingPage.routeName) return true;
+      return false;
+    });
   }
 
   void didChangeDependencies() {

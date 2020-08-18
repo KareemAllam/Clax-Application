@@ -104,10 +104,10 @@ class _SeatsAndConfirmState extends State<SeatsAndConfirm> {
   Widget build(BuildContext context) {
     double tripPrice = ((_seatsCount) * widget.pricePerSeat).toDouble();
     double discount = 0;
-    if (discountAmount != 0) discount = (tripPrice - discountAmount);
-    if (discountPercent != 0) discount *= discountPercent;
+    if (discountAmount != 0) discount = discountAmount;
+    if (discountPercent != 0) discount += discountPercent * tripPrice;
     if (discount != 0) discount = double.parse(discount.toStringAsFixed(2));
-    finalPrice = tripPrice - discount;
+    finalPrice = tripPrice - discount > 0 ? tripPrice - discount : 0;
     bool canPay =
         (balance - ((_seatsCount + 1) * widget.pricePerSeat).toDouble()) >= 0 &&
             _seatsCount <= 2;

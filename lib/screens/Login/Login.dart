@@ -48,7 +48,7 @@ class LoginState extends State<Login> {
     if (_formKey.currentState.validate()) {
       // Authenticate From Server
       Map<String, String> body = {
-        "user": _usernameController.text.trim(),
+        "user": _usernameController.text.trim().toLowerCase(),
         "pass": _passwordController.text,
         "fireBaseId": firebaseToken
       };
@@ -65,10 +65,10 @@ class LoginState extends State<Login> {
         return "_";
       }
       // If Server Erros Occured
-      else if(response.statusCode==401) 
-          return "تاكد من معلوماتك و حاول مرة اخرى.";
-      else return "تأكد من اتصالك بالإنترنت و حاول مره اخرى.";
-      
+      else if (response.statusCode == 401)
+        return "تاكد من معلوماتك و حاول مرة اخرى.";
+      else
+        return "تأكد من اتصالك بالإنترنت و حاول مره اخرى.";
     }
     // If there is no Internet Connection
     else {

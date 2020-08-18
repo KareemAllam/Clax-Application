@@ -10,7 +10,7 @@ class DriverArrivedInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Timer time =
-        Timer(Duration(seconds: 5), () => Navigator.of(context).pop(true));
+        Timer(Duration(seconds: 10), () => Navigator.of(context).pop(true));
     // Buttons Setup
     Widget cancelButton = FlatButton(
         child: Text("الغاء",

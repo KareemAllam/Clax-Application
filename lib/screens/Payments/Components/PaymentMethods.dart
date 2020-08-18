@@ -1,5 +1,7 @@
 // Dart & Other Packages
 import 'dart:convert';
+import 'package:clax/providers/Profile.dart';
+import 'package:clax/utils/password.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 // Flutter's Material Components
@@ -33,7 +35,8 @@ class PaymentPopup extends StatefulWidget {
 }
 
 class _PaymentPopupState extends State<PaymentPopup> {
-  TextEditingController amount = TextEditingController();
+  TextEditingController amountController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
   bool loading = false;
   List error = [false, ""];
 
@@ -42,16 +45,29 @@ class _PaymentPopupState extends State<PaymentPopup> {
       loading = true;
       error[0] = false;
     });
-    if (amount.text.length == 0) {
+    if (amountController.text.length == 0) {
       setState(() {
         loading = false;
         error = [true, "رجاءً تأكد من معلوماتك و حاول مره اخرى"];
       });
       return false;
-    } else {
+    } else if (passwordController.text.length == 0) {
+      setState(() {
+        loading = false;
+        error = [true, "رجاءا، ادخل كلمة المرور الخاصة بك"];
+      });
+      return false;
+    }
+
+    String passHashed = Provider.of<ProfilesProvider>(context, listen: false)
+        .profile
+        .passHashed;
+    bool passwordValidated =
+        verifyPassword(passwordController.text, passHashed);
+    if (passwordValidated) {
       ServerResponse result =
           await Provider.of<PaymentProvider>(context, listen: false)
-              .chargeCredit(id, amount.text);
+              .chargeCredit(id, amountController.text);
       if (result.status) {
         BillModel bill = BillModel.fromJson(json.decode(result.message));
         Provider.of<PaymentProvider>(context, listen: false).add(bill);
@@ -67,6 +83,12 @@ class _PaymentPopupState extends State<PaymentPopup> {
         });
         return false;
       }
+    } else {
+      setState(() {
+        loading = false;
+        error = [true, "كلمة المرور غير صحيح"];
+      });
+      return false;
     }
   }
 
@@ -75,7 +97,7 @@ class _PaymentPopupState extends State<PaymentPopup> {
       loading = true;
       error = [false];
     });
-    if (amount.text.length == 0) {
+    if (amountController.text.length == 0) {
       setState(() {
         loading = false;
         error = [
@@ -83,7 +105,21 @@ class _PaymentPopupState extends State<PaymentPopup> {
         ];
       });
       return "error";
-    } else {
+    } else if (passwordController.text.length == 0) {
+      setState(() {
+        loading = false;
+        error = [true, "رجاءا، ادخل كلمة المرور الخاصة بك"];
+      });
+      return false;
+    }
+
+    String passHashed = Provider.of<ProfilesProvider>(context, listen: false)
+        .profile
+        .passHashed;
+    bool passwordValidated =
+        verifyPassword(passwordController.text, passHashed);
+
+    if (passwordValidated) {
       //Api request
       setState(() {
         error = [false, "رجاءً تأكد من معلوماتك و حاول مره اخرى"];
@@ -91,7 +127,7 @@ class _PaymentPopupState extends State<PaymentPopup> {
       });
       ServerResponse result =
           await Provider.of<PaymentProvider>(context, listen: false)
-              .chargePaypal(amount.text);
+              .chargePaypal(amountController.text);
       if (result.status) {
         setState(() {
           loading = false;
@@ -104,12 +140,19 @@ class _PaymentPopupState extends State<PaymentPopup> {
           error = [true, result.message];
         });
       }
+    } else {
+      setState(() {
+        loading = false;
+        error = [true, "كلمة المرور غير صحيح"];
+      });
+      return false;
     }
   }
 
   void dispose() {
     super.dispose();
-    amount.dispose();
+    amountController.dispose();
+    passwordController.dispose();
   }
 
   @override
@@ -118,74 +161,77 @@ class _PaymentPopupState extends State<PaymentPopup> {
         backgroundColor: Colors.transparent,
         contentPadding: EdgeInsets.all(0),
         titlePadding: EdgeInsets.all(0),
-        // title: Container(
-        //     padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        //     decoration: BoxDecoration(
-        //         // color: Theme.of(context).primaryColor,
-        //         color: Colors.white,
-        //         borderRadius: BorderRadius.only(
-        //           topLeft: Radius.circular(20),
-        //           topRight: Radius.circular(20),
-        //         )),
-        //     child: Text(
-        //       "حدد المبلغ المناسب:",
-        //       style: Theme.of(context)
-        //           .textTheme
-        //           .bodyText2
-        //           .copyWith(color: Colors.black87),
-        //     )),
         content: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
           Container(
-              child: Column(children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Expanded(
-                      child: TextField(
-                          controller: amount,
-                          cursorColor: Theme.of(context).primaryColor,
-                          style: Theme.of(context).textTheme.bodyText1.copyWith(
-                              fontFamily: "Product Sans",
-                              fontWeight: FontWeight.bold),
-                          decoration: InputDecoration(
-                              hintText: "25",
-                              hintStyle: Theme.of(context)
-                                  .textTheme
-                                  .bodyText2
-                                  .copyWith(
-                                      fontFamily: 'Product Sans',
-                                      color: Colors.grey),
-                              border: InputBorder.none,
-                              icon: Icon(
-                                Icons.add,
-                              )),
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            WhitelistingTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(3)
-                          ]),
-                    ),
-                    Expanded(
-                        child: Text("جنية مصري",
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context)
+            child: Column(children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Expanded(
+                    child: TextField(
+                        controller: amountController,
+                        cursorColor: Theme.of(context).primaryColor,
+                        style: Theme.of(context).textTheme.bodyText1.copyWith(
+                            fontFamily: "Product Sans",
+                            fontWeight: FontWeight.bold),
+                        decoration: InputDecoration(
+                            hintText: "25",
+                            hintStyle: Theme.of(context)
                                 .textTheme
                                 .bodyText2
-                                .copyWith(color: Colors.grey)))
-                  ],
-                ),
-              ]),
-              padding: EdgeInsets.symmetric(
-                vertical: 20,
-                horizontal: 20,
+                                .copyWith(
+                                    fontFamily: 'Product Sans',
+                                    color: Colors.grey),
+                            border: InputBorder.none,
+                            icon: Icon(
+                              Icons.add,
+                            )),
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          WhitelistingTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(3)
+                        ]),
+                  ),
+                  Expanded(
+                      child: Text("جنية مصري",
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyText2
+                              .copyWith(color: Colors.grey)))
+                ],
               ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-                color: Colors.white,
-              )),
+              TextField(
+                obscureText: true,
+                controller: passwordController,
+                cursorColor: Theme.of(context).primaryColor,
+                style: Theme.of(context).textTheme.bodyText1.copyWith(
+                    fontFamily: "Product Sans", fontWeight: FontWeight.bold),
+                decoration: InputDecoration(
+                    hintText: "ادخل كلمة المرور",
+                    hintStyle: Theme.of(context)
+                        .textTheme
+                        .bodyText2
+                        .copyWith(color: Colors.grey),
+                    border: InputBorder.none,
+                    icon: Icon(
+                      Icons.lock,
+                    )),
+                keyboardType: TextInputType.text,
+              )
+            ]),
+            padding: EdgeInsets.symmetric(
+              vertical: 10,
+              horizontal: 20,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+              color: Colors.white,
+            ),
+          ),
           GestureDetector(
             onTap: () async {
               FocusScope.of(context).unfocus();
@@ -204,7 +250,7 @@ class _PaymentPopupState extends State<PaymentPopup> {
                   Navigator.of(context).pushNamed(PaypalWeb.routeName,
                       arguments: {
                         'url': result,
-                        'amount': double.parse(amount.text)
+                        'amount': double.parse(amountController.text)
                       });
                 }
               }

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:clax/models/Bill.dart';
 import 'package:clax/models/Error.dart';
 import 'package:clax/providers/Payment.dart';
-import 'package:clax/screens/Payments/widgets/Confirmation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';

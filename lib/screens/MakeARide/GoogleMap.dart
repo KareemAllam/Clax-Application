@@ -144,13 +144,15 @@ class _MapPageState extends State<MapPage> {
               circles: map.circles,
               polylines: map.polylines,
               markers: map.markers.values.toSet(),
-              cameraTargetBounds: CameraTargetBounds(LatLngBounds(
-                  southwest: LatLng(25.78847, 25.00192),
-                  northeast: LatLng(40.78847, 40.00192))),
-              minMaxZoomPreference: MinMaxZoomPreference(7, 25),
+              cameraTargetBounds: CameraTargetBounds(
+                LatLngBounds(
+                    southwest: LatLng(25.78847, 25.00192),
+                    northeast: LatLng(40.78847, 40.00192)),
+              ),
+              minMaxZoomPreference: MinMaxZoomPreference(12, 25),
               initialCameraPosition: CameraPosition(
                   target: map.coordinates ?? LatLng(31.5812, 30.50037),
-                  zoom: 12),
+                  zoom: 14),
               onMapCreated: (GoogleMapController controller) {
                 createPolyLine(controller);
                 map.controller.complete(controller);

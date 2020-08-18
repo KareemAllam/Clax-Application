@@ -112,6 +112,18 @@ class MapProvider extends ChangeNotifier {
         placemarks[0].administrativeArea;
     _userLocation['position'] = pickupLocation;
 
+    // Update the only marker
+    Marker marker = Marker(
+      markerId: MarkerId(_userId),
+      position: pickupLocation,
+      infoWindow: InfoWindow(
+        title: "مكان الركوب",
+        snippet:
+            "Lat: ${pickupLocation.latitude}, Long: ${pickupLocation.longitude}",
+      ),
+    );
+    _markers[_userId] = marker;
+
     notifyListeners();
     enableStreamingDriverLocation();
   }
@@ -341,17 +353,15 @@ class MapProvider extends ChangeNotifier {
             listen: false)
         .currentTripInfo
         .requestId;
-
+    _realtimeDB.updateChild(
+        'clax-requests/$_lineId/$requestId', {'status': "arrived"});
     Timer time = Timer(Duration(seconds: 60), () {
       // Stop Trip State
       // Change request State
       _realtimeDB.updateChild('clax-requests/$_lineId/$requestId',
           {'status': "passenger_cancelled"});
-      Navigator.of(scaffoldKey.currentContext).pop();
+      Navigator.of(scaffoldKey.currentContext, rootNavigator: false).pop();
       // Clear Trip State
-      Provider.of<CurrentTripProvider>(scaffoldKey.currentContext,
-              listen: false)
-          .clearTripInfo();
 
       // Return to Main Screen
       Navigator.of(scaffoldKey.currentContext).popUntil((route) {
@@ -366,7 +376,8 @@ class MapProvider extends ChangeNotifier {
           .currentTripInfo
           .finalCost;
       Provider.of<PaymentProvider>(scaffoldKey.currentContext, listen: false)
-          .setBalance = -finalPrice;
+          .updateBalance(finalPrice);
+
       // Add Bill
       Provider.of<PaymentProvider>(scaffoldKey.currentContext, listen: false)
           .add(BillModel(
@@ -378,12 +389,13 @@ class MapProvider extends ChangeNotifier {
       disableStreamingDriverLocation();
       Provider.of<CurrentTripProvider>(scaffoldKey.currentContext,
               listen: false)
-          .cancelTripRequest();
+          .cancelOngoingTripRequest();
+
       showDialog(
         useRootNavigator: false,
         context: scaffoldKey.currentContext,
         builder: (context) => AlertDialog(
-          elevation: 1,
+          elevation: 0,
           backgroundColor: Colors.transparent,
           title: GestureDetector(
             onTap: Navigator.of(scaffoldKey.currentContext).pop,
@@ -447,7 +459,7 @@ class MapProvider extends ChangeNotifier {
         // Clear Trip State
         Provider.of<CurrentTripProvider>(scaffoldKey.currentContext,
                 listen: false)
-            .clearTripInfo();
+            .cancelOngoingTripRequest();
 
         // Return to Main Screen
         Navigator.of(scaffoldKey.currentContext).popUntil((route) {
@@ -458,7 +470,7 @@ class MapProvider extends ChangeNotifier {
           useRootNavigator: false,
           context: scaffoldKey.currentContext,
           builder: (context) => AlertDialog(
-            elevation: 1,
+            elevation: 0,
             backgroundColor: Colors.transparent,
             title: GestureDetector(
               onTap: Navigator.of(scaffoldKey.currentContext).pop,
@@ -555,8 +567,7 @@ class MapProvider extends ChangeNotifier {
       onPressed: () {
         // Dismiss the Alert Dialoge Box
         Navigator.of(scaffoldKey.currentContext).pop();
-        Navigator.of(scaffoldKey.currentContext)
-            .pushReplacementNamed(RateTrip.routeName);
+        Navigator.of(scaffoldKey.currentContext).pushNamed(RateTrip.routeName);
       },
     );
 
@@ -622,7 +633,7 @@ class MapProvider extends ChangeNotifier {
         .currentTripInfo
         .finalCost;
     Provider.of<PaymentProvider>(scaffoldKey.currentContext, listen: false)
-        .setBalance = -finalPrice;
+        .updateBalance(finalPrice);
     // Add Bill
     Provider.of<PaymentProvider>(scaffoldKey.currentContext, listen: false).add(
         BillModel(
@@ -633,7 +644,7 @@ class MapProvider extends ChangeNotifier {
     // Stop Ongoing State
     disableStreamingDriverLocation();
     Provider.of<CurrentTripProvider>(scaffoldKey.currentContext, listen: false)
-        .cancelTripRequest();
+        .cancelOngoingTripRequest();
   }
 
   // Getters

@@ -62,8 +62,15 @@ class CurrentTripProvider extends ChangeNotifier {
     }
   }
 
-  Future clearTripInfo() async {
+  Future cancelSearchingTrip({bool stopListening = false}) async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
+
+    if (stopListening) {
+      String lineId = currentTripInfo.lindId;
+      String requestId = currentTripInfo.requestId;
+      db.updateChild('clax-requests/$lineId/$requestId', {"status": "cancel"});
+      db.cancelReadAsync('clax-requests/$lineId/$requestId');
+    }
     currentTripInfo = null;
     currentDriverInfo = null;
     _prefs.remove("tripInfo");
@@ -72,15 +79,18 @@ class CurrentTripProvider extends ChangeNotifier {
   }
 
   /// Cancel a trip request recently made.
-  Future cancelTripRequest() async {
+  Future cancelOngoingTripRequest() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     String lineId = currentTripInfo.lindId;
     String requestId = currentTripInfo.requestId;
     // Listing to changes on RequestId
-    db.updateChild('clax-requests/$lineId/$requestId', {"status": "cancel"});
+    db.updateChild(
+        'clax-requests/$lineId/$requestId', {"status": "passenger_cancelled"});
     db.cancelReadAsync('clax-requests/$lineId/$requestId');
     currentTripInfo = null;
+    currentDriverInfo = null;
     _prefs.remove("tripInfo");
+    _prefs.remove("driverInfo");
     notifyListeners();
   }
 
@@ -143,13 +153,14 @@ class CurrentTripProvider extends ChangeNotifier {
     print('clax-requests/$lineId/$requestId');
     db.readAsync('clax-requests/$lineId/$requestId', (value) async {
       if (value == null) {
-        clearTripInfo();
+        cancelSearchingTrip();
         db.cancelReadAsync('clax-requests/$lineId/$requestId');
       }
-      // print(value);
+      //-------------------------
       // No Driver has accepted the request
-      else if (value['status'] == "cancel") {
-        cancelTripRequest();
+      else if (value['status'] == "refused") {
+        db.cancelReadAsync('clax-requests/$lineId/$requestId');
+        cancelSearchingTrip();
         showDialog(
           context: scaffoldKey.currentContext,
           builder: (context) => AlertDialog(
@@ -202,62 +213,10 @@ class CurrentTripProvider extends ChangeNotifier {
                 )),
           ),
         );
-      } else if (value['status'] == "refused") {
-        cancelTripRequest();
-        // TODO: Show notificaion
-        showDialog(
-          context: scaffoldKey.currentContext,
-          builder: (context) => AlertDialog(
-            backgroundColor: Colors.transparent,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5),
-            ),
-            titlePadding: EdgeInsets.all(0),
-            contentPadding: EdgeInsets.all(0),
-            title: Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(5),
-                      topRight: Radius.circular(5))),
-              padding:
-                  EdgeInsets.only(top: 20, right: 15, left: 15, bottom: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "لا يوجد سائق متاح ف حالياً",
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText1
-                        .copyWith(fontWeight: FontWeight.values[5]),
-                  ),
-                  SizedBox(height: 2),
-                  Text("حاول مره اخرى في وقت لاحق",
-                      style: Theme.of(context).textTheme.caption)
-                ],
-              ),
-            ),
-            content: Container(
-                color: Theme.of(context).primaryColor,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    FlatButton(
-                      child: Text("حسنا",
-                          style: TextStyle(
-                              color: Theme.of(context).accentColor,
-                              fontWeight: FontWeight.bold)),
-                      onPressed: () async {
-                        // Dismiss the Alert Dialoge Box
-                        Navigator.of(context, rootNavigator: true).pop();
-                      },
-                    ),
-                  ],
-                )),
-          ),
-        );
-      } else if (value['status'] == "pending_passenger") {
+      }
+      //-------------------------
+      // Driver accepted his request
+      else if (value['status'] == "pending_passenger") {
         // Driver Information
         Map body = {
           'tourId': value['_tour'],
@@ -285,9 +244,8 @@ class CurrentTripProvider extends ChangeNotifier {
 
         // User Refused the Driver
         if (!answer) {
-          cancelTripRequest();
-          db.updateChild('clax-requests/$lineId/$requestId',
-              {'status': "passenger_cancelled"});
+          db.updateChild(
+              'clax-requests/$lineId/$requestId', {'status': "canceled"});
         }
 
         // User Accepted the Driver
@@ -296,7 +254,7 @@ class CurrentTripProvider extends ChangeNotifier {
           db.updateChild('clax-requests/$lineId/$requestId', {
             'cost': _currentTripInfo.finalCost,
             'expectedTime': distanceInfo['duration']["value"],
-            'status': "confirmed"
+            'status': "waiting"
           });
 
           // Update CurrentTrip with current date

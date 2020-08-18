@@ -291,7 +291,7 @@ class _StartARideState extends State<StartARide> with TickerProviderStateMixin {
           key: _scaffoldKey,
           elevation: 0.0,
           actions: <Widget>[
-            IconButton(
+            if(finalLine==null)IconButton(
                 icon: Icon(Icons.refresh),
                 onPressed: Provider.of<RoutesProvider>(context, listen: false)
                     .fetchDataOnline)

@@ -97,11 +97,17 @@ class _ComplainDetailsState extends State<ComplainDetails> {
                           child: Icon(Icons.error_outline,
                               color: Theme.of(context).primaryColor)),
                       SizedBox(width: 16),
-                      Text('${complain.subject}',
-                          strutStyle: StrutStyle(forceStrutHeight: true),
-                          style: Theme.of(context).textTheme.subtitle2.copyWith(
-                              color: Color(0xff212121),
-                              fontWeight: FontWeight.w700))
+                      Expanded(
+                        child: Text('${complain.subject}',
+                            overflow: TextOverflow.fade,
+                            strutStyle: StrutStyle(forceStrutHeight: true),
+                            style: Theme.of(context)
+                                .textTheme
+                                .subtitle2
+                                .copyWith(
+                                    color: Color(0xff212121),
+                                    fontWeight: FontWeight.w700)),
+                      )
                     ]),
                     SizedBox(height: 10),
                     Row(

@@ -95,7 +95,8 @@ class MemberInvitationCard extends StatelessWidget {
                           String result =
                               await transactions.acceptARequest(transaction.id);
                           if (result != 'Error') {
-                            account.setBalance = -transaction.amount.toDouble();
+                            account
+                                .updateBalance(-transaction.amount.toDouble());
                             BillModel bill =
                                 BillModel.fromJson(json.decode(result));
                             payments.add(bill);

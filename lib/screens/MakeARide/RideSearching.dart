@@ -89,7 +89,7 @@ class _RideSearchingState extends State<RideSearching>
                 FlatButton(
                   onPressed: () {
                     Provider.of<CurrentTripProvider>(context, listen: false)
-                        .cancelTripRequest();
+                        .cancelSearchingTrip(stopListening: true);
                   },
                   child: Text(
                     "الغاء الطلب",

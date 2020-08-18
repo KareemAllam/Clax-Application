@@ -17,7 +17,7 @@ import 'package:clax/utils/Adjustments.dart';
 class PaymentProvider extends ChangeNotifier {
   double _balance = 0.0;
   double discountPercent = 0.0;
-  double discountAmount = 0;
+  double discountAmount = 0.0;
   List<CreditCardModel> _cards = [];
   List<BillModel> _bills = [];
   List<Offer> offers = [];
@@ -131,8 +131,11 @@ class PaymentProvider extends ChangeNotifier {
     }
   }
 
-  set setBalance(double amount) {
+  void updateBalance(double amount) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     _balance += amount;
+    prefs.setDouble('balance', _balance);
+    notifyListeners();
   }
 
   List<CreditCardModel> get cards => _cards;
@@ -282,31 +285,26 @@ class PaymentProvider extends ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Response response = await Api.get('passengers/settings/get-offers');
     if (response.statusCode == 200) {
-      offers = List<Offer>.from(json.decode(response.body).map(
-            (offer) => Offer.fromJson(offer),
-          ));
-
-      bool offerRemoved = false;
-      List<Offer> newOffers = [];
-      offers.forEach((offer) {
-        if (offer.end.isBefore(DateTime.now())) {
-          offerRemoved = true;
-        } else {
-          newOffers.add(offer);
+      if (!response.body.contains("تمتلك")) {
+        offers = List<Offer>.from(json.decode(response.body).map(
+              (offer) => Offer.fromJson(offer),
+            ));
+        offers.removeWhere((offer) => offer.end.isBefore(DateTime.now()));
+        discountPercent = 0;
+        discountAmount = 0;
+        offers.forEach((offer) {
           if (offer.offerType == "Discount")
             discountPercent += offer.value;
           else
             discountAmount += offer.value;
-        }
-      });
-
-      if (offerRemoved) {
-        offers = newOffers;
-        prefs.setString("offers", json.encode(offers));
+        });
+        prefs.setString('offers', json.encode(offers));
+        notifyListeners();
+      } else {
+        offers = [];
+        prefs.setString('offers', json.encode(offers));
+        notifyListeners();
       }
-
-      prefs.setString('offers', json.encode(offers));
-      notifyListeners();
       return ServerResponse(status: true);
     } else
       return ServerResponse(
