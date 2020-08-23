@@ -1,5 +1,5 @@
-# Clax-Application
-WIP: Clax Mobile Application using Flutter 
+# Authentication Model
+Authenticaion including Login, Registeration and Verification.
 
 ## Clax Application Structure:
 - **screens Folder:** Screens
@@ -7,5 +7,3 @@ WIP: Clax Mobile Application using Flutter
 - **models Folder:** Data Type Identifications, Schemas
 - **utils Folder:** Functions
 - **services Folder:** API Communications
-
-_Examples are included in each folder._
