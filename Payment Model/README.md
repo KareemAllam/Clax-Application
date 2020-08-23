@@ -1,6 +1,9 @@
 # Payment Model
-added Payment Feature using Paypal, Credit Card.
-added Credit Card information adding.
+Payment Feature using Paypal, Credit Card.
 
-//todo list
-add api requests to Transfer Money, Complains and Credit Card Charge 
+## Application Structure:
+- **screens Folder:** Screens
+- **widgets Folder:** Buttons, Alerts ... etc
+- **models Folder:** Data Type Identifications, Schemas
+- **utils Folder:** Functions
+- **services Folder:** API Communications
