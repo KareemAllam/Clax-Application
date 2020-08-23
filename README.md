@@ -1,18 +1,26 @@
 # Clax for Passengers
 
-Application made for public transporters, allowing them to communicate with public microbus drivers for a faster delivery of service.
+  Made for public transporters, the app eases the communication with public microbus drivers for a faster reservation of ongoing rides.
 
 <p align="center">
   <img src="https://i.imgur.com/DZSnCUa.png" />
 </p>
 
-## Features
-// Later Discussed
+## Prerequisites
+1. Dart
+2. Flutter
+3. Android SDK
+4. Your preferred editior. (VsCode / Android Studio)
 
-## Questions/issues
+## Installation
+1. Navigate to pubspec.yaml and run the package installer.
+2. Run the project:
+```dart
+flutter run
+```
 
+## Authors
 If you have a general question about the app, refer to us anytime using one the links below:
 - [Kareem Allam](https://github.com/KareemAllam)
 - [Asmaa Ghodia](https://github.com/AsmaaMghodia)
 - [Hagar Alaa Eldeen](https://github.com/HagarAlaaEldeen)
-
