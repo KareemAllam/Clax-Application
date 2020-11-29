@@ -24,3 +24,9 @@ If you have a general question about the app, refer to us anytime using one the 
 - [Kareem Allam](https://github.com/KareemAllam)
 - [Asmaa Ghodia](https://github.com/AsmaaMghodia)
 - [Hagar Alaa Eldeen](https://github.com/HagarAlaaEldeen)
+
+## Backend API
+https://github.com/raaedserag/Clax
+
+## Demo Video
+https://drive.google.com/file/d/1gEHTx8E57BFEPpzOo3c0QMec7R3dKtHn/view?usp=sharing
